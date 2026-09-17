@@ -1,0 +1,89 @@
+<div class="recipes-container">
+  <header class="header">
+    <h1>Baza Przepisów 📖</h1>
+  </header>
+
+  <div class="recipes-grid" *ngIf="!loading; else loadingTpl">
+    <div *ngIf="recipes.length === 0" class="empty-state">
+      Brak przepisów w bazie. Dodaj swój pierwszy przepis!
+    </div>
+
+    <div *ngFor="let recipe of recipes" class="recipe-card">
+      <div class="recipe-header">
+        <h3>{{ recipe.title }}</h3>
+        <span class="calorie-badge">{{ recipe.calories }} kcal</span>
+      </div>
+
+      <div class="macros-grid">
+        <div class="macro-box protein">
+          <span class="label">Białko</span>
+          <span class="val">{{ recipe.protein }}g</span>
+        </div>
+        <div class="macro-box carbs">
+          <span class="label">Węgle</span>
+          <span class="val">{{ recipe.carbs }}g</span>
+        </div>
+        <div class="macro-box fat">
+          <span class="label">Tłuszcze</span>
+          <span class="val">{{ recipe.fat }}g</span>
+        </div>
+      </div>
+
+      <p *ngIf="recipe.instructions" class="instructions">
+        {{ recipe.instructions }}
+      </p>
+    </div>
+  </div>
+
+  <ng-template #loadingTpl>
+    <div class="loading">Ładowanie przepisów...</div>
+  </ng-template>
+
+  <button (click)="showModal = true" class="btn-fab">+ Nowy przepis</button>
+
+  <!-- Modal tworzenia przepisu -->
+  <div class="modal-backdrop" *ngIf="showModal">
+    <div class="modal">
+      <h2>Dodaj nowy przepis</h2>
+
+      <div class="form-group">
+        <label>Nazwa potrawy</label>
+        <input type="text" [(ngModel)]="title" placeholder="np. Owsianka z borówkami" />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Kalorie (kcal)</label>
+          <input type="number" [(ngModel)]="calories" placeholder="400" />
+        </div>
+        <div class="form-group">
+          <label>Białko (g)</label>
+          <input type="number" [(ngModel)]="protein" placeholder="25" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Węglowodany (g)</label>
+          <input type="number" [(ngModel)]="carbs" placeholder="50" />
+        </div>
+        <div class="form-group">
+          <label>Tłuszcze (g)</label>
+          <input type="number" [(ngModel)]="fat" placeholder="10" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Instrukcja / Sposób przygotowania</label>
+        <textarea [(ngModel)]="instructions" rows="3" placeholder="Krótki opis..."></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button (click)="showModal = false" class="btn-secondary">Anuluj</button>
+        <button (click)="createRecipe()" [disabled]="loading || !title || !calories" class="btn-primary">Zapisz</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-navbar></app-navbar>

@@ -1,0 +1,138 @@
+.meal-plan-container {
+  padding: 20px 16px 80px 16px;
+  max-width: 480px;
+  margin: 0 auto;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
+    h1 {
+      font-size: 1.35rem;
+      font-weight: 700;
+    }
+
+    .date-picker {
+      padding: 8px 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+  }
+
+  .meal-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    border: 1px solid #e2e8f0;
+
+    .meal-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+
+      .type-badge {
+        font-size: 0.75rem;
+        background: #ecfdf5;
+        color: #059669;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-weight: 600;
+      }
+
+      .btn-delete {
+        background: none;
+        border: none;
+        cursor: pointer;
+      }
+    }
+
+    .meal-details {
+      h3 { font-size: 1rem; margin-bottom: 4px; }
+      p { font-size: 0.85rem; color: #64748b; margin-bottom: 8px; }
+
+      .macros {
+        display: flex;
+        gap: 12px;
+        font-size: 0.75rem;
+        color: #0f172a;
+      }
+    }
+  }
+
+  .btn-fab {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    background: #10b981;
+    color: white;
+    border: none;
+    padding: 14px 20px;
+    border-radius: 30px;
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+    cursor: pointer;
+  }
+
+  .modal-backdrop {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    z-index: 2000;
+
+    .modal {
+      background: white;
+      padding: 24px;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 400px;
+
+      h2 { margin-bottom: 16px; font-size: 1.2rem; }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 14px;
+
+        label { font-size: 0.85rem; font-weight: 500; }
+        select, input {
+          padding: 10px;
+          border: 1px solid #e2e8f0;
+          border-radius: 8px;
+        }
+      }
+
+      .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
+
+        button {
+          padding: 10px 16px;
+          border-radius: 8px;
+          border: none;
+          cursor: pointer;
+          font-weight: 600;
+        }
+
+        .btn-secondary { background: #f1f5f9; color: #64748b; }
+        .btn-primary { background: #10b981; color: white; }
+      }
+    }
+  }
+
+  .empty-state, .loading {
+    text-align: center;
+    color: #64748b;
+    padding: 40px 0;
+  }
+}
