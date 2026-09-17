@@ -1,0 +1,116 @@
+.dashboard-container {
+  padding: 20px 16px 80px 16px;
+  max-width: 480px;
+  margin: 0 auto;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
+    h1 {
+      font-size: 1.35rem;
+      font-weight: 700;
+    }
+
+    .user-email {
+      font-size: 0.8rem;
+      color: #64748b;
+    }
+
+    .btn-logout {
+      background: #f1f5f9;
+      border: none;
+      font-size: 1.2rem;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  }
+
+  .card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+  }
+
+  .calorie-card {
+    .calorie-info {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 16px;
+
+      .label {
+        display: block;
+        font-size: 0.8rem;
+        color: #64748b;
+      }
+
+      .value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #0f172a;
+
+        small {
+          font-size: 0.9rem;
+          font-weight: 400;
+          color: #64748b;
+        }
+      }
+    }
+
+    .percentage-text {
+      display: block;
+      margin-top: 8px;
+      font-size: 0.75rem;
+      color: #64748b;
+      text-align: right;
+    }
+  }
+
+  .macro-card {
+    h3 {
+      font-size: 1rem;
+      margin-bottom: 16px;
+    }
+
+    .macro-item {
+      margin-bottom: 12px;
+
+      .macro-header {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin-bottom: 4px;
+      }
+    }
+  }
+
+  .progress-bar-bg {
+    width: 100%;
+    height: 12px;
+    background-color: #f1f5f9;
+    border-radius: 6px;
+    overflow: hidden;
+
+    &.small {
+      height: 8px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background-color: #10b981;
+      border-radius: 6px;
+      transition: width 0.3s ease;
+
+      &.protein { background-color: #ef4444; }
+      &.carbs { background-color: #3b82f6; }
+      &.fat { background-color: #f59e0b; }
+    }
+  }
+}
