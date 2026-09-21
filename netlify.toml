@@ -1,11 +1,19 @@
+# Konfiguracja dla Netlify
+
 [build]
-  # Polecenie do zbudowania aplikacji Angular
-  command = "ng build"
+  # Ustawienie base directory na pusty string, aby nadpisać ewentualne
+  # błędne ustawienia w interfejsie webowym Netlify.
+  base = ""
 
-  # Katalog, w którym znajdują się gotowe pliki aplikacji po zbudowaniu
-  # Dla nowszych wersji Angulara z SSR jest to zazwyczaj 'dist/nazwa-projektu/browser'
-  publish = "dist/meal-planner-pwa/browser"
+  # Polecenie do zbudowania aplikacji Angular w trybie produkcyjnym.
+  command = "ng build --configuration production"
 
-[functions]
-  # Katalog, w którym znajdują się funkcje serwerowe (jeśli używasz)
-  directory = "dist/meal-planner-pwa/server"
+  # Prawidłowy katalog publikacji, zgodnie z plikiem angular.json.
+  # Ponieważ SSR jest wyłączony, nie ma podkatalogu /browser.
+  publish = "dist/meal-planner-pwa"
+
+# Kluczowa reguła dla aplikacji typu SPA (Single Page Application)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
