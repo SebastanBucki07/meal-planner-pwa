@@ -3,9 +3,20 @@
     <h1>Baza Przepisów 📖</h1>
   </header>
 
+  <!-- Wyszukiwarka i Filtry -->
+  <div class="filters-card">
+    <input type="text" class="search-input" placeholder="Szukaj po nazwie..." [(ngModel)]="searchTerm" (ngModelChange)="applyFilters()">
+    <div class="filters-grid">
+      <input type="number" placeholder="Max kcal" [(ngModel)]="maxCalories" (ngModelChange)="applyFilters()">
+      <input type="number" placeholder="Min białko" [(ngModel)]="minProtein" (ngModelChange)="applyFilters()">
+      <input type="number" placeholder="Min węgle" [(ngModel)]="minCarbs" (ngModelChange)="applyFilters()">
+      <input type="number" placeholder="Min tłuszcz" [(ngModel)]="minFat" (ngModelChange)="applyFilters()">
+    </div>
+  </div>
+
   <div class="recipes-grid" *ngIf="!loading; else loadingTpl">
     <div *ngIf="recipes.length === 0" class="empty-state">
-      Brak przepisów w bazie. Dodaj swój pierwszy przepis!
+      Brak przepisów pasujących do kryteriów.
     </div>
 
     <!-- Pojedyncza karta przepisu -->
