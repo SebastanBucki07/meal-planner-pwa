@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import {SupabaseService} from '../../services/supabase.service';
-import {NavbarComponent} from '../navbar/navbar.component';
-import {CommonModule} from '@angular/common';
+import { SupabaseService } from '../../services/supabase.service';
+import { NavbarComponent } from '../navbar/navbar.component';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 export interface WeekDay {
   date: Date;
-  dateStr: string;     // Format 'YYYY-MM-DD'
-  fullDateStr: string; // Format 'DD.MM'
-  dayName: string;     // 'Pn', 'Wt', itp.
+  dateStr: string;
+  fullDateStr: string;
+  dayName: string;
   isToday: boolean;
 }
 
@@ -24,7 +25,6 @@ export interface PlannedMeal {
   carbs: number;
 }
 
-// Zmień nazwę z Recipe na PlanRecipe
 export interface PlanRecipe {
   id: string;
   title: string;
@@ -37,35 +37,21 @@ export interface PlanRecipe {
   instructions?: string;
 }
 
-
-
-
 @Component({
   selector: 'app-plan',
   standalone: true,
-  imports: [CommonModule, NavbarComponent],
+  imports: [CommonModule, NavbarComponent, FormsModule],
   templateUrl: './plan.component.html',
   styleUrls: ['./plan.component.scss']
 })
 export class PlanComponent implements OnInit {
   loading: boolean = false;
-
-  readonly mealTypes: string[] = [
-    'Śniadanie',
-    'II śniadanie',
-    'Obiad',
-    'Kolacja',
-    'Przekąska'
-  ];
-
+  readonly mealTypes: string[] = ['Śniadanie', 'II śniadanie', 'Obiad', 'Kolacja', 'Przekąska'];
   weekOffset: number = 0;
   currentWeekRangeText: string = '';
   selectedDate: string = '';
   weekDays: WeekDay[] = [];
-
   dayMeals: PlannedMeal[] = [];
-
-  // Docelowe makroskładniki (domyślne lub pobierane z bazy z profilu)
   targetCalories: number = 2500;
   targetProtein: number = 160;
   targetFat: number = 80;
@@ -75,8 +61,16 @@ export class PlanComponent implements OnInit {
   isModalOpen: boolean = false;
   isPreviewOpen: boolean = false;
   selectedMealType: string = '';
-  availableRecipes: PlanRecipe[] = [];
   selectedRecipeForPreview: PlanRecipe | null = null;
+
+  // Logika listy przepisów i filtrowania
+  availableRecipes: PlanRecipe[] = [];
+  filteredRecipes: PlanRecipe[] = [];
+  searchTerm: string = '';
+  maxCalories: number | null = null;
+  minProtein: number | null = null;
+  minCarbs: number | null = null;
+  minFat: number | null = null;
 
   constructor(private supabase: SupabaseService) {}
 
@@ -86,6 +80,163 @@ export class PlanComponent implements OnInit {
     this.generateWeek(0);
     this.loadUserProfileTargets();
     this.loadPlanForSelectedDate();
+  }
+
+  applyFilter(): void {
+    let recipes = [...this.availableRecipes];
+
+    // Filtr po nazwie
+    if (this.searchTerm) {
+      const lowerCaseSearch = this.searchTerm.toLowerCase();
+      recipes = recipes.filter(recipe =>
+        recipe.title.toLowerCase().includes(lowerCaseSearch)
+      );
+    }
+
+    // Filtr po kaloriach (max)
+    if (this.maxCalories !== null && this.maxCalories > 0) {
+      recipes = recipes.filter(recipe => recipe.calories <= this.maxCalories!);
+    }
+
+    // Filtr po białku (min)
+    if (this.minProtein !== null && this.minProtein > 0) {
+      recipes = recipes.filter(recipe => (recipe.protein || 0) >= this.minProtein!);
+    }
+
+    // Filtr po węglowodanach (min)
+    if (this.minCarbs !== null && this.minCarbs > 0) {
+      recipes = recipes.filter(recipe => (recipe.carbs || 0) >= this.minCarbs!);
+    }
+
+    // Filtr po tłuszczach (min)
+    if (this.minFat !== null && this.minFat > 0) {
+      recipes = recipes.filter(recipe => (recipe.fat || 0) >= this.minFat!);
+    }
+
+    this.filteredRecipes = recipes;
+  }
+
+  openAddMealModal(mealType: string): void {
+    this.selectedMealType = mealType;
+    this.isModalOpen = true;
+    // Resetuj wszystkie filtry
+    this.searchTerm = '';
+    this.maxCalories = null;
+    this.minProtein = null;
+    this.minCarbs = null;
+    this.minFat = null;
+    this.loadAvailableRecipes();
+  }
+
+  closeModal(): void {
+    this.isModalOpen = false;
+    this.selectedMealType = '';
+    this.availableRecipes = [];
+    this.filteredRecipes = [];
+  }
+
+  async loadAvailableRecipes(): Promise<void> {
+    try {
+      const { data, error } = await this.supabase.client
+        .from('recipes')
+        .select('id, title, image_url, calories, protein, fat, carbs')
+        .order('title', { ascending: true });
+
+      if (error) {
+        console.error('Błąd pobierania przepisów:', error);
+        this.availableRecipes = [];
+      } else {
+        this.availableRecipes = data || [];
+      }
+      this.applyFilter();
+    } catch (err) {
+      console.error('Błąd połączenia:', err);
+    }
+  }
+
+  // Reszta metod bez zmian
+  private mealTypeToDbKey(type: string): string {
+    const map: Record<string, string> = {
+      'Śniadanie': 'Śniadanie',
+      'II śniadanie': 'Drugie Śniadanie',
+      'Obiad': 'Obiad',
+      'Kolacja': 'Kolacja',
+      'Przekąska': 'Przekąska'
+    };
+    return map[type] || type;
+  }
+
+  private dbKeyToMealType(key: string): string {
+    const map: Record<string, string> = {
+      'Śniadanie': 'Śniadanie',
+      'sniadanie': 'Śniadanie',
+      'Drugie Śniadanie': 'II śniadanie',
+      'Drugie śniadanie': 'II śniadanie',
+      'drugie_sniadanie': 'II śniadanie',
+      'Obiad': 'Obiad',
+      'obiad': 'Obiad',
+      'Kolacja': 'Kolacja',
+      'kolacja': 'Kolacja',
+      'Przekąska': 'Przekąska',
+      'przekaska': 'Przekąska'
+    };
+    return map[key] || key;
+  }
+
+  async addMealToPlan(recipeId: string): Promise<void> {
+    try {
+      const { data: authData } = await this.supabase.client.auth.getUser();
+      const userId = authData.user?.id;
+      const payload: any = {
+        date: this.selectedDate,
+        meal_type: this.mealTypeToDbKey(this.selectedMealType),
+        recipe_id: recipeId
+      };
+      if (userId) { payload.user_id = userId; }
+
+      const { error } = await this.supabase.client.from('meal_plans').insert([payload]);
+      if (error) { throw error; }
+
+      await this.loadPlanForSelectedDate();
+      this.closeModal();
+    } catch (error) {
+      console.error('Błąd podczas dodawania posiłku do planu:', error);
+      alert('Błąd dodawania posiłku. Upewnij się, że wybór jest poprawny.');
+    }
+  }
+
+  async openRecipePreview(recipeId: string): Promise<void> {
+    try {
+      const { data, error } = await this.supabase.client.from('recipes').select('*').eq('id', recipeId).single();
+      if (error || !data) { throw error || new Error('Recipe not found'); }
+      this.selectedRecipeForPreview = data;
+      this.isPreviewOpen = true;
+    } catch (err) {
+      console.error('Błąd podglądu:', err);
+    }
+  }
+
+  closePreviewModal(): void {
+    this.isPreviewOpen = false;
+    this.selectedRecipeForPreview = null;
+  }
+
+  async removeMeal(mealId: string, event: Event): Promise<void> {
+    event.stopPropagation();
+    try {
+      const { error } = await this.supabase.client.from('meal_plans').delete().eq('id', mealId);
+      if (error) { throw error; }
+      this.dayMeals = this.dayMeals.filter(m => m.id !== mealId);
+    } catch (err) {
+      console.error('Błąd usuwania:', err);
+    }
+  }
+
+  private formatDateToString(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   async loadUserProfileTargets(): Promise<void> {
@@ -118,7 +269,6 @@ export class PlanComponent implements OnInit {
     this.selectDate(this.formatDateToString(today));
   }
 
-  // Metody obliczające procentowe zapełnienie paska postępu
   getCaloriesPercent(): number {
     return Math.min(Math.round((this.dayCalories / this.targetCalories) * 100), 100);
   }
@@ -133,34 +283,6 @@ export class PlanComponent implements OnInit {
 
   getCarbsPercent(): number {
     return Math.min(Math.round((this.dayCarbs / this.targetCarbs) * 100), 100);
-  }
-
-  private mealTypeToDbKey(type: string): string {
-    const map: Record<string, string> = {
-      'Śniadanie': 'Śniadanie',
-      'II śniadanie': 'Drugie Śniadanie',
-      'Obiad': 'Obiad',
-      'Kolacja': 'Kolacja',
-      'Przekąska': 'Przekąska'
-    };
-    return map[type] || type;
-  }
-
-  private dbKeyToMealType(key: string): string {
-    const map: Record<string, string> = {
-      'Śniadanie': 'Śniadanie',
-      'sniadanie': 'Śniadanie',
-      'Drugie Śniadanie': 'II śniadanie',
-      'Drugie śniadanie': 'II śniadanie',
-      'drugie_sniadanie': 'II śniadanie',
-      'Obiad': 'Obiad',
-      'obiad': 'Obiad',
-      'Kolacja': 'Kolacja',
-      'kolacja': 'Kolacja',
-      'Przekąska': 'Przekąska',
-      'przekaska': 'Przekąska'
-    };
-    return map[key] || key;
   }
 
   changeWeek(offsetChange: number): void {
@@ -297,118 +419,5 @@ export class PlanComponent implements OnInit {
 
   get dayFat(): number {
     return Math.round(this.dayMeals.reduce((sum, m) => sum + (m.fat || 0), 0));
-  }
-
-  async openRecipePreview(recipeId: string): Promise<void> {
-    try {
-      const { data, error } = await this.supabase.client
-      .from('recipes')
-      .select('*')
-      .eq('id', recipeId)
-      .single();
-
-      if (error || !data) {
-        console.error('Błąd podczas pobierania podglądu przepisu:', error);
-        return;
-      }
-
-      this.selectedRecipeForPreview = data;
-      this.isPreviewOpen = true;
-    } catch (err) {
-      console.error('Błąd podglądu:', err);
-    }
-  }
-
-  closePreviewModal(): void {
-    this.isPreviewOpen = false;
-    this.selectedRecipeForPreview = null;
-  }
-
-  openAddMealModal(mealType: string): void {
-    this.selectedMealType = mealType;
-    this.isModalOpen = true;
-    this.loadAvailableRecipes();
-  }
-
-  closeModal(): void {
-    this.isModalOpen = false;
-    this.selectedMealType = '';
-  }
-
-  async loadAvailableRecipes(): Promise<void> {
-    try {
-      const { data, error } = await this.supabase.client
-      .from('recipes')
-      .select('id, title, image_url, calories, protein, fat, carbs')
-      .order('title', { ascending: true });
-
-      if (error) {
-        console.error('Błąd pobierania przepisów:', error);
-        this.availableRecipes = [];
-        return;
-      }
-
-      this.availableRecipes = data || [];
-    } catch (err) {
-      console.error('Błąd połączenia:', err);
-    }
-  }
-
-  async addMealToPlan(recipeId: string): Promise<void> {
-    try {
-      const { data: authData } = await this.supabase.client.auth.getUser();
-      const userId = authData.user?.id;
-
-      const payload: any = {
-        date: this.selectedDate,
-        meal_type: this.mealTypeToDbKey(this.selectedMealType),
-        recipe_id: recipeId
-      };
-
-      if (userId) {
-        payload.user_id = userId;
-      }
-
-      const { error } = await this.supabase.client
-      .from('meal_plans')
-      .insert([payload]);
-
-      if (error) {
-        console.error('Błąd podczas dodawania posiłku do planu:', error);
-        alert('Błąd dodawania posiłku. Upewnij się, że wybór jest poprawny.');
-        return;
-      }
-
-      await this.loadPlanForSelectedDate();
-      this.closeModal();
-    } catch (err) {
-      console.error('Błąd zapisu:', err);
-    }
-  }
-
-  async removeMeal(mealId: string, event: Event): Promise<void> {
-    event.stopPropagation();
-    try {
-      const { error } = await this.supabase.client
-      .from('meal_plans')
-      .delete()
-      .eq('id', mealId);
-
-      if (error) {
-        console.error('Błąd podczas usuwania posiłku:', error);
-        return;
-      }
-
-      this.dayMeals = this.dayMeals.filter(m => m.id !== mealId);
-    } catch (err) {
-      console.error('Błąd usuwania:', err);
-    }
-  }
-
-  private formatDateToString(date: Date): string {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
   }
 }

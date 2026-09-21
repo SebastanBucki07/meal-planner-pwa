@@ -13,6 +13,51 @@
     }
   }
 
+  /* Karta z filtrami */
+  .filters-card {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    padding: 16px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+
+    .search-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      font-size: 1rem;
+      margin-bottom: 12px;
+      box-sizing: border-box;
+
+      &:focus {
+        outline: none;
+        border-color: #3b82f6;
+      }
+    }
+
+    .filters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 12px;
+
+      input[type="number"] {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        box-sizing: border-box;
+
+        &:focus {
+          outline: none;
+          border-color: #3b82f6;
+        }
+      }
+    }
+  }
+
   /* Siatka Przepisów */
   .recipes-grid {
     display: grid;
@@ -164,99 +209,6 @@
 
     &:hover {
       background: #2563eb;
-    }
-  }
-
-  /* Modal dodawania przepisu */
-  .modal-backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(4px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 16px;
-    z-index: 100;
-
-    .modal {
-      background: white;
-      border-radius: 20px;
-      padding: 24px;
-      width: 100%;
-      max-width: 480px;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-
-      h2 {
-        margin: 0 0 20px 0;
-        font-size: 1.4rem;
-        color: #0f172a;
-      }
-
-      .form-group {
-        margin-bottom: 14px;
-
-        label {
-          display: block;
-          font-size: 0.85rem;
-          font-weight: 600;
-          color: #475569;
-          margin-bottom: 6px;
-        }
-
-        input, textarea {
-          width: 100%;
-          padding: 10px 12px;
-          border: 1px solid #cbd5e1;
-          border-radius: 8px;
-          font-size: 0.95rem;
-          box-sizing: border-box;
-
-          &:focus {
-            outline: none;
-            border-color: #3b82f6;
-          }
-        }
-      }
-
-      .form-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-      }
-
-      .modal-actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 12px;
-        margin-top: 20px;
-
-        button {
-          padding: 10px 18px;
-          border-radius: 8px;
-          font-weight: 600;
-          cursor: pointer;
-          border: none;
-
-          &.btn-secondary {
-            background: #f1f5f9;
-            color: #475569;
-          }
-
-          &.btn-primary {
-            background: #3b82f6;
-            color: white;
-
-            &:disabled {
-              opacity: 0.5;
-              cursor: not-allowed;
-            }
-          }
-        }
-      }
     }
   }
 }

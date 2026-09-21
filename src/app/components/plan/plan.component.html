@@ -125,7 +125,7 @@
     </div>
   </main>
 
-  <!-- Modal dodawania posiłku -->
+  <!-- Modal dodawania posiłku z filtrowaniem -->
   <div class="modal-backdrop" *ngIf="isModalOpen" (click)="closeModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
@@ -133,14 +133,39 @@
         <button class="btn-close" (click)="closeModal()">✕</button>
       </div>
       <div class="modal-body">
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Filtruj po nazwie..."
+          [(ngModel)]="searchTerm"
+          (input)="applyFilter()">
+
+        <div class="filters-grid">
+          <input type="number" placeholder="Max kcal" [(ngModel)]="maxCalories" (input)="applyFilter()">
+          <input type="number" placeholder="Min białko" [(ngModel)]="minProtein" (input)="applyFilter()">
+          <input type="number" placeholder="Min węgle" [(ngModel)]="minCarbs" (input)="applyFilter()">
+          <input type="number" placeholder="Min tłuszcz" [(ngModel)]="minFat" (input)="applyFilter()">
+        </div>
+
         <div class="recipe-list">
+          <div *ngIf="filteredRecipes.length === 0" class="no-results">
+            Brak przepisów pasujących do filtra.
+          </div>
           <div
             class="recipe-item"
-            *ngFor="let recipe of availableRecipes"
+            *ngFor="let recipe of filteredRecipes"
             (click)="addMealToPlan(recipe.id)"
           >
-            <div class="recipe-title">{{ recipe.title }}</div>
-            <div class="recipe-macros">{{ recipe.calories }} kcal</div>
+            <img [src]="recipe.image_url || 'assets/placeholder.png'" [alt]="recipe.title" class="recipe-item-img">
+            <div class="recipe-item-details">
+              <div class="recipe-title">{{ recipe.title }}</div>
+              <div class="recipe-macros">
+                <span>{{ recipe.calories }} kcal</span>
+                <span>B: {{ recipe.protein || 0 }}g</span>
+                <span>W: {{ recipe.carbs || 0 }}g</span>
+                <span>T: {{ recipe.fat || 0 }}g</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
