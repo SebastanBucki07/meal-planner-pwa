@@ -51,10 +51,29 @@ export class DashboardComponent implements OnInit {
 
   async ngOnInit() {
     await Promise.all([
+      this.fetchUserProfile(), // <-- Pobieramy cele użytkownika
       this.fetchTodayMealPlan(),
       this.fetchRecentRecipes()
     ]);
     this.loading = false;
+  }
+
+  async fetchUserProfile() {
+    const { data: { user } } = await this.supabase.auth.getUser();
+    if (user) {
+      const { data } = await this.supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+
+      if (data) {
+        this.targetCalories = data.target_calories || 2000;
+        this.targetProtein = data.target_protein || 150;
+        this.targetCarbs = data.target_carbs || 200;
+        this.targetFat = data.target_fat || 65;
+      }
+    }
   }
 
   async fetchTodayMealPlan() {
@@ -152,7 +171,7 @@ export class DashboardComponent implements OnInit {
       this.todayMeals.reduce((sum, item) => sum + Number(item.recipe?.fat || 0), 0).toFixed(1)
     );
   }
-  
+
   getCaloriePercentage(): number {
     if (!this.targetCalories) return 0;
     return Math.round((this.consumedCalories / this.targetCalories) * 100);

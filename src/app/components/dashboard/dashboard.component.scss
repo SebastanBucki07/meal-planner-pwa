@@ -186,3 +186,24 @@
   padding: 60px 20px;
   color: #64748b;
 }
+
+.title-with-action {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  .btn-edit-goals {
+    font-size: 0.75rem;
+    text-decoration: none;
+    background: rgba(0, 0, 0, 0.06);
+    padding: 3px 8px;
+    border-radius: 6px;
+    color: inherit;
+    font-weight: 600;
+    transition: background 0.2s;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.12);
+    }
+  }
+}
