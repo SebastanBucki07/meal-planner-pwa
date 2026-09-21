@@ -8,7 +8,11 @@
   <div class="card progress-card" [ngClass]="getStatusClass(consumedCalories, targetCalories)">
     <div class="progress-header">
       <div>
-        <h3>Kalorie</h3>
+        <div class="title-with-action">
+          <h3>Kalorie</h3>
+          <!-- Przycisk przejścia do edycji celów -->
+          <a routerLink="/profile" class="btn-edit-goals" title="Edytuj cele makro">⚙️ Edytuj cele</a>
+        </div>
         <span class="subtext">{{ consumedCalories }} / {{ targetCalories }} kcal</span>
       </div>
       <span class="percentage-badge">{{ getCaloriePercentage() }}%</span>
@@ -85,6 +89,8 @@
       </div>
     </div>
   </section>
+
+
 </div>
 
 <ng-template #loadingTpl>
