@@ -1,0 +1,75 @@
+<div class="page-layout">
+  <!-- Panel boczny z historią list -->
+  <aside class="sidebar">
+    <h3>Historia List</h3>
+    <div class="history-list">
+      <div
+        *ngFor="let list of historyLists"
+        class="history-item"
+        [class.active]="activeList?.id === list.id"
+        (click)="selectListFromHistory(list)">
+        <span>Lista od {{ list.start_date | date:'dd.MM' }}</span>
+        <span>do {{ list.end_date | date:'dd.MM.yyyy' }}</span>
+      </div>
+      <div *ngIf="historyLists.length === 0" class="no-history">
+        Brak aktywnych list.
+      </div>
+    </div>
+  </aside>
+
+  <!-- Główna zawartość -->
+  <main class="main-content">
+    <div class="shopping-list-container">
+      <header class="header">
+        <h1>Lista Zakupów 🛒</h1>
+        <p>Wybierz zakres dat i wygeneruj nową listę, lub wybierz istniejącą z historii.</p>
+      </header>
+
+      <!-- Generator nowej listy -->
+      <div class="generator-section">
+        <div class="date-picker-container">
+          <div class="date-input-group">
+            <label for="startDate">Od:</label>
+            <input type="date" id="startDate" [(ngModel)]="startDate">
+          </div>
+          <div class="date-input-group">
+            <label for="endDate">Do:</label>
+            <input type="date" id="endDate" [(ngModel)]="endDate">
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn-generate" (click)="generateShoppingList()">
+            + Wygeneruj Nową Listę
+          </button>
+        </div>
+      </div>
+
+      <!-- Wyświetlanie aktywnej listy -->
+      <div *ngIf="loading" class="loading-spinner">
+        Ładowanie...
+      </div>
+
+      <div *ngIf="!loading && activeList" class="list-container">
+        <div *ngFor="let category of categories" class="category-section">
+          <h2>{{ category }}</h2>
+          <div class="ingredient-item" *ngFor="let item of getItemsForCategory(category)">
+            <input
+              type="checkbox"
+              [id]="item.name + activeList!.id"
+              [(ngModel)]="item.checked"
+              (ngModelChange)="onItemCheck()">
+            <label [for]="item.name + activeList!.id" [class.checked]="item.checked">
+              {{ item.name }} - <strong>{{ item.amount }} {{ item.unit }}</strong>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="!loading && !activeList" class="empty-state">
+        <p>Wybierz listę z historii lub wygeneruj nową.</p>
+      </div>
+    </div>
+  </main>
+</div>
+
+<app-navbar></app-navbar>

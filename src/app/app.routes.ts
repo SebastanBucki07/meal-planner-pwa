@@ -2,11 +2,12 @@ import { Routes } from '@angular/router';
 import { AuthComponent } from './components/auth/auth.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { authGuard } from './guards/auth.guard';
-import {RecipesComponent} from './recipes/recipes.component';
-import {AddRecipeComponent} from './recipes/add-recipe/add-recipe.component';
-import {RecipeDetailsComponent} from './recipes/recipe-details/recipe-details.component';
-import {ProfileComponent} from './components/profile/profile.component';
-import {PlanComponent} from './components/plan/plan.component';
+import { RecipesComponent } from './recipes/recipes.component';
+import { AddRecipeComponent } from './recipes/add-recipe/add-recipe.component';
+import { RecipeDetailsComponent } from './recipes/recipe-details/recipe-details.component';
+import { ProfileComponent } from './components/profile/profile.component';
+import { PlanComponent } from './components/plan/plan.component';
+import { ShoppingListComponent } from './components/shopping-list/shopping-list.component'; // Import
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -17,6 +18,7 @@ export const routes: Routes = [
   { path: 'recipes', component: RecipesComponent, canActivate: [authGuard] },
   { path: 'profile', component: ProfileComponent },
   { path: 'plan', component: PlanComponent },
+  { path: 'shopping-list', component: ShoppingListComponent, canActivate: [authGuard] }, // Dodana ścieżka
 
   { path: '**', redirectTo: 'dashboard' }
 ];
