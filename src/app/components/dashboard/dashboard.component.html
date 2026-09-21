@@ -1,65 +1,94 @@
-<div class="dashboard-container">
-  <header class="header">
-    <div>
-      <h1>Podsumowanie dnia 🥗</h1>
-      <p class="user-email">{{ userEmail }}</p>
-    </div>
-    <button (click)="logout()" class="btn-logout" title="Wyloguj">🚪</button>
+<div class="dashboard-container" *ngIf="!loading; else loadingTpl">
+  <header class="dashboard-header">
+    <h1>Cześć! 👋</h1>
+    <p class="subtitle">Oto Twoje podsumowanie na dziś</p>
   </header>
 
-  <!-- Karta Kalorii -->
-  <div class="card calorie-card">
-    <div class="calorie-info">
+  <!-- Karta Paska Kalorii -->
+  <div class="card progress-card" [ngClass]="getStatusClass(consumedCalories, targetCalories)">
+    <div class="progress-header">
       <div>
-        <span class="label">Spożyto</span>
-        <span class="value">{{ consumedCalories }} <small>kcal</small></span>
+        <h3>Kalorie</h3>
+        <span class="subtext">{{ consumedCalories }} / {{ targetCalories }} kcal</span>
       </div>
-      <div class="target">
-        <span class="label">Cel</span>
-        <span class="value">{{ targetCalories }} <small>kcal</small></span>
-      </div>
+      <span class="percentage-badge">{{ getCaloriePercentage() }}%</span>
     </div>
-
     <div class="progress-bar-bg">
-      <div class="progress-bar-fill" [style.width.%]="caloriePercentage"></div>
-    </div>
-    <span class="percentage-text">{{ caloriePercentage }}% celu zrealizowane</span>
-  </div>
-
-  <!-- Karta Makroskładników -->
-  <div class="card macro-card">
-    <h3>Makroskładniki</h3>
-
-    <div class="macro-item">
-      <div class="macro-header">
-        <span>Białko 🥩</span>
-        <span>{{ consumedProtein }}g / {{ targetProtein }}g</span>
-      </div>
-      <div class="progress-bar-bg small">
-        <div class="progress-bar-fill protein" [style.width.%]="(consumedProtein / targetProtein) * 100"></div>
-      </div>
-    </div>
-
-    <div class="macro-item">
-      <div class="macro-header">
-        <span>Węglowodany 🍞</span>
-        <span>{{ consumedCarbs }}g / {{ targetCarbs }}g</span>
-      </div>
-      <div class="progress-bar-bg small">
-        <div class="progress-bar-fill carbs" [style.width.%]="(consumedCarbs / targetCarbs) * 100"></div>
-      </div>
-    </div>
-
-    <div class="macro-item">
-      <div class="macro-header">
-        <span>Tłuszcze 🥑</span>
-        <span>{{ consumedFat }}g / {{ targetFat }}g</span>
-      </div>
-      <div class="progress-bar-bg small">
-        <div class="progress-bar-fill fat" [style.width.%]="(consumedFat / targetFat) * 100"></div>
-      </div>
+      <div class="progress-bar-fill" [style.width.%]="getProgressBarWidth()"></div>
     </div>
   </div>
+
+  <!-- Siatka Makroskładników -->
+  <div class="macros-grid">
+    <!-- Białko -->
+    <div class="card macro-card" [ngClass]="getStatusClass(consumedProtein, targetProtein)">
+      <span class="label">Białko</span>
+      <span class="value">{{ consumedProtein }} / {{ targetProtein }}g</span>
+    </div>
+
+    <!-- Węglowodany -->
+    <div class="card macro-card" [ngClass]="getStatusClass(consumedCarbs, targetCarbs)">
+      <span class="label">Węglowodany</span>
+      <span class="value">{{ consumedCarbs }} / {{ targetCarbs }}g</span>
+    </div>
+
+    <!-- Tłuszcze -->
+    <div class="card macro-card" [ngClass]="getStatusClass(consumedFat, targetFat)">
+      <span class="label">Tłuszcze</span>
+      <span class="value">{{ consumedFat }} / {{ targetFat }}g</span>
+    </div>
+  </div>
+
+  <!-- Dzisiejsze Zaplanowane Posiłki -->
+  <section class="section">
+    <div class="section-header">
+      <h2>Dzisiejsze posiłki 🥗</h2>
+      <a routerLink="/plan" class="link-more">Zarządzaj planem</a>
+    </div>
+
+    <div class="meals-list" *ngIf="todayMeals.length > 0; else noMealsTpl">
+      <div class="meal-item card" *ngFor="let meal of todayMeals">
+        <div class="meal-type">{{ meal.meal_type }}</div>
+        <div class="meal-details">
+          <h4>{{ meal.recipe.title }}</h4>
+          <span class="meal-macro">{{ meal.recipe.calories }} kcal | B: {{ meal.recipe.protein }}g</span>
+        </div>
+        <a [routerLink]="['/recipes', meal.recipe.id]" class="btn-view">➔</a>
+      </div>
+    </div>
+
+    <ng-template #noMealsTpl>
+      <div class="empty-card card">
+        <p>Brak zaplanowanych posiłków na dziś.</p>
+        <a routerLink="/plan" class="btn-inline">+ Zaplanuj posiłek</a>
+      </div>
+    </ng-template>
+  </section>
+
+  <!-- Ostatnie Przepisy -->
+  <section class="section">
+    <div class="section-header">
+      <h2>Ostatnie przepisy 🍳</h2>
+      <a routerLink="/recipes" class="link-more">Wszystkie</a>
+    </div>
+
+    <div class="recent-recipes-grid">
+      <div class="recipe-mini-card card" *ngFor="let recipe of recentRecipes">
+        <div class="mini-img" *ngIf="recipe.image_url">
+          <img [src]="recipe.image_url" [alt]="recipe.title" />
+        </div>
+        <div class="mini-content">
+          <h4>{{ recipe.title }}</h4>
+          <span>{{ recipe.calories }} kcal</span>
+        </div>
+        <a [routerLink]="['/recipes', recipe.id]" class="card-overlay-link"></a>
+      </div>
+    </div>
+  </section>
 </div>
+
+<ng-template #loadingTpl>
+  <div class="loading-state">Ładowanie dashboardu...</div>
+</ng-template>
 
 <app-navbar></app-navbar>

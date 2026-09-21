@@ -1,0 +1,142 @@
+<div class="page-container">
+  <div class="editor-layout">
+
+    <!-- LEWA KOLUMNA: Formularz edycji -->
+    <div class="form-section">
+      <h2>Nowy Przepis 🍳</h2>
+
+      <div class="form-group">
+        <label>Nazwa przepisu</label>
+        <input type="text" [(ngModel)]="title" placeholder="np. Kurczak w sosie słodko-kwaśnym" />
+      </div>
+
+      <div class="form-group">
+        <label>Link do zdjęcia (opcjonalnie)</label>
+        <input type="text" [(ngModel)]="imageUrl" placeholder="https://..." />
+      </div>
+
+      <div class="form-group">
+        <label>Link do filmu Video (YouTube / TikTok)</label>
+        <input type="text" [(ngModel)]="videoUrl" placeholder="https://youtube.com/watch?v=..." />
+      </div>
+
+      <!-- Tabela Składników -->
+      <div class="section-box">
+        <h3>Składniki</h3>
+        <table class="ingredients-table">
+          <thead>
+          <tr>
+            <th>Składnik</th>
+            <th>Ilość</th>
+            <th>Jednostka</th>
+            <th>kcal</th>
+            <th>B</th>
+            <th>W</th>
+            <th>T</th>
+            <th></th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let row of ingredientRows; let i = index">
+            <td>
+              <select [(ngModel)]="row.ingredientId" (change)="onIngredientChange(row)">
+                <option value="" disabled>Wybierz...</option>
+                <option *ngFor="let ing of availableIngredients" [value]="ing.id">{{ ing.name }}</option>
+              </select>
+            </td>
+            <td>
+              <input type="number" [(ngModel)]="row.amount" (input)="onIngredientChange(row)" class="num-input" />
+            </td>
+            <td>
+              <select [(ngModel)]="row.unit" (change)="onUnitChange(row)">
+                <option *ngFor="let u of availableUnits" [value]="u.name">{{ u.name }}</option>
+              </select>
+            </td>
+            <td class="macro-cell">{{ row.calories }}</td>
+            <td class="macro-cell">{{ row.protein }}</td>
+            <td class="macro-cell">{{ row.carbs }}</td>
+            <td class="macro-cell">{{ row.fat }}</td>
+            <td>
+              <button (click)="removeIngredientRow(i)" class="btn-del">❌</button>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+        <button (click)="addIngredientRow()" class="btn-add-row">+ Dodaj składnik</button>
+      </div>
+
+      <!-- Tabela Instrukcji Krok po Kroku -->
+      <div class="section-box">
+        <h3>Instrukcja przygotowania</h3>
+        <div class="step-row" *ngFor="let step of stepRows; let i = index">
+          <span class="step-num">Krok {{ step.stepNumber }}</span>
+          <textarea [(ngModel)]="step.instruction" rows="2" placeholder="Opisz krok..."></textarea>
+          <button (click)="removeStepRow(i)" class="btn-del">❌</button>
+        </div>
+        <button (click)="addStepRow()" class="btn-add-row">+ Dodaj kolejny krok</button>
+      </div>
+
+      <button (click)="saveRecipe()" [disabled]="!title || ingredientRows.length === 0" class="btn-save">
+        💾 Zapisz Przepis
+      </button>
+    </div>
+
+    <!-- PRAWA KOLUMNA: Podgląd Live -->
+    <div class="preview-section">
+      <div class="preview-card">
+        <div class="live-badge">LIVE PREVIEW</div>
+
+        <div class="image-preview" *ngIf="imageUrl">
+          <img [src]="imageUrl" alt="Zdjęcie potrawy" />
+        </div>
+
+        <h2>{{ title || 'Nazwa Twojego przepisu' }}</h2>
+
+        <!-- Sumaryczny pasek kalorii i makro -->
+        <div class="macro-summary">
+          <div class="macro-box kcal">
+            <span class="val">{{ totalCalories }}</span>
+            <span class="lbl">kcal</span>
+          </div>
+          <div class="macro-box protein">
+            <span class="val">{{ totalProtein }}g</span>
+            <span class="lbl">Białko</span>
+          </div>
+          <div class="macro-box carbs">
+            <span class="val">{{ totalCarbs }}g</span>
+            <span class="lbl">Węgle</span>
+          </div>
+          <div class="macro-box fat">
+            <span class="val">{{ totalFat }}g</span>
+            <span class="lbl">Tłuszcze</span>
+          </div>
+        </div>
+
+        <div class="preview-block">
+          <h4>Składniki:</h4>
+          <ul>
+            <li *ngFor="let ing of ingredientRows">
+              <strong>{{ ing.name || 'Wybierz składnik' }}</strong> — {{ ing.amount }} {{ ing.unit }} ({{ ing.calories }} kcal)
+            </li>
+          </ul>
+        </div>
+
+        <div class="preview-block" *ngIf="stepRows.length > 0">
+          <h4>Sposób przygotowania:</h4>
+          <ol>
+            <ng-container *ngFor="let step of stepRows">
+              <li *ngIf="step.instruction">{{ step.instruction }}</li>
+            </ng-container>
+          </ol>
+        </div>
+
+        <div class="video-link" *ngIf="videoUrl">
+          🎬 <a [href]="videoUrl" target="_blank">Obejrzyj wideo w nowej karcie</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<app-navbar></app-navbar>

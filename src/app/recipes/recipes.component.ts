@@ -1,82 +1,46 @@
-import { Component } from '@angular/core';
-import {SupabaseService} from '../services/supabase.service';
-import {FormsModule} from '@angular/forms';
-import {NavbarComponent} from '../components/navbar/navbar.component';
-import {NgForOf, NgIf} from '@angular/common';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import {environment} from '../../environment';
+import { NavbarComponent } from '../components/navbar/navbar.component';
 
 @Component({
   selector: 'app-recipes',
+  standalone: true,
   imports: [
-    FormsModule,
-    NavbarComponent,
-    NgIf,
-    NgForOf
+    CommonModule,
+    RouterLink,
+    NavbarComponent
   ],
   templateUrl: './recipes.component.html',
-  styleUrl: './recipes.component.scss'
+  styleUrls: ['./recipes.component.scss']
 })
-export class RecipesComponent {
+export class RecipesComponent implements OnInit {
+  private supabase: SupabaseClient;
   recipes: any[] = [];
-  loading = false;
-  showModal = false;
+  loading: boolean = true;
 
-  // Formularz nowego przepisu
-  title = '';
-  calories: number | null = null;
-  protein: number | null = null;
-  carbs: number | null = null;
-  fat: number | null = null;
-  instructions = '';
-
-  constructor(private supabase: SupabaseService) {}
-
-  async ngOnInit() {
-    await this.loadRecipes();
+  constructor() {
+    this.supabase = createClient(environment.SUPABASE_URL, environment.SUPABASE_ANON_KEY);
   }
 
-  async loadRecipes() {
+  async ngOnInit() {
+    await this.fetchRecipes();
+  }
+
+  async fetchRecipes() {
     this.loading = true;
-    const { data, error } = await this.supabase.getRecipes();
-    if (!error && data) {
+    const { data, error } = await this.supabase
+    .from('recipes')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Błąd pobierania przepisów:', error);
+    } else if (data) {
       this.recipes = data;
     }
     this.loading = false;
-  }
-
-  async createRecipe() {
-    if (!this.title || this.calories === null) return;
-
-    this.loading = true;
-
-    const recipeData = {
-      title: this.title.trim(),
-      calories: Number(this.calories) || 0,
-      protein: Number(this.protein) || 0,
-      carbs: Number(this.carbs) || 0,
-      fat: Number(this.fat) || 0,
-      instructions: this.instructions ? this.instructions.trim() : ''
-    };
-
-    const { error } = await this.supabase.addRecipe(recipeData);
-
-    if (error) {
-      console.error('Błąd dodawania przepisu:', error);
-      alert('Nie udało się dodać przepisu: ' + error.message);
-    } else {
-      this.resetForm();
-      this.showModal = false;
-      await this.loadRecipes();
-    }
-
-    this.loading = false;
-  }
-
-  resetForm() {
-    this.title = '';
-    this.calories = null;
-    this.protein = null;
-    this.carbs = null;
-    this.fat = null;
-    this.instructions = '';
   }
 }

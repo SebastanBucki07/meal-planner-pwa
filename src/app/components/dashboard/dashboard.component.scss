@@ -1,116 +1,188 @@
 .dashboard-container {
-  padding: 20px 16px 80px 16px;
-  max-width: 480px;
+  padding: 20px 16px 100px 16px;
+  max-width: 800px;
   margin: 0 auto;
 
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  .dashboard-header {
     margin-bottom: 20px;
-
-    h1 {
-      font-size: 1.35rem;
-      font-weight: 700;
-    }
-
-    .user-email {
-      font-size: 0.8rem;
-      color: #64748b;
-    }
-
-    .btn-logout {
-      background: #f1f5f9;
-      border: none;
-      font-size: 1.2rem;
-      padding: 8px 12px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
+    h1 { font-size: 1.8rem; font-weight: 800; color: #0f172a; margin: 0; }
+    .subtitle { color: #64748b; font-size: 0.95rem; margin-top: 4px; }
   }
 
+  /* BAZOWY STYL KARTY */
   .card {
     background: #ffffff;
     border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 16px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    padding: 16px;
     border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+
+    /* DYNAMICZNE KOLORY STATUSÓW (MALEJĄCE NAJMOCNIEJSZE STYLES) */
+    &.status-yellow {
+      background-color: #fefce8 !important;
+      border-color: #fef08a !important;
+      .label, .subtext { color: #a16207 !important; }
+      .value, h3 { color: #854d0e !important; }
+      .percentage-badge { background: #fef08a !important; color: #854d0e !important; }
+      .progress-bar-fill { background-color: #eab308 !important; }
+    }
+
+    &.status-green {
+      background-color: #f0fdf4 !important;
+      border-color: #bbf7d0 !important;
+      .label, .subtext { color: #15803d !important; }
+      .value, h3 { color: #166534 !important; }
+      .percentage-badge { background: #bbf7d0 !important; color: #166534 !important; }
+      .progress-bar-fill { background-color: #22c55e !important; }
+    }
+
+    &.status-orange {
+      background-color: #fff7ed !important;
+      border-color: #fed7aa !important;
+      .label, .subtext { color: #c2410c !important; }
+      .value, h3 { color: #9a3412 !important; }
+      .percentage-badge { background: #fed7aa !important; color: #9a3412 !important; }
+      .progress-bar-fill { background-color: #f97316 !important; }
+    }
+
+    &.status-red {
+      background-color: #fef2f2 !important;
+      border-color: #fecaca !important;
+      .label, .subtext { color: #b91c1c !important; }
+      .value, h3 { color: #991b1b !important; }
+      .percentage-badge { background: #fecaca !important; color: #991b1b !important; }
+      .progress-bar-fill { background-color: #ef4444 !important; }
+    }
   }
 
-  .calorie-card {
-    .calorie-info {
+  /* Pasek Kalorii */
+  .progress-card {
+    margin-bottom: 16px;
+    .progress-header {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 16px;
-
-      .label {
-        display: block;
-        font-size: 0.8rem;
-        color: #64748b;
-      }
-
-      .value {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #0f172a;
-
-        small {
-          font-size: 0.9rem;
-          font-weight: 400;
-          color: #64748b;
-        }
-      }
-    }
-
-    .percentage-text {
-      display: block;
-      margin-top: 8px;
-      font-size: 0.75rem;
-      color: #64748b;
-      text-align: right;
-    }
-  }
-
-  .macro-card {
-    h3 {
-      font-size: 1rem;
-      margin-bottom: 16px;
-    }
-
-    .macro-item {
+      align-items: center;
       margin-bottom: 12px;
-
-      .macro-header {
-        display: flex;
-        justify-content: space-between;
+      h3 { margin: 0; font-size: 1.1rem; }
+      .subtext { font-size: 0.85rem; }
+      .percentage-badge {
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 20px;
         font-size: 0.85rem;
-        font-weight: 500;
-        margin-bottom: 4px;
+      }
+    }
+
+    .progress-bar-bg {
+      height: 10px;
+      background: rgba(0, 0, 0, 0.05);
+      border-radius: 10px;
+      overflow: hidden;
+      .progress-bar-fill {
+        height: 100%;
+        border-radius: 10px;
+        transition: width 0.3s ease;
       }
     }
   }
 
-  .progress-bar-bg {
-    width: 100%;
-    height: 12px;
-    background-color: #f1f5f9;
-    border-radius: 6px;
-    overflow: hidden;
+  /* Siatka Makro */
+  .macros-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
 
-    &.small {
-      height: 8px;
-    }
-
-    .progress-bar-fill {
-      height: 100%;
-      background-color: #10b981;
-      border-radius: 6px;
-      transition: width 0.3s ease;
-
-      &.protein { background-color: #ef4444; }
-      &.carbs { background-color: #3b82f6; }
-      &.fat { background-color: #f59e0b; }
+    .macro-card {
+      text-align: center;
+      padding: 12px 8px;
+      .label { display: block; font-size: 0.75rem; text-transform: uppercase; font-weight: 600; }
+      .value { display: block; font-weight: 700; font-size: 0.95rem; margin-top: 4px; }
     }
   }
+
+  /* Pozostałe sekcje */
+  .section {
+    margin-bottom: 28px;
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      h2 { font-size: 1.2rem; font-weight: 700; color: #0f172a; margin: 0; }
+      .link-more { color: #3b82f6; text-decoration: none; font-size: 0.85rem; font-weight: 600; }
+    }
+  }
+
+  .meals-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    .meal-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      .meal-type {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        background: #f1f5f9;
+        color: #475569;
+        padding: 4px 8px;
+        border-radius: 6px;
+      }
+      .meal-details {
+        flex: 1;
+        margin: 0 12px;
+        h4 { margin: 0; font-size: 0.95rem; color: #1e293b; }
+        .meal-macro { font-size: 0.8rem; color: #64748b; }
+      }
+      .btn-view { color: #94a3b8; text-decoration: none; font-weight: bold; }
+    }
+  }
+
+  .empty-card {
+    text-align: center;
+    padding: 24px;
+    color: #64748b;
+    p { margin: 0 0 10px 0; }
+    .btn-inline { color: #3b82f6; text-decoration: none; font-weight: 700; }
+  }
+
+  .recent-recipes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    .recipe-mini-card {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px;
+      .mini-img {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        overflow: hidden;
+        flex-shrink: 0;
+        img { width: 100%; height: 100%; object-fit: cover; }
+      }
+      .mini-content {
+        h4 { margin: 0; font-size: 0.85rem; color: #1e293b; line-height: 1.2; }
+        span { font-size: 0.75rem; color: #64748b; }
+      }
+      .card-overlay-link {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+      }
+    }
+  }
+}
+
+.loading-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #64748b;
 }

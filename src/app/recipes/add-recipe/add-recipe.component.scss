@@ -1,0 +1,140 @@
+.page-container {
+  padding: 20px 16px 100px 16px;
+  max-width: 1100px;
+  margin: 0 auto;
+
+  .editor-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+
+    @media (min-width: 850px) {
+      grid-template-columns: 1.2fr 0.8fr; // Dwukolumnowy podgląd Live po prawej
+    }
+  }
+
+  .form-section, .preview-section {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid #e2e8f0;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 14px;
+
+    input, select, textarea {
+      padding: 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+    }
+  }
+
+  .section-box {
+    margin-top: 20px;
+    background: #f8fafc;
+    padding: 14px;
+    border-radius: 12px;
+
+    h3 { font-size: 1rem; margin-bottom: 12px; }
+  }
+
+  .ingredients-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th, td {
+      padding: 6px 4px;
+      font-size: 0.8rem;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 6px;
+      font-size: 0.8rem;
+    }
+
+    .num-input { width: 55px; }
+    .macro-cell { font-weight: 600; text-align: center; }
+  }
+
+  .step-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 8px;
+
+    .step-num { font-size: 0.75rem; font-weight: 700; width: 60px; }
+    textarea { flex: 1; font-size: 0.85rem; }
+  }
+
+  .btn-add-row {
+    background: #e2e8f0;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+
+  .btn-save {
+    width: 100%;
+    background: #10b981;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-top: 20px;
+    cursor: pointer;
+  }
+
+  // Live Preview Styling
+  .preview-card {
+    position: sticky;
+    top: 20px;
+
+    .live-badge {
+      display: inline-block;
+      background: #ef4444;
+      color: white;
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+
+    .image-preview img {
+      width: 100%;
+      max-height: 200px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+
+    .macro-summary {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin: 16px 0;
+
+      .macro-box {
+        background: #f1f5f9;
+        padding: 10px 4px;
+        border-radius: 8px;
+        text-align: center;
+
+        .val { display: block; font-weight: 700; font-size: 0.9rem; }
+        .lbl { font-size: 0.7rem; color: #64748b; }
+
+        &.kcal { background: #ecfdf5; color: #059669; }
+      }
+    }
+  }
+}
