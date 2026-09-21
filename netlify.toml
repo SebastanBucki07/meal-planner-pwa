@@ -1,0 +1,11 @@
+[build]
+  # Polecenie do zbudowania aplikacji Angular
+  command = "ng build"
+
+  # Katalog, w którym znajdują się gotowe pliki aplikacji po zbudowaniu
+  # Dla nowszych wersji Angulara z SSR jest to zazwyczaj 'dist/nazwa-projektu/browser'
+  publish = "dist/meal-planner-pwa/browser"
+
+[functions]
+  # Katalog, w którym znajdują się funkcje serwerowe (jeśli używasz)
+  directory = "dist/meal-planner-pwa/server"
