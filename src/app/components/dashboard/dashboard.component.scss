@@ -1,209 +1,232 @@
 .dashboard-container {
-  padding: 20px 16px 100px 16px;
-  max-width: 800px;
+  max-width: 600px;
   margin: 0 auto;
+  padding: 1rem 1rem 90px 1rem;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: #0f172a;
+}
 
-  .dashboard-header {
-    margin-bottom: 20px;
-    h1 { font-size: 1.8rem; font-weight: 800; color: #0f172a; margin: 0; }
-    .subtitle { color: #64748b; font-size: 0.95rem; margin-top: 4px; }
-  }
+.summary-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
 
-  /* BAZOWY STYL KARTY */
-  .card {
-    background: #ffffff;
-    border-radius: 16px;
-    padding: 16px;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-    transition: background-color 0.3s ease, border-color 0.3s ease;
+  .summary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
 
-    /* DYNAMICZNE KOLORY STATUSÓW (MALEJĄCE NAJMOCNIEJSZE STYLES) */
-    &.status-yellow {
-      background-color: #fefce8 !important;
-      border-color: #fef08a !important;
-      .label, .subtext { color: #a16207 !important; }
-      .value, h3 { color: #854d0e !important; }
-      .percentage-badge { background: #fef08a !important; color: #854d0e !important; }
-      .progress-bar-fill { background-color: #eab308 !important; }
+    h2 {
+      margin: 0;
+      font-size: 1.05rem;
+      color: #64748b;
+      font-weight: 600;
     }
 
-    &.status-green {
-      background-color: #f0fdf4 !important;
-      border-color: #bbf7d0 !important;
-      .label, .subtext { color: #15803d !important; }
-      .value, h3 { color: #166534 !important; }
-      .percentage-badge { background: #bbf7d0 !important; color: #166534 !important; }
-      .progress-bar-fill { background-color: #22c55e !important; }
-    }
-
-    &.status-orange {
-      background-color: #fff7ed !important;
-      border-color: #fed7aa !important;
-      .label, .subtext { color: #c2410c !important; }
-      .value, h3 { color: #9a3412 !important; }
-      .percentage-badge { background: #fed7aa !important; color: #9a3412 !important; }
-      .progress-bar-fill { background-color: #f97316 !important; }
-    }
-
-    &.status-red {
-      background-color: #fef2f2 !important;
-      border-color: #fecaca !important;
-      .label, .subtext { color: #b91c1c !important; }
-      .value, h3 { color: #991b1b !important; }
-      .percentage-badge { background: #fecaca !important; color: #991b1b !important; }
-      .progress-bar-fill { background-color: #ef4444 !important; }
+    .percentage-badge {
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 0.2rem 0.6rem;
+      border-radius: 12px;
+      background: #eff6ff;
+      color: #2563eb;
     }
   }
 
-  /* Pasek Kalorii */
-  .progress-card {
-    margin-bottom: 16px;
-    .progress-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-      h3 { margin: 0; font-size: 1.1rem; }
-      .subtext { font-size: 0.85rem; }
-      .percentage-badge {
-        font-weight: 700;
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 0.85rem;
-      }
-    }
+  /* Kolory badge'a w zależności od przekroczenia */
+  &.status-ok .percentage-badge { background: #ecfdf5; color: #10b981; }
+  &.status-warn .percentage-badge { background: #fffbe2; color: #d97706; }
+  &.status-over .percentage-badge { background: #fef2f2; color: #ef4444; }
 
-    .progress-bar-bg {
-      height: 10px;
-      background: rgba(0, 0, 0, 0.05);
+  .calories-main {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+
+    .consumed { color: #0f172a; }
+    .target { font-size: 1.1rem; color: #94a3b8; font-weight: 500; }
+  }
+
+  /* Pasek główny kalorii */
+  .progress-bar-container {
+    height: 10px;
+    background: #f1f5f9;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 1.25rem;
+
+    .progress-bar-fill {
+      height: 100%;
       border-radius: 10px;
-      overflow: hidden;
-      .progress-bar-fill {
-        height: 100%;
-        border-radius: 10px;
-        transition: width 0.3s ease;
-      }
+      transition: width 0.4s ease, background-color 0.3s ease;
+
+      /* Dynamiczne kolory paska */
+      &.status-under { background: #3b82f6; } /* Niebieski - poniżej celu */
+      &.status-ok { background: #10b981; }    /* Zielony - cel osiągnięty */
+      &.status-warn { background: #f59e0b; }  /* Pomarańczowy - lekkie przekroczenie */
+      &.status-over { background: #ef4444; }  /* Czerwony - znaczne przekroczenie */
     }
   }
 
-  /* Siatka Makro */
+  /* Mini paski w kafelkach makroskładników */
   .macros-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-bottom: 28px;
+    gap: 0.75rem;
 
-    .macro-card {
-      text-align: center;
-      padding: 12px 8px;
-      .label { display: block; font-size: 0.75rem; text-transform: uppercase; font-weight: 600; }
-      .value { display: block; font-weight: 700; font-size: 0.95rem; margin-top: 4px; }
-    }
-  }
-
-  /* Pozostałe sekcje */
-  .section {
-    margin-bottom: 28px;
-    .section-header {
+    .macro-item {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-      h2 { font-size: 1.2rem; font-weight: 700; color: #0f172a; margin: 0; }
-      .link-more { color: #3b82f6; text-decoration: none; font-size: 0.85rem; font-weight: 600; }
-    }
-  }
+      flex-direction: column;
+      padding: 0.65rem 0.6rem;
+      border-radius: 12px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
 
-  .meals-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    .meal-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 16px;
-      .meal-type {
+      .macro-header {
+        display: flex;
+        justify-content: space-between;
         font-size: 0.75rem;
         font-weight: 700;
-        text-transform: uppercase;
-        background: #f1f5f9;
+        margin-bottom: 0.25rem;
+
+        .percent {
+          font-weight: 800;
+        }
+      }
+
+      .value {
+        font-size: 0.8rem;
+        font-weight: 600;
         color: #475569;
-        padding: 4px 8px;
-        border-radius: 6px;
+        margin-bottom: 0.4rem;
       }
-      .meal-details {
-        flex: 1;
-        margin: 0 12px;
-        h4 { margin: 0; font-size: 0.95rem; color: #1e293b; }
-        .meal-macro { font-size: 0.8rem; color: #64748b; }
-      }
-      .btn-view { color: #94a3b8; text-decoration: none; font-weight: bold; }
-    }
-  }
 
-  .empty-card {
-    text-align: center;
-    padding: 24px;
-    color: #64748b;
-    p { margin: 0 0 10px 0; }
-    .btn-inline { color: #3b82f6; text-decoration: none; font-weight: 700; }
-  }
-
-  .recent-recipes-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 12px;
-    .recipe-mini-card {
-      position: relative;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px;
-      .mini-img {
-        width: 48px;
-        height: 48px;
-        border-radius: 8px;
+      .mini-progress-bg {
+        height: 4px;
+        background: #e2e8f0;
+        border-radius: 4px;
         overflow: hidden;
-        flex-shrink: 0;
-        img { width: 100%; height: 100%; object-fit: cover; }
+
+        .mini-progress-fill {
+          height: 100%;
+          border-radius: 4px;
+          transition: width 0.3s ease;
+        }
       }
-      .mini-content {
-        h4 { margin: 0; font-size: 0.85rem; color: #1e293b; line-height: 1.2; }
-        span { font-size: 0.75rem; color: #64748b; }
+
+      /* Dedykowane akcenty dla makro oraz zmiana koloru przy przekroczeniu */
+      &.macro-protein {
+        .label, .percent { color: #ef4444; }
+        .mini-progress-fill { background: #ef4444; }
       }
-      .card-overlay-link {
-        position: absolute;
-        top: 0; left: 0; width: 100%; height: 100%;
+
+      &.macro-fat {
+        .label, .percent { color: #d97706; }
+        .mini-progress-fill { background: #f59e0b; }
+      }
+
+      &.macro-carbs {
+        .label, .percent { color: #10b981; }
+        .mini-progress-fill { background: #10b981; }
+      }
+
+      /* Jeśli makro zostanie mocno przekroczone (>115%) */
+      &.status-over {
+        border-color: #fca5a5;
+        background: #fef2f2;
+        .percent { color: #dc2626; }
       }
     }
   }
 }
 
-.loading-state {
-  text-align: center;
-  padding: 60px 20px;
-  color: #64748b;
-}
+.today-meals-section {
+  h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #0f172a;
+  }
 
-.title-with-action {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  .meal-type-block {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
 
-  .btn-edit-goals {
-    font-size: 0.75rem;
-    text-decoration: none;
-    background: rgba(0, 0, 0, 0.06);
-    padding: 3px 8px;
-    border-radius: 6px;
-    color: inherit;
-    font-weight: 600;
-    transition: background 0.2s;
+    .meal-type-header {
+      margin-bottom: 0.75rem;
 
-    &:hover {
-      background: rgba(0, 0, 0, 0.12);
+      h3 {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 700;
+        color: #1e293b;
+      }
+    }
+
+    .meals-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      .meal-card {
+        display: flex;
+        align-items: center;
+        background: #f8fafc;
+        border: 1px solid #f1f5f9;
+        padding: 0.65rem;
+        border-radius: 12px;
+
+        .meal-thumb {
+          width: 44px;
+          height: 44px;
+          border-radius: 10px;
+          overflow: hidden;
+          margin-right: 0.75rem;
+          flex-shrink: 0;
+
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+        }
+
+        .meal-info {
+          display: flex;
+          flex-direction: column;
+
+          strong {
+            font-size: 0.9rem;
+            color: #0f172a;
+          }
+
+          small {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 3px;
+
+            /* Subtelne akcenty makro w kartach */
+            .tag-kcal { color: #2563eb; font-weight: 600; }
+            .tag-p { color: #ef4444; }
+            .tag-f { color: #d97706; }
+            .tag-c { color: #10b981; }
+          }
+        }
+      }
+
+      .empty-type {
+        font-size: 0.825rem;
+        color: #94a3b8;
+        font-style: italic;
+        padding: 0.25rem 0;
+      }
     }
   }
 }

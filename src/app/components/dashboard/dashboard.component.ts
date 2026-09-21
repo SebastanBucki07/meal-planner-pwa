@@ -1,9 +1,8 @@
 import {Component, OnInit} from '@angular/core';
-import {CommonModule, NgClass} from '@angular/common';
-import {RouterLink} from '@angular/router';
-import {createClient, SupabaseClient} from '@supabase/supabase-js';
-import {environment} from '../../../environment'
+import {CommonModule} from '@angular/common';
 import {NavbarComponent} from '../navbar/navbar.component';
+import {createClient, SupabaseClient} from '@supabase/supabase-js';
+import {environment} from '../../../environment';
 
 export interface PlannedMeal {
   id: string;
@@ -22,7 +21,7 @@ export interface PlannedMeal {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, NgClass, RouterLink, NavbarComponent],
+  imports: [CommonModule, NavbarComponent],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
@@ -31,6 +30,15 @@ export class DashboardComponent implements OnInit {
 
   loading: boolean = true;
   todayDate: string = new Date().toISOString().split('T')[0];
+
+  // Sekcje posiłków
+  readonly mealTypes: string[] = [
+    'Śniadanie',
+    'II śniadanie',
+    'Obiad',
+    'Kolacja',
+    'Przekąska'
+  ];
 
   targetCalories: number = 2000;
   targetProtein: number = 150;
@@ -51,11 +59,29 @@ export class DashboardComponent implements OnInit {
 
   async ngOnInit() {
     await Promise.all([
-      this.fetchUserProfile(), // <-- Pobieramy cele użytkownika
+      this.fetchUserProfile(),
       this.fetchTodayMealPlan(),
       this.fetchRecentRecipes()
     ]);
     this.loading = false;
+  }
+
+  // Mapowanie wartości z bazy danych do spójnych etykiet w interfejsie
+  private dbKeyToMealType(key: string): string {
+    const map: Record<string, string> = {
+      'Śniadanie': 'Śniadanie',
+      'sniadanie': 'Śniadanie',
+      'Drugie Śniadanie': 'II śniadanie',
+      'Drugie śniadanie': 'II śniadanie',
+      'drugie_sniadanie': 'II śniadanie',
+      'Obiad': 'Obiad',
+      'obiad': 'Obiad',
+      'Kolacja': 'Kolacja',
+      'kolacja': 'Kolacja',
+      'Przekąska': 'Przekąska',
+      'przekaska': 'Przekąska'
+    };
+    return map[key] || key;
   }
 
   async fetchUserProfile() {
@@ -83,11 +109,18 @@ export class DashboardComponent implements OnInit {
     const day = String(now.getDate()).padStart(2, '0');
     this.todayDate = `${year}-${month}-${day}`;
 
-    // 1. Pobierz plany posiłków na dziś
-    const {data: mealPlans, error: mealPlansError} = await this.supabase
-    .from('meal_plan')
-    .select('id, meal_type, recipe_id')
+    const { data: { user } } = await this.supabase.auth.getUser();
+
+    let query = this.supabase
+    .from('meal_plans')
+    .select('id, meal_type, recipe_id, user_id')
     .eq('date', this.todayDate);
+
+    if (user) {
+      query = query.eq('user_id', user.id);
+    }
+
+    const { data: mealPlans, error: mealPlansError } = await query;
 
     if (mealPlansError) {
       console.error('Błąd pobierania planu na dziś:', mealPlansError);
@@ -100,7 +133,6 @@ export class DashboardComponent implements OnInit {
       return;
     }
 
-    // 2. Zbierz ID wszystkich potrzebnych przepisów
     const recipeIds = mealPlans.map(p => p.recipe_id).filter(id => id != null);
 
     if (recipeIds.length === 0) {
@@ -109,8 +141,7 @@ export class DashboardComponent implements OnInit {
       return;
     }
 
-    // 3. Pobierz wszystkie przepisy jednym zapytaniem
-    const {data: recipes, error: recipesError} = await this.supabase
+    const { data: recipes, error: recipesError } = await this.supabase
     .from('recipes')
     .select('*')
     .in('id', recipeIds);
@@ -120,7 +151,6 @@ export class DashboardComponent implements OnInit {
       return;
     }
 
-    // 4. Połącz plany posiłków z przepisami
     const recipesById = new Map(recipes.map(r => [r.id, r]));
 
     this.todayMeals = mealPlans
@@ -129,7 +159,7 @@ export class DashboardComponent implements OnInit {
       if (recipe) {
         return {
           id: plan.id,
-          meal_type: plan.meal_type,
+          meal_type: this.dbKeyToMealType(plan.meal_type),
           recipe: recipe,
         } as PlannedMeal;
       }
@@ -141,10 +171,10 @@ export class DashboardComponent implements OnInit {
   }
 
   async fetchRecentRecipes() {
-    const {data, error} = await this.supabase
+    const { data, error } = await this.supabase
     .from('recipes')
     .select('id, title, calories, protein, image_url')
-    .order('created_at', {ascending: false})
+    .order('created_at', { ascending: false })
     .limit(3);
 
     if (error) {
@@ -152,6 +182,13 @@ export class DashboardComponent implements OnInit {
     } else if (data) {
       this.recentRecipes = data;
     }
+  }
+
+  // Pobieranie posiłków dla wybranego typu
+  getMealsForType(mealType: string): PlannedMeal[] {
+    return this.todayMeals.filter(
+      m => m.meal_type.toLowerCase() === mealType.toLowerCase()
+    );
   }
 
   calculateDailyTotals() {
@@ -177,24 +214,25 @@ export class DashboardComponent implements OnInit {
     return Math.round((this.consumedCalories / this.targetCalories) * 100);
   }
 
-  // Odpowiedni szerokość paska postępu (max 100% dla wyglądu interfejsu)
-  getProgressBarWidth(): number {
-    return Math.min(this.getCaloriePercentage(), 100);
+  // Oblicza rzeczywisty procent (może być wyższy niż 100%)
+  getMacroPercent(consumed: number, target: number): number {
+    if (!target || target === 0) return 0;
+    return Math.round((consumed / target) * 100);
   }
 
+// Zwraca szerokość paska do wizualizacji w UI (max 100% dla paska)
+  getProgressBarWidth(consumed: number, target: number): number {
+    return Math.min(this.getMacroPercent(consumed, target), 100);
+  }
+
+// Dynamiczna klasa statusu w zależności od stopnia realizacji/przekroczenia celu
   getStatusClass(consumed: number, target: number): string {
-    if (!target || target === 0) return 'status-yellow';
+    if (!target || target === 0) return 'status-normal';
+    const percent = this.getMacroPercent(consumed, target);
 
-    const ratio = consumed / target;
-
-    if (ratio < 0.85) {
-      return 'status-yellow';
-    } else if (ratio <= 1.05) {
-      return 'status-green';
-    } else if (ratio <= 1.15) {
-      return 'status-orange';
-    } else {
-      return 'status-red';
-    }
+    if (percent < 85) return 'status-under';   // Za mało (np. żółty/niebieski)
+    if (percent <= 105) return 'status-ok';    // W celu (zielony)
+    if (percent <= 115) return 'status-warn';  // Lekkie przekroczenie (pomarańczowy)
+    return 'status-over';                      // Duże przekroczenie (czerwony)
   }
 }
