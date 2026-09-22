@@ -91,7 +91,7 @@
 
   <!-- Sekcje posiłków dla danego dnia -->
   <main class="meals-list" *ngIf="!loading">
-    <div class="meal-type-section" *ngFor="let type of mealTypes">
+    <div class="meal-type-section" *ngFor="let type of MEAL_TYPES">
       <div class="meal-header">
         <h2>{{ type }}</h2>
         <button class="btn-add" (click)="openAddMealModal(type)">+ Dodaj</button>

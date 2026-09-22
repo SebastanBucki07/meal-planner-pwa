@@ -1,11 +1,19 @@
 <div class="dashboard-container" *ngIf="!loading">
+  <!-- Nagłówek z wylogowaniem -->
+  <header class="dashboard-header">
+    <h1>Dashboard</h1>
+    <button class="btn-logout" (click)="logout()">
+      Wyloguj
+    </button>
+  </header>
+
   <!-- Podsumowanie dnia & Makro -->
   <section class="summary-card" [ngClass]="getStatusClass(consumedCalories, targetCalories)">
     <div class="summary-header">
       <h2>Dzisiejszy bilans</h2>
       <span class="percentage-badge">
-      {{ getMacroPercent(consumedCalories, targetCalories) }}% celu
-    </span>
+        {{ getMacroPercent(consumedCalories, targetCalories) }}% celu
+      </span>
     </div>
 
     <div class="calories-main">
@@ -13,7 +21,6 @@
       <span class="target">/ {{ targetCalories }} kcal</span>
     </div>
 
-    <!-- Pasek postępu kalorii z dynamiczną klasą statusu -->
     <div class="progress-bar-container">
       <div
         class="progress-bar-fill"
@@ -22,7 +29,6 @@
       ></div>
     </div>
 
-    <!-- Grid Makroskładników z procentami i przekroczeniami -->
     <div class="macros-grid">
       <div class="macro-item macro-protein" [ngClass]="getStatusClass(consumedProtein, targetProtein)">
         <div class="macro-header">
@@ -59,11 +65,146 @@
     </div>
   </section>
 
-  <!-- Posiłki na dziś podzielone na 5 sekcji -->
+  <!-- Układ dwukolumnowy: Statystyki tygodnia + Wykres wagi -->
+  <div class="dashboard-grid">
+
+    <!-- Podsumowanie Poprzedniego Tygodnia -->
+    <section class="info-card previous-week-card">
+      <div class="card-header">
+        <h3>Poprzedni tydzień</h3>
+      </div>
+      <div class="week-stats">
+        <div class="stat-box">
+          <span class="stat-value">{{ prevWeekAvgCalories }} kcal</span>
+          <span class="stat-label">Średnio dziennie</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-value">{{ prevWeekDaysTracked }} / 7</span>
+          <span class="stat-label">Dni z planem</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Wykres Wagi oraz Tabela Pomiarów -->
+    <section class="info-card weight-chart-card">
+      <div class="card-header">
+        <h3>Wykres wagi</h3>
+        <span class="current-weight-badge" *ngIf="latestWeight">
+          Ostatni: <strong>{{ latestWeight }} kg</strong>
+        </span>
+      </div>
+
+      <div *ngIf="weightHistory.length > 0; else emptyChart">
+        <!-- Wykres SVG -->
+        <div class="chart-container">
+          <svg [attr.viewBox]="'0 0 ' + svgWidth + ' ' + svgHeight" class="weight-svg">
+
+            <!-- Linie siatki Y -->
+            <g class="grid-lines">
+              <g *ngFor="let line of yGridLines">
+                <line
+                  [attr.x1]="padding.left"
+                  [attr.y1]="line.y"
+                  [attr.x2]="svgWidth - padding.right"
+                  [attr.y2]="line.y"
+                  stroke="#e2e8f0"
+                  stroke-dasharray="4,4"
+                  stroke-width="1"
+                />
+                <text
+                  [attr.x]="padding.left - 8"
+                  [attr.y]="line.y + 4"
+                  text-anchor="end"
+                  font-size="12"
+                  font-weight="600"
+                  fill="#64748b">
+                  {{ line.value }}
+                </text>
+              </g>
+            </g>
+
+            <!-- Linie Osi X i Y -->
+            <line
+              [attr.x1]="padding.left"
+              [attr.y1]="svgHeight - padding.bottom"
+              [attr.x2]="svgWidth - padding.right"
+              [attr.y2]="svgHeight - padding.bottom"
+              stroke="#cbd5e1"
+              stroke-width="2"
+            />
+
+            <!-- Linia wykresu -->
+            <polyline
+              fill="none"
+              stroke="#2563eb"
+              stroke-width="3.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              [attr.points]="polylinePoints"
+            />
+
+            <!-- Punkty oraz Etykiety -->
+            <g *ngFor="let pt of chartPoints">
+              <circle
+                [attr.cx]="pt.x"
+                [attr.cy]="pt.y"
+                r="6"
+                fill="#2563eb"
+                stroke="#ffffff"
+                stroke-width="2.5"
+              />
+
+              <!-- Wartość nad punktem -->
+              <text
+                [attr.x]="pt.x"
+                [attr.y]="pt.y - 12"
+                text-anchor="middle"
+                font-weight="bold"
+                font-size="13"
+                fill="#1e40af">
+                {{ pt.weight }} kg
+              </text>
+
+              <!-- Data pod osią X -->
+              <text
+                [attr.x]="pt.x"
+                [attr.y]="svgHeight - padding.bottom + 22"
+                text-anchor="middle"
+                font-size="11"
+                font-weight="500"
+                fill="#475569">
+                {{ pt.date }}
+              </text>
+            </g>
+          </svg>
+        </div>
+
+        <!-- Czytelna lista z historią pomiarów pod wykresem -->
+        <div class="weight-history-list">
+          <h4>Ostatnie pomiary:</h4>
+          <div class="history-grid">
+            <div class="history-item" *ngFor="let entry of weightHistory">
+              <span class="entry-date">{{ entry.fullDate }}</span>
+              <span class="entry-weight">{{ entry.weight }} kg</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #emptyChart>
+        <div class="empty-chart">
+          Brak zarejestrowanych pomiarów wagi.
+        </div>
+      </ng-template>
+    </section>
+
+  </div>
+
+  <!-- Dzisiejsze posiłki -->
   <section class="today-meals-section">
     <h2>Dzisiejsze posiłki</h2>
 
-    <div class="meal-type-block" *ngFor="let type of mealTypes">
+    <div class="meal-type-block" *ngFor="let type of MEAL_TYPES">
       <div class="meal-type-header">
         <h3>{{ type }}</h3>
       </div>
@@ -92,5 +233,4 @@
   </section>
 </div>
 
-<!-- Dolny panel nawigacyjny -->
 <app-navbar></app-navbar>

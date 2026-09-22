@@ -3,29 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { SupabaseService } from '../../services/supabase.service';
-
-// Interfejsy
-interface ShoppingListItem {
-  name: string;
-  amount: number;
-  unit: string;
-  category: string;
-  shop_order: number;
-  checked: boolean;
-}
-
-interface ShoppingList {
-  id: number;
-  start_date: string;
-  end_date: string;
-  items: ShoppingListItem[];
-  is_completed: boolean;
-}
-
-interface Unit {
-  name: string;
-  multiplier_to_grams: number;
-}
+import {ShoppingList, ShoppingListItem} from '../../models';
 
 @Component({
   selector: 'app-shopping-list',
