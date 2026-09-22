@@ -6,29 +6,7 @@ import {NgForOf, NgIf} from '@angular/common';
 import {Ingredient} from '../../services/recipe.service';
 import {createClient, SupabaseClient} from '@supabase/supabase-js';
 import {environment} from '../../../environment';
-
-interface IngredientRow {
-  ingredientId: string;
-  name: string;
-  amount: number;
-  unit: string;
-  unitMultiplier: number;
-  calories: number;
-  protein: number;
-  carbs: number;
-  fat: number;
-}
-
-interface StepRow {
-  stepNumber: number;
-  instruction: string;
-}
-
-export interface Unit {
-  id: string;
-  name: string;
-  multiplier_to_grams: number;
-}
+import {IngredientRow, StepRow, Unit} from '../../models';
 
 @Component({
   selector: 'app-add-recipe',

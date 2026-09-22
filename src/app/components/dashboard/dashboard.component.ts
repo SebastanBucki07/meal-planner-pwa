@@ -4,33 +4,11 @@ import { Router } from '@angular/router';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { environment } from '../../../environment';
-
-export interface WeightEntry {
-  date: string;
-  fullDate: string;
-  weight: number;
-}
-
-export interface ChartPoint {
-  x: number;
-  y: number;
-  weight: number;
-  date: string;
-}
-
-export interface PlannedMeal {
-  id: string;
-  meal_type: string;
-  recipe: {
-    id: string;
-    title: string;
-    calories: number;
-    protein: number;
-    carbs: number;
-    fat: number;
-    image_url?: string;
-  };
-}
+import {ChartPoint} from '../../models/chartPoint.model';
+import {WeightEntry} from '../../models/weightEntry.model';
+import {PlannedMeal} from '../../models';
+import {MEAL_TYPES} from '../../models/mealTypes.model';
+import {dbKeyToMealType} from '../../helpers/mealType.helper';
 
 @Component({
   selector: 'app-dashboard',
@@ -45,14 +23,6 @@ export class DashboardComponent implements OnInit {
 
   loading: boolean = true;
   todayDate: string = new Date().toISOString().split('T')[0];
-
-  readonly mealTypes: string[] = [
-    'Śniadanie',
-    'II śniadanie',
-    'Obiad',
-    'Kolacja',
-    'Przekąska'
-  ];
 
   targetCalories: number = 2000;
   targetProtein: number = 150;
@@ -102,23 +72,6 @@ export class DashboardComponent implements OnInit {
   async logout(): Promise<void> {
     await this.supabase.auth.signOut();
     this.router.navigate(['/auth']);
-  }
-
-  private dbKeyToMealType(key: string): string {
-    const map: Record<string, string> = {
-      'Śniadanie': 'Śniadanie',
-      'sniadanie': 'Śniadanie',
-      'Drugie Śniadanie': 'II śniadanie',
-      'Drugie śniadanie': 'II śniadanie',
-      'drugie_sniadanie': 'II śniadanie',
-      'Obiad': 'Obiad',
-      'obiad': 'Obiad',
-      'Kolacja': 'Kolacja',
-      'kolacja': 'Kolacja',
-      'Przekąska': 'Przekąska',
-      'przekaska': 'Przekąska'
-    };
-    return map[key] || key;
   }
 
   async fetchUserProfile() {
@@ -187,7 +140,7 @@ export class DashboardComponent implements OnInit {
       if (recipe) {
         return {
           id: plan.id,
-          meal_type: this.dbKeyToMealType(plan.meal_type),
+          meal_type: dbKeyToMealType(plan.meal_type),
           recipe: recipe,
         } as PlannedMeal;
       }
@@ -395,4 +348,6 @@ export class DashboardComponent implements OnInit {
     }
     return 'ok';
   }
+
+  protected readonly MEAL_TYPES = MEAL_TYPES;
 }

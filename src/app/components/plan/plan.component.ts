@@ -3,14 +3,10 @@ import {SupabaseService} from '../../services/supabase.service';
 import {NavbarComponent} from '../navbar/navbar.component';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
-
-export interface WeekDay {
-  date: Date;
-  dateStr: string;
-  fullDateStr: string;
-  dayName: string;
-  isToday: boolean;
-}
+import {WeekDay} from '../../models';
+import {MEAL_TYPES} from '../../models/mealTypes.model';
+import {dbKeyToMealType} from '../../helpers/mealType.helper';
+import {RecipeStep} from '../../models/recipeStep.model';
 
 export interface PlannedMeal {
   id: string;
@@ -43,11 +39,6 @@ export interface Ingredient {
   unit: string;
 }
 
-export interface RecipeStep {
-  step_number: number;
-  instruction: string;
-}
-
 export interface Recipe {
   id: string;
   user_id: string;
@@ -74,7 +65,6 @@ export interface Recipe {
 })
 export class PlanComponent implements OnInit {
   loading: boolean = false;
-  readonly mealTypes: string[] = ['Śniadanie', 'II śniadanie', 'Obiad', 'Kolacja', 'Przekąska'];
   weekOffset: number = 0;
   currentWeekRangeText: string = '';
   selectedDate: string = '';
@@ -193,23 +183,6 @@ export class PlanComponent implements OnInit {
       'Przekąska': 'Przekąska'
     };
     return map[type] || type;
-  }
-
-  private dbKeyToMealType(key: string): string {
-    const map: Record<string, string> = {
-      'Śniadanie': 'Śniadanie',
-      'sniadanie': 'Śniadanie',
-      'Drugie Śniadanie': 'II śniadanie',
-      'Drugie śniadanie': 'II śniadanie',
-      'drugie_sniadanie': 'II śniadanie',
-      'Obiad': 'Obiad',
-      'obiad': 'Obiad',
-      'Kolacja': 'Kolacja',
-      'kolacja': 'Kolacja',
-      'Przekąska': 'Przekąska',
-      'przekaska': 'Przekąska'
-    };
-    return map[key] || key;
   }
 
   async addMealToPlan(recipeId: string): Promise<void> {
@@ -428,7 +401,7 @@ export class PlanComponent implements OnInit {
         return {
           id: item.id,
           date: item.date,
-          mealType: this.dbKeyToMealType(item.meal_type),
+          mealType: dbKeyToMealType(item.meal_type),
           recipeId: item.recipe_id,
           recipeName: recipe.title || 'Nieznany przepis',
           imageUrl: recipe.image_url,
@@ -464,4 +437,6 @@ export class PlanComponent implements OnInit {
   get dayFat(): number {
     return Math.round(this.dayMeals.reduce((sum, m) => sum + (m.fat || 0), 0));
   }
+
+  protected readonly MEAL_TYPES = MEAL_TYPES;
 }
