@@ -168,26 +168,46 @@ export class ProfileComponent implements OnInit {
       return;
     }
 
-    const { error } = await this.supabase
-    .from('profiles')
-    .upsert({
-      id: user.id,
-      target_calories: this.targetCalories,
-      target_protein: this.targetProtein,
-      target_carbs: this.targetCarbs,
-      target_fat: this.targetFat,
-      height: this.height,
-      weight: this.weight,
-      updated_at: new Date()
-    });
+    try {
+      // 1. Zapis/Aktualizacja w profilu głównym
+      const { error: profileError } = await this.supabase
+      .from('profiles')
+      .upsert({
+        id: user.id,
+        target_calories: this.targetCalories,
+        target_protein: this.targetProtein,
+        target_carbs: this.targetCarbs,
+        target_fat: this.targetFat,
+        height: this.height,
+        weight: this.weight,
+        updated_at: new Date()
+      });
 
-    if (error) {
+      if (profileError) throw profileError;
+
+      // 2. Dodanie nowego wpisu do historii wagi (weight_logs), jeśli waga została podana
+      if (this.weight) {
+        const todayStr = new Date().toISOString().split('T')[0];
+
+        const { error: weightError } = await this.supabase
+        .from('weight_logs')
+        .insert({
+          user_id: user.id,
+          weight: this.weight,
+          date: todayStr // Upewnij się, że nazwa klucza odpowiada nazwie kolumny w Supabase
+        });
+
+        if (weightError) {
+          console.warn('Błąd zapisu wagi:', weightError.message);
+        }
+      }
+
+      this.message = 'Ustawienia i nowa waga zostały zapisane! 🎉';
+    } catch (error) {
       console.error('Błąd zapisu profilu:', error);
       this.message = 'Nie udało się zapisać zmian.';
-    } else {
-      this.message = 'Ustawienia i cele zostały zapisane! 🎉';
+    } finally {
+      this.saving = false;
     }
-
-    this.saving = false;
   }
 }
