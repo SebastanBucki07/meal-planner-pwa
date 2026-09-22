@@ -82,8 +82,12 @@
       &.kcal {
         background: #ecfdf5;
         border-color: #a7f3d0;
-        .val { color: #047857; }
-        .lbl { color: #059669; }
+        .val {
+          color: #047857;
+        }
+        .lbl {
+          color: #059669;
+        }
       }
     }
   }

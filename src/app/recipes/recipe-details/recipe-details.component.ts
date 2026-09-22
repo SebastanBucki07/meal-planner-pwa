@@ -3,26 +3,20 @@ import { CommonModule, NgForOf, NgIf } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import {environment} from '../../../environment';
+import { environment } from '../../../environment';
 import { NavbarComponent } from '../../components/navbar/navbar.component';
 
 @Component({
   selector: 'app-recipe-details',
   standalone: true,
-  imports: [
-    CommonModule,
-    NgIf,
-    NgForOf,
-    RouterLink,
-    NavbarComponent
-  ],
+  imports: [CommonModule, NgIf, NgForOf, RouterLink, NavbarComponent],
   templateUrl: './recipe-details.component.html',
   styleUrl: './recipe-details.component.scss'
 })
 export class RecipeDetailsComponent implements OnInit {
   private supabase: SupabaseClient;
   recipe: any = null;
-  loading: boolean = true;
+  loading = true;
   safeVideoUrl: SafeResourceUrl | null = null;
 
   constructor(
@@ -41,11 +35,7 @@ export class RecipeDetailsComponent implements OnInit {
 
   async fetchRecipe(id: string) {
     this.loading = true;
-    const { data, error } = await this.supabase
-    .from('recipes')
-    .select('*')
-    .eq('id', id)
-    .single();
+    const { data, error } = await this.supabase.from('recipes').select('*').eq('id', id).single();
 
     if (error) {
       console.error('Błąd pobierania przepisu:', error);

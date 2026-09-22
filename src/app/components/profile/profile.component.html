@@ -10,29 +10,47 @@
 
     <div class="form-grid-2">
       <div class="form-group">
-        <label>Wzrost (cm)</label>
-        <input type="number" [(ngModel)]="height" (ngModelChange)="calculateBMI()" placeholder="np. 180" />
+        <label for="height">Wzrost (cm)</label>
+        <input
+          id="height"
+          type="number"
+          [(ngModel)]="height"
+          (ngModelChange)="calculateBMI()"
+          placeholder="np. 180"
+        />
       </div>
       <div class="form-group">
-        <label>Waga (kg)</label>
-        <input type="number" [(ngModel)]="weight" (ngModelChange)="calculateBMI()" placeholder="np. 80" />
+        <label for="weight">Waga (kg)</label>
+        <input
+          id="weight"
+          type="number"
+          [(ngModel)]="weight"
+          (ngModelChange)="calculateBMI()"
+          placeholder="np. 80"
+        />
       </div>
     </div>
 
     <!-- Wskaźnik BMI -->
     <div class="bmi-result" *ngIf="bmi" [ngClass]="bmiColorClass">
-      <div class="bmi-val">BMI: <strong>{{ bmi }}</strong></div>
-      <div class="bmi-cat">Kategoria WHO: <strong>{{ bmiCategory }}</strong></div>
+      <div class="bmi-val">
+        BMI:
+        <strong>{{ bmi }}</strong>
+      </div>
+      <div class="bmi-cat">
+        Kategoria WHO:
+        <strong>{{ bmiCategory }}</strong>
+      </div>
     </div>
 
     <div class="form-grid-2 margin-top">
       <div class="form-group">
-        <label>Wiek</label>
-        <input type="number" [(ngModel)]="age" placeholder="30" />
+        <label for="age">Wiek</label>
+        <input id="age" type="number" [(ngModel)]="age" placeholder="30" />
       </div>
       <div class="form-group">
-        <label>Płeć</label>
-        <select [(ngModel)]="gender">
+        <label for="gender">Płeć</label>
+        <select id="gender" [(ngModel)]="gender">
           <option value="male">Mężczyzna</option>
           <option value="female">Kobieta</option>
         </select>
@@ -40,29 +58,50 @@
     </div>
 
     <div class="form-group">
-      <label>Tryb pracy</label>
+      <span class="label">Tryb pracy</span>
       <div class="toggle-buttons">
-        <button [class.active]="workType === 'sedentary'" (click)="workType = 'sedentary'">Siedząca</button>
-        <button [class.active]="workType === 'physical'" (click)="workType = 'physical'">Fizyczna</button>
+        <button
+          type="button"
+          [class.active]="workType === 'sedentary'"
+          (click)="workType = 'sedentary'"
+        >
+          Siedząca
+        </button>
+        <button
+          type="button"
+          [class.active]="workType === 'physical'"
+          (click)="workType = 'physical'"
+        >
+          Fizyczna
+        </button>
       </div>
     </div>
 
     <div class="form-group">
-      <label>Treningi w tygodniu: <strong>{{ workoutsPerWeek }}x</strong></label>
-      <input type="range" min="0" max="6" step="1" [(ngModel)]="workoutsPerWeek" />
+      <label for="workouts">
+        Treningi w tygodniu:
+        <strong>{{ workoutsPerWeek }}x</strong>
+      </label>
+      <input id="workouts" type="range" min="0" max="6" step="1" [(ngModel)]="workoutsPerWeek" />
     </div>
 
     <!-- 3 PRZYCISKI CELU -->
     <div class="form-group">
-      <label>Jaki jest Twój cel?</label>
+      <span class="label">Jaki jest Twój cel?</span>
       <div class="goal-buttons">
-        <button [class.active]="goal === 'lose'" (click)="goal = 'lose'">📉 Chcę schudnąć</button>
-        <button [class.active]="goal === 'maintain'" (click)="goal = 'maintain'">⚖️ Utrzymać wagę</button>
-        <button [class.active]="goal === 'gain'" (click)="goal = 'gain'">📈 Chcę przytyć</button>
+        <button type="button" [class.active]="goal === 'lose'" (click)="goal = 'lose'">
+          📉 Chcę schudnąć
+        </button>
+        <button type="button" [class.active]="goal === 'maintain'" (click)="goal = 'maintain'">
+          ⚖️ Utrzymać wagę
+        </button>
+        <button type="button" [class.active]="goal === 'gain'" (click)="goal = 'gain'">
+          📈 Chcę przytyć
+        </button>
       </div>
     </div>
 
-    <button class="btn-calc" (click)="calculateTDEE()">
+    <button type="button" class="btn-calc" (click)="calculateTDEE()">
       🧮 Oblicz i przelicz cele makro
     </button>
   </div>
@@ -72,28 +111,28 @@
     <h2>2. Dzienne cele makroskładników</h2>
 
     <div class="form-group">
-      <label>Cel Kaloryczny (kcal)</label>
-      <input type="number" [(ngModel)]="targetCalories" />
+      <label for="targetCalories">Cel Kaloryczny (kcal)</label>
+      <input id="targetCalories" type="number" [(ngModel)]="targetCalories" />
     </div>
 
     <div class="form-grid-3">
       <div class="form-group">
-        <label>Białko (g)</label>
-        <input type="number" [(ngModel)]="targetProtein" />
+        <label for="targetProtein">Białko (g)</label>
+        <input id="targetProtein" type="number" [(ngModel)]="targetProtein" />
       </div>
       <div class="form-group">
-        <label>Węgle (g)</label>
-        <input type="number" [(ngModel)]="targetCarbs" />
+        <label for="targetCarbs">Węgle (g)</label>
+        <input id="targetCarbs" type="number" [(ngModel)]="targetCarbs" />
       </div>
       <div class="form-group">
-        <label>Tłuszcze (g)</label>
-        <input type="number" [(ngModel)]="targetFat" />
+        <label for="targetFat">Tłuszcze (g)</label>
+        <input id="targetFat" type="number" [(ngModel)]="targetFat" />
       </div>
     </div>
 
     <div class="status-msg" *ngIf="message">{{ message }}</div>
 
-    <button class="btn-save" (click)="saveProfile()" [disabled]="saving">
+    <button type="button" class="btn-save" (click)="saveProfile()" [disabled]="saving">
       {{ saving ? 'Zapisywanie...' : 'Zapisz Ustawienia w Bazie' }}
     </button>
   </div>

@@ -1,23 +1,32 @@
 <div class="page-container">
   <div class="editor-layout">
-
     <!-- LEWA KOLUMNA: Formularz edycji -->
     <div class="form-section">
       <h2>Nowy Przepis 🍳</h2>
 
       <div class="form-group">
-        <label>Nazwa przepisu</label>
-        <input type="text" [(ngModel)]="title" placeholder="np. Kurczak w sosie słodko-kwaśnym" />
+        <label for="recipeTitle">Nazwa przepisu</label>
+        <input
+          id="recipeTitle"
+          type="text"
+          [(ngModel)]="title"
+          placeholder="np. Kurczak w sosie słodko-kwaśnym"
+        />
       </div>
 
       <div class="form-group">
-        <label>Link do zdjęcia (opcjonalnie)</label>
-        <input type="text" [(ngModel)]="imageUrl" placeholder="https://..." />
+        <label for="recipeImageUrl">Link do zdjęcia (opcjonalnie)</label>
+        <input id="recipeImageUrl" type="text" [(ngModel)]="imageUrl" placeholder="https://..." />
       </div>
 
       <div class="form-group">
-        <label>Link do filmu Video (YouTube / TikTok)</label>
-        <input type="text" [(ngModel)]="videoUrl" placeholder="https://youtube.com/watch?v=..." />
+        <label for="recipeVideoUrl">Link do filmu Video (YouTube / TikTok)</label>
+        <input
+          id="recipeVideoUrl"
+          type="text"
+          [(ngModel)]="videoUrl"
+          placeholder="https://youtube.com/watch?v=..."
+        />
       </div>
 
       <!-- Tabela Składników -->
@@ -25,44 +34,53 @@
         <h3>Składniki</h3>
         <table class="ingredients-table">
           <thead>
-          <tr>
-            <th>Składnik</th>
-            <th>Ilość</th>
-            <th>Jednostka</th>
-            <th>kcal</th>
-            <th>B</th>
-            <th>W</th>
-            <th>T</th>
-            <th></th>
-          </tr>
+            <tr>
+              <th scope="col">Składnik</th>
+              <th scope="col">Ilość</th>
+              <th scope="col">Jednostka</th>
+              <th scope="col">kcal</th>
+              <th scope="col">B</th>
+              <th scope="col">W</th>
+              <th scope="col">T</th>
+              <th scope="col"></th>
+            </tr>
           </thead>
           <tbody>
-          <tr *ngFor="let row of ingredientRows; let i = index">
-            <td>
-              <select [(ngModel)]="row.ingredientId" (change)="onIngredientChange(row)">
-                <option value="" disabled>Wybierz...</option>
-                <option *ngFor="let ing of availableIngredients" [value]="ing.id">{{ ing.name }}</option>
-              </select>
-            </td>
-            <td>
-              <input type="number" [(ngModel)]="row.amount" (input)="onIngredientChange(row)" class="num-input" />
-            </td>
-            <td>
-              <select [(ngModel)]="row.unit" (change)="onUnitChange(row)">
-                <option *ngFor="let u of availableUnits" [value]="u.name">{{ u.name }}</option>
-              </select>
-            </td>
-            <td class="macro-cell">{{ row.calories }}</td>
-            <td class="macro-cell">{{ row.protein }}</td>
-            <td class="macro-cell">{{ row.carbs }}</td>
-            <td class="macro-cell">{{ row.fat }}</td>
-            <td>
-              <button (click)="removeIngredientRow(i)" class="btn-del">❌</button>
-            </td>
-          </tr>
+            <tr *ngFor="let row of ingredientRows; let i = index">
+              <td>
+                <select [(ngModel)]="row.ingredientId" (change)="onIngredientChange(row)">
+                  <option value="" disabled>Wybierz...</option>
+                  <option *ngFor="let ing of availableIngredients" [value]="ing.id">
+                    {{ ing.name }}
+                  </option>
+                </select>
+              </td>
+              <td>
+                <input
+                  type="number"
+                  [(ngModel)]="row.amount"
+                  (input)="onIngredientChange(row)"
+                  class="num-input"
+                />
+              </td>
+              <td>
+                <select [(ngModel)]="row.unit" (change)="onUnitChange(row)">
+                  <option *ngFor="let u of availableUnits" [value]="u.name">{{ u.name }}</option>
+                </select>
+              </td>
+              <td class="macro-cell">{{ row.calories }}</td>
+              <td class="macro-cell">{{ row.protein }}</td>
+              <td class="macro-cell">{{ row.carbs }}</td>
+              <td class="macro-cell">{{ row.fat }}</td>
+              <td>
+                <button type="button" (click)="removeIngredientRow(i)" class="btn-del">❌</button>
+              </td>
+            </tr>
           </tbody>
         </table>
-        <button (click)="addIngredientRow()" class="btn-add-row">+ Dodaj składnik</button>
+        <button type="button" (click)="addIngredientRow()" class="btn-add-row">
+          + Dodaj składnik
+        </button>
       </div>
 
       <!-- Tabela Instrukcji Krok po Kroku -->
@@ -71,12 +89,19 @@
         <div class="step-row" *ngFor="let step of stepRows; let i = index">
           <span class="step-num">Krok {{ step.stepNumber }}</span>
           <textarea [(ngModel)]="step.instruction" rows="2" placeholder="Opisz krok..."></textarea>
-          <button (click)="removeStepRow(i)" class="btn-del">❌</button>
+          <button type="button" (click)="removeStepRow(i)" class="btn-del">❌</button>
         </div>
-        <button (click)="addStepRow()" class="btn-add-row">+ Dodaj kolejny krok</button>
+        <button type="button" (click)="addStepRow()" class="btn-add-row">
+          + Dodaj kolejny krok
+        </button>
       </div>
 
-      <button (click)="saveRecipe()" [disabled]="!title || ingredientRows.length === 0" class="btn-save">
+      <button
+        type="button"
+        (click)="saveRecipe()"
+        [disabled]="!title || ingredientRows.length === 0"
+        class="btn-save"
+      >
         💾 Zapisz Przepis
       </button>
     </div>
@@ -116,7 +141,8 @@
           <h4>Składniki:</h4>
           <ul>
             <li *ngFor="let ing of ingredientRows">
-              <strong>{{ ing.name || 'Wybierz składnik' }}</strong> — {{ ing.amount }} {{ ing.unit }} ({{ ing.calories }} kcal)
+              <strong>{{ ing.name || 'Wybierz składnik' }}</strong>
+              — {{ ing.amount }} {{ ing.unit }} ({{ ing.calories }} kcal)
             </li>
           </ul>
         </div>
@@ -131,11 +157,13 @@
         </div>
 
         <div class="video-link" *ngIf="videoUrl">
-          🎬 <a [href]="videoUrl" target="_blank">Obejrzyj wideo w nowej karcie</a>
+          🎬
+          <a [href]="videoUrl" target="_blank" rel="noopener noreferrer">
+            Obejrzyj wideo w nowej karcie
+          </a>
         </div>
       </div>
     </div>
-
   </div>
 </div>
 

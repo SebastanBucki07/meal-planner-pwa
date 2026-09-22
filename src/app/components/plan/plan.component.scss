@@ -2,7 +2,11 @@
   max-width: 800px;
   margin: 0 auto;
   padding: 1rem 1rem 90px 1rem;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family:
+    'Inter',
+    system-ui,
+    -apple-system,
+    sans-serif;
   color: #1e293b;
   min-height: 100vh;
 }
@@ -144,7 +148,8 @@
       box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
       transform: translateY(-2px);
 
-      .day-name, .day-date {
+      .day-name,
+      .day-date {
         color: #ffffff;
       }
     }
@@ -201,10 +206,18 @@
       }
     }
 
-    &.calories .progress-bar-fill { background: #2563eb; }
-    &.protein .progress-bar-fill { background: #ef4444; }
-    &.fat .progress-bar-fill { background: #f59e0b; }
-    &.carbs .progress-bar-fill { background: #10b981; }
+    &.calories .progress-bar-fill {
+      background: #2563eb;
+    }
+    &.protein .progress-bar-fill {
+      background: #ef4444;
+    }
+    &.fat .progress-bar-fill {
+      background: #f59e0b;
+    }
+    &.carbs .progress-bar-fill {
+      background: #10b981;
+    }
   }
 
   .macros-grid {
@@ -329,7 +342,10 @@
       align-items: center;
       margin-bottom: 1rem;
 
-      h3 { margin: 0; font-size: 1.1rem; }
+      h3 {
+        margin: 0;
+        font-size: 1.1rem;
+      }
       .btn-close {
         background: none;
         border: none;
@@ -344,7 +360,8 @@
       gap: 1rem;
     }
 
-    .search-input, .filters-grid input {
+    .search-input,
+    .filters-grid input {
       width: 100%;
       padding: 10px 14px;
       border: 1px solid #cbd5e1;

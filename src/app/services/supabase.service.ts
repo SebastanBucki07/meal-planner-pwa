@@ -52,8 +52,9 @@ export class SupabaseService {
     if (!user) throw new Error('Brak zalogowanego użytkownika');
 
     return await this.supabase
-    .from('meal_plan')
-    .select(`
+      .from('meal_plan')
+      .select(
+        `
       id,
       date,
       meal_type,
@@ -66,44 +67,47 @@ export class SupabaseService {
         carbs,
         fat
       )
-    `)
-    .eq('user_id', user.id)
-    .eq('date', date);
+    `
+      )
+      .eq('user_id', user.id)
+      .eq('date', date);
   }
 
-// Pobieranie listy dostępnych przepisów do wyboru
+  // Pobieranie listy dostępnych przepisów do wyboru
   async getRecipes() {
-    return await this.supabase
-    .from('recipes')
-    .select('*')
-    .order('title');
+    return await this.supabase.from('recipes').select('*').order('title');
   }
 
-// Dodanie posiłku do planu
-  async addMealToPlan(meal: { date: string; recipe_id: string; meal_type: string; servings: number }) {
+  // Dodanie posiłku do planu
+  async addMealToPlan(meal: {
+    date: string;
+    recipe_id: string;
+    meal_type: string;
+    servings: number;
+  }) {
     const user = this.user;
     if (!user) throw new Error('Brak zalogowanego użytkownika');
 
-    return await this.supabase
-    .from('meal_plan')
-    .insert([{ ...meal, user_id: user.id }]);
+    return await this.supabase.from('meal_plan').insert([{ ...meal, user_id: user.id }]);
   }
 
-// Usunięcie posiłku z planu
+  // Usunięcie posiłku z planu
   async deleteMealFromPlan(id: string) {
-    return await this.supabase
-    .from('meal_plan')
-    .delete()
-    .eq('id', id);
+    return await this.supabase.from('meal_plan').delete().eq('id', id);
   }
 
   // Dodawanie nowego przepisu do bazy
-  async addRecipe(recipe: { title: string; calories: number; protein: number; carbs: number; fat: number; instructions?: string }) {
+  async addRecipe(recipe: {
+    title: string;
+    calories: number;
+    protein: number;
+    carbs: number;
+    fat: number;
+    instructions?: string;
+  }) {
     const user = this.user;
     if (!user) throw new Error('Brak zalogowanego użytkownika');
 
-    return await this.supabase
-    .from('recipes')
-    .insert([{ ...recipe, user_id: user.id }]);
+    return await this.supabase.from('recipes').insert([{ ...recipe, user_id: user.id }]);
   }
 }

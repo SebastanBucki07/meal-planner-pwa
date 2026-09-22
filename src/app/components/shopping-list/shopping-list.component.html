@@ -3,17 +3,17 @@
   <aside class="sidebar">
     <h3>Historia List</h3>
     <div class="history-list">
-      <div
+      <button
+        type="button"
         *ngFor="let list of historyLists"
         class="history-item"
         [class.active]="activeList?.id === list.id"
-        (click)="selectListFromHistory(list)">
+        (click)="selectListFromHistory(list)"
+      >
         <span>Lista od {{ list.start_date | date:'dd.MM' }}</span>
         <span>do {{ list.end_date | date:'dd.MM.yyyy' }}</span>
-      </div>
-      <div *ngIf="historyLists.length === 0" class="no-history">
-        Brak aktywnych list.
-      </div>
+      </button>
+      <div *ngIf="historyLists.length === 0" class="no-history">Brak aktywnych list.</div>
     </div>
   </aside>
 
@@ -30,11 +30,11 @@
         <div class="date-picker-container">
           <div class="date-input-group">
             <label for="startDate">Od:</label>
-            <input type="date" id="startDate" [(ngModel)]="startDate">
+            <input type="date" id="startDate" [(ngModel)]="startDate" />
           </div>
           <div class="date-input-group">
             <label for="endDate">Do:</label>
-            <input type="date" id="endDate" [(ngModel)]="endDate">
+            <input type="date" id="endDate" [(ngModel)]="endDate" />
           </div>
         </div>
         <div class="actions">
@@ -45,9 +45,7 @@
       </div>
 
       <!-- Wyświetlanie aktywnej listy -->
-      <div *ngIf="loading" class="loading-spinner">
-        Ładowanie...
-      </div>
+      <div *ngIf="loading" class="loading-spinner">Ładowanie...</div>
 
       <div *ngIf="!loading && activeList" class="list-container">
         <div *ngFor="let category of categories" class="category-section">
@@ -57,9 +55,11 @@
               type="checkbox"
               [id]="item.name + activeList!.id"
               [(ngModel)]="item.checked"
-              (ngModelChange)="onItemCheck()">
+              (ngModelChange)="onItemCheck()"
+            />
             <label [for]="item.name + activeList!.id" [class.checked]="item.checked">
-              {{ item.name }} - <strong>{{ item.amount }} {{ item.unit }}</strong>
+              {{ item.name }} -
+              <strong>{{ item.amount }} {{ item.unit }}</strong>
             </label>
           </div>
         </div>

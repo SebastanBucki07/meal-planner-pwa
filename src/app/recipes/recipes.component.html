@@ -5,12 +5,38 @@
 
   <!-- Wyszukiwarka i Filtry -->
   <div class="filters-card">
-    <input type="text" class="search-input" placeholder="Szukaj po nazwie..." [(ngModel)]="searchTerm" (ngModelChange)="applyFilters()">
+    <input
+      type="text"
+      class="search-input"
+      placeholder="Szukaj po nazwie..."
+      [(ngModel)]="searchTerm"
+      (ngModelChange)="applyFilters()"
+    />
     <div class="filters-grid">
-      <input type="number" placeholder="Max kcal" [(ngModel)]="maxCalories" (ngModelChange)="applyFilters()">
-      <input type="number" placeholder="Min białko" [(ngModel)]="minProtein" (ngModelChange)="applyFilters()">
-      <input type="number" placeholder="Min węgle" [(ngModel)]="minCarbs" (ngModelChange)="applyFilters()">
-      <input type="number" placeholder="Min tłuszcz" [(ngModel)]="minFat" (ngModelChange)="applyFilters()">
+      <input
+        type="number"
+        placeholder="Max kcal"
+        [(ngModel)]="maxCalories"
+        (ngModelChange)="applyFilters()"
+      />
+      <input
+        type="number"
+        placeholder="Min białko"
+        [(ngModel)]="minProtein"
+        (ngModelChange)="applyFilters()"
+      />
+      <input
+        type="number"
+        placeholder="Min węgle"
+        [(ngModel)]="minCarbs"
+        (ngModelChange)="applyFilters()"
+      />
+      <input
+        type="number"
+        placeholder="Min tłuszcz"
+        [(ngModel)]="minFat"
+        (ngModelChange)="applyFilters()"
+      />
     </div>
   </div>
 
@@ -45,9 +71,7 @@
         </div>
       </div>
 
-      <a [routerLink]="['/recipes', recipe.id]" class="btn-details">
-        Zobacz przepis ➔
-      </a>
+      <a [routerLink]="['/recipes', recipe.id]" class="btn-details">Zobacz przepis ➔</a>
     </div>
   </div>
 
