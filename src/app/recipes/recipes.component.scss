@@ -42,7 +42,7 @@
       grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
       gap: 12px;
 
-      input[type="number"] {
+      input[type='number'] {
         width: 100%;
         padding: 10px 12px;
         border: 1px solid #cbd5e1;
@@ -64,7 +64,8 @@
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 20px;
 
-    .empty-state, .loading {
+    .empty-state,
+    .loading {
       grid-column: 1 / -1;
       text-align: center;
       padding: 40px 20px;
@@ -83,7 +84,9 @@
     flex-direction: column;
     justify-content: space-between;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition:
+      transform 0.2s,
+      box-shadow 0.2s;
 
     &:hover {
       transform: translateY(-2px);
@@ -229,7 +232,9 @@
   font-size: 0.95rem;
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
   z-index: 90;
-  transition: background-color 0.2s, transform 0.2s;
+  transition:
+    background-color 0.2s,
+    transform 0.2s;
 
   &:hover {
     background: #2563eb;

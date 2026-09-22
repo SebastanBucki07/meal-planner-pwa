@@ -1,21 +1,16 @@
-import {Component, OnInit} from '@angular/core';
-import {Router} from '@angular/router';
-import {NavbarComponent} from '../../components/navbar/navbar.component';
-import {FormsModule} from '@angular/forms';
-import {NgForOf, NgIf} from '@angular/common';
-import {Ingredient} from '../../services/recipe.service';
-import {createClient, SupabaseClient} from '@supabase/supabase-js';
-import {environment} from '../../../environment';
-import {IngredientRow, StepRow, Unit} from '../../models';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { NavbarComponent } from '../../components/navbar/navbar.component';
+import { FormsModule } from '@angular/forms';
+import { NgForOf, NgIf } from '@angular/common';
+import { Ingredient } from '../../services/recipe.service';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { environment } from '../../../environment';
+import { IngredientRow, StepRow, Unit } from '../../models';
 
 @Component({
   selector: 'app-add-recipe',
-  imports: [
-    NavbarComponent,
-    FormsModule,
-    NgIf,
-    NgForOf
-  ],
+  imports: [NavbarComponent, FormsModule, NgIf, NgForOf],
   templateUrl: './add-recipe.component.html',
   styleUrl: './add-recipe.component.scss'
 })
@@ -23,9 +18,9 @@ export class AddRecipeComponent implements OnInit {
   private supabase: SupabaseClient;
 
   // Dane do kontrolek
-  title: string = '';
-  imageUrl: string = '';
-  videoUrl: string = '';
+  title = '';
+  imageUrl = '';
+  videoUrl = '';
 
   // Słowniki pobierane z Supabase
   availableIngredients: Ingredient[] = [];
@@ -40,10 +35,7 @@ export class AddRecipeComponent implements OnInit {
   }
 
   async ngOnInit() {
-    await Promise.all([
-      this.fetchIngredients(),
-      this.fetchUnits()
-    ]);
+    await Promise.all([this.fetchIngredients(), this.fetchUnits()]);
 
     // Domyślne wiersze na start
     this.addIngredientRow();
@@ -52,10 +44,10 @@ export class AddRecipeComponent implements OnInit {
 
   // 1. Pobieranie danych z Supabase
   async fetchIngredients() {
-    const {data, error} = await this.supabase
-    .from('ingredients')
-    .select('*')
-    .order('name', {ascending: true});
+    const { data, error } = await this.supabase
+      .from('ingredients')
+      .select('*')
+      .order('name', { ascending: true });
 
     if (error) {
       console.error('Błąd pobierania składników:', error);
@@ -65,10 +57,10 @@ export class AddRecipeComponent implements OnInit {
   }
 
   async fetchUnits() {
-    const {data, error} = await this.supabase
-    .from('units')
-    .select('*')
-    .order('name', {ascending: true});
+    const { data, error } = await this.supabase
+      .from('units')
+      .select('*')
+      .order('name', { ascending: true });
 
     if (error) {
       console.error('Błąd pobierania jednostek:', error);
@@ -162,7 +154,7 @@ export class AddRecipeComponent implements OnInit {
   removeStepRow(index: number) {
     this.stepRows.splice(index, 1);
     // Przeliczenie numerów kroków po usunięciu
-    this.stepRows.forEach((step, idx) => step.stepNumber = idx + 1);
+    this.stepRows.forEach((step, idx) => (step.stepNumber = idx + 1));
   }
 
   // 6. Zapis przepisu w Supabase
@@ -171,24 +163,24 @@ export class AddRecipeComponent implements OnInit {
 
     // Przygotowanie danych do zapisu
     const preparedIngredients = this.ingredientRows
-    .filter(row => row.ingredientId)
-    .map(row => ({
-      ingredient_id: row.ingredientId,
-      name: row.name,
-      amount: row.amount,
-      unit: row.unit,
-      calories: row.calories,
-      protein: row.protein,
-      carbs: row.carbs,
-      fat: row.fat
-    }));
+      .filter(row => row.ingredientId)
+      .map(row => ({
+        ingredient_id: row.ingredientId,
+        name: row.name,
+        amount: row.amount,
+        unit: row.unit,
+        calories: row.calories,
+        protein: row.protein,
+        carbs: row.carbs,
+        fat: row.fat
+      }));
 
     const preparedSteps = this.stepRows
-    .filter(step => step.instruction.trim() !== '')
-    .map(step => ({
-      step_number: step.stepNumber,
-      instruction: step.instruction
-    }));
+      .filter(step => step.instruction.trim() !== '')
+      .map(step => ({
+        step_number: step.stepNumber,
+        instruction: step.instruction
+      }));
 
     const newRecipe = {
       title: this.title,
@@ -202,9 +194,7 @@ export class AddRecipeComponent implements OnInit {
       fat: this.totalFat
     };
 
-    const {data, error} = await this.supabase
-    .from('recipes')
-    .insert([newRecipe]);
+    const { data, error } = await this.supabase.from('recipes').insert([newRecipe]);
 
     if (error) {
       console.error('Błąd zapisu przepisu:', error);

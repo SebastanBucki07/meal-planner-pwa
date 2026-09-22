@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { SupabaseService } from '../../services/supabase.service';
-import {ShoppingList, ShoppingListItem} from '../../models';
+import { ShoppingList, ShoppingListItem } from '../../models';
 
 @Component({
   selector: 'app-shopping-list',
@@ -13,16 +13,16 @@ import {ShoppingList, ShoppingListItem} from '../../models';
   styleUrls: ['./shopping-list.component.scss']
 })
 export class ShoppingListComponent implements OnInit {
-  loading: boolean = false;
+  loading = false;
 
   historyLists: ShoppingList[] = [];
   activeList: ShoppingList | null = null;
   categories: string[] = [];
 
-  startDate: string = '';
-  endDate: string = '';
+  startDate = '';
+  endDate = '';
 
-  constructor(private supabase: SupabaseService) { }
+  constructor(private supabase: SupabaseService) {}
 
   ngOnInit(): void {
     this.setDefaultDates();
@@ -63,7 +63,9 @@ export class ShoppingListComponent implements OnInit {
       }
 
       // Pobierz ID użytkownika
-      const { data: { user } } = await this.supabase.client.auth.getUser();
+      const {
+        data: { user }
+      } = await this.supabase.client.auth.getUser();
       if (!user) throw new Error('Użytkownik nie jest zalogowany');
 
       const { data, error } = await this.supabase.client
@@ -83,7 +85,6 @@ export class ShoppingListComponent implements OnInit {
       this.activeList = data as ShoppingList;
       await this.loadHistory();
       this.updateCategories();
-
     } catch (error) {
       console.error('Błąd generowania listy zakupów:', error);
       alert('Nie udało się wygenerować listy zakupów.');
@@ -126,12 +127,19 @@ export class ShoppingListComponent implements OnInit {
       { data: ingredientsData, error: ingredientsError }
     ] = await Promise.all([unitsPromise, categoriesPromise, ingredientsPromise]);
 
-    if (unitsError || categoriesError || ingredientsError) throw unitsError || categoriesError || ingredientsError;
+    if (unitsError || categoriesError || ingredientsError)
+      throw unitsError || categoriesError || ingredientsError;
 
-    const unitMultipliers = new Map<string, number>(units.map((u: any) => [u.name, u.multiplier_to_grams]));
-    const categoryDetailsMap = new Map<number, { name: string, shop_order: number }>();
-    categoriesData.forEach((cat: any) => categoryDetailsMap.set(cat.id, { name: cat.name, shop_order: cat.shop_order }));
-    const ingredientToCategoryMap = new Map<string, number>(ingredientsData.map((ing: any) => [ing.id, ing.category_id]));
+    const unitMultipliers = new Map<string, number>(
+      units.map((u: any) => [u.name, u.multiplier_to_grams])
+    );
+    const categoryDetailsMap = new Map<number, { name: string; shop_order: number }>();
+    categoriesData.forEach((cat: any) =>
+      categoryDetailsMap.set(cat.id, { name: cat.name, shop_order: cat.shop_order })
+    );
+    const ingredientToCategoryMap = new Map<string, number>(
+      ingredientsData.map((ing: any) => [ing.id, ing.category_id])
+    );
 
     const { data: mealPlans, error: mealPlansError } = await this.supabase.client
       .from('meal_plans')
@@ -155,7 +163,7 @@ export class ShoppingListComponent implements OnInit {
 
           if (aggregatedIngredients.has(key)) {
             const existing = aggregatedIngredients.get(key)!;
-            const multiplier = isPiece ? 1 : (unitMultipliers.get(unit) || 1);
+            const multiplier = isPiece ? 1 : unitMultipliers.get(unit) || 1;
             existing.amount += ingredient.amount * multiplier;
           } else {
             const categoryId = ingredientToCategoryMap.get(ingredient.ingredient_id);
@@ -200,7 +208,9 @@ export class ShoppingListComponent implements OnInit {
         categoryMap.set(item.category, item.shop_order);
       }
     });
-    this.categories = Array.from(categoryMap.keys()).sort((a, b) => categoryMap.get(a)! - categoryMap.get(b)!);
+    this.categories = Array.from(categoryMap.keys()).sort(
+      (a, b) => categoryMap.get(a)! - categoryMap.get(b)!
+    );
   }
 
   getItemsForCategory(category: string): ShoppingListItem[] {

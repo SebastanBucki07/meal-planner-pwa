@@ -19,7 +19,10 @@ export class AuthComponent {
   successMessage = '';
   loading = false;
 
-  constructor(private supabase: SupabaseService, private router: Router) {}
+  constructor(
+    private supabase: SupabaseService,
+    private router: Router
+  ) {}
 
   async onSubmit() {
     this.loading = true;
@@ -35,7 +38,8 @@ export class AuthComponent {
           // Rejestracja udana bez wymagania maila -> przechodzimy do dashboardu
           this.router.navigate(['/dashboard']);
         } else {
-          this.successMessage = 'Konto zostało utworzone! Jeśli masz włączone potwierdzanie e-mail w Supabase, sprawdź skrzynkę odbiorczą.';
+          this.successMessage =
+            'Konto zostało utworzone! Jeśli masz włączone potwierdzanie e-mail w Supabase, sprawdź skrzynkę odbiorczą.';
         }
       } else {
         const { error } = await this.supabase.signIn(this.email, this.password);

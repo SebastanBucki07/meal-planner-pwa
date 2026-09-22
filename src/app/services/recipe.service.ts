@@ -1,6 +1,6 @@
-import {Injectable} from '@angular/core';
-import {createClient, SupabaseClient} from '@supabase/supabase-js';
-import {environment} from '../../environment';
+import { Injectable } from '@angular/core';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { environment } from '../../environment';
 
 export interface Ingredient {
   id: string;
@@ -23,10 +23,10 @@ export class RecipeService {
 
   // Metoda do pobierania listy składników z bazy
   async getIngredients(): Promise<Ingredient[]> {
-    const {data, error} = await this.supabase
-    .from('ingredients')
-    .select('*')
-    .order('name', {ascending: true});
+    const { data, error } = await this.supabase
+      .from('ingredients')
+      .select('*')
+      .order('name', { ascending: true });
 
     if (error) {
       console.error('Błąd podczas pobierania składników:', error);

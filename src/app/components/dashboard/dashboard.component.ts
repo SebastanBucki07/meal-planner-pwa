@@ -4,11 +4,11 @@ import { Router } from '@angular/router';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { environment } from '../../../environment';
-import {ChartPoint} from '../../models/chartPoint.model';
-import {WeightEntry} from '../../models/weightEntry.model';
-import {PlannedMeal} from '../../models';
-import {MEAL_TYPES} from '../../models/mealTypes.model';
-import {dbKeyToMealType} from '../../helpers/mealType.helper';
+import { ChartPoint } from '../../models/chartPoint.model';
+import { WeightEntry } from '../../models/weightEntry.model';
+import { PlannedMeal } from '../../models';
+import { MEAL_TYPES } from '../../models/mealTypes.model';
+import { dbKeyToMealType } from '../../helpers/mealType.helper';
 
 @Component({
   selector: 'app-dashboard',
@@ -21,37 +21,37 @@ export class DashboardComponent implements OnInit {
   private supabase: SupabaseClient;
   private router = inject(Router);
 
-  loading: boolean = true;
+  loading = true;
   todayDate: string = new Date().toISOString().split('T')[0];
 
-  targetCalories: number = 2000;
-  targetProtein: number = 150;
-  targetCarbs: number = 200;
-  targetFat: number = 65;
+  targetCalories = 2000;
+  targetProtein = 150;
+  targetCarbs = 200;
+  targetFat = 65;
 
   todayMeals: PlannedMeal[] = [];
   recentRecipes: any[] = [];
 
-  consumedCalories: number = 0;
-  consumedProtein: number = 0;
-  consumedCarbs: number = 0;
-  consumedFat: number = 0;
+  consumedCalories = 0;
+  consumedProtein = 0;
+  consumedCarbs = 0;
+  consumedFat = 0;
 
   // Podsumowanie poprzedniego tygodnia
-  prevWeekAvgCalories: number = 0;
-  prevWeekDaysTracked: number = 0;
+  prevWeekAvgCalories = 0;
+  prevWeekDaysTracked = 0;
 
   // Wykres wagi
   weightHistory: WeightEntry[] = [];
   latestWeight: number | null = null;
 
   // Konfiguracja i skala wykresu SVG
-  readonly svgWidth: number = 600;
-  readonly svgHeight: number = 260;
+  readonly svgWidth = 600;
+  readonly svgHeight = 260;
   readonly padding = { top: 30, right: 30, bottom: 50, left: 50 };
 
-  minWeight: number = 0;
-  maxWeight: number = 100;
+  minWeight = 0;
+  maxWeight = 100;
   yGridLines: { value: number; y: number }[] = [];
 
   constructor() {
@@ -75,13 +75,11 @@ export class DashboardComponent implements OnInit {
   }
 
   async fetchUserProfile() {
-    const { data: { user } } = await this.supabase.auth.getUser();
+    const {
+      data: { user }
+    } = await this.supabase.auth.getUser();
     if (user) {
-      const { data } = await this.supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', user.id)
-      .single();
+      const { data } = await this.supabase.from('profiles').select('*').eq('id', user.id).single();
 
       if (data) {
         this.targetCalories = data.target_calories || 2000;
@@ -99,12 +97,14 @@ export class DashboardComponent implements OnInit {
     const day = String(now.getDate()).padStart(2, '0');
     this.todayDate = `${year}-${month}-${day}`;
 
-    const { data: { user } } = await this.supabase.auth.getUser();
+    const {
+      data: { user }
+    } = await this.supabase.auth.getUser();
 
     let query = this.supabase
-    .from('meal_plans')
-    .select('id, meal_type, recipe_id, user_id')
-    .eq('date', this.todayDate);
+      .from('meal_plans')
+      .select('id, meal_type, recipe_id, user_id')
+      .eq('date', this.todayDate);
 
     if (user) {
       query = query.eq('user_id', user.id);
@@ -126,37 +126,37 @@ export class DashboardComponent implements OnInit {
     }
 
     const { data: recipes, error: recipesError } = await this.supabase
-    .from('recipes')
-    .select('*')
-    .in('id', recipeIds);
+      .from('recipes')
+      .select('*')
+      .in('id', recipeIds);
 
     if (recipesError || !recipes) return;
 
     const recipesById = new Map(recipes.map(r => [r.id, r]));
 
     this.todayMeals = mealPlans
-    .map(plan => {
-      const recipe = recipesById.get(plan.recipe_id);
-      if (recipe) {
-        return {
-          id: plan.id,
-          meal_type: dbKeyToMealType(plan.meal_type),
-          recipe: recipe,
-        } as PlannedMeal;
-      }
-      return null;
-    })
-    .filter((meal): meal is PlannedMeal => meal !== null);
+      .map(plan => {
+        const recipe = recipesById.get(plan.recipe_id);
+        if (recipe) {
+          return {
+            id: plan.id,
+            meal_type: dbKeyToMealType(plan.meal_type),
+            recipe: recipe
+          } as PlannedMeal;
+        }
+        return null;
+      })
+      .filter((meal): meal is PlannedMeal => meal !== null);
 
     this.calculateDailyTotals();
   }
 
   async fetchRecentRecipes() {
     const { data, error } = await this.supabase
-    .from('recipes')
-    .select('id, title, calories, protein, image_url')
-    .order('created_at', { ascending: false })
-    .limit(3);
+      .from('recipes')
+      .select('id, title, calories, protein, image_url')
+      .order('created_at', { ascending: false })
+      .limit(3);
 
     if (!error && data) {
       this.recentRecipes = data;
@@ -164,7 +164,9 @@ export class DashboardComponent implements OnInit {
   }
 
   async fetchPreviousWeekSummary(): Promise<void> {
-    const { data: { user } } = await this.supabase.auth.getUser();
+    const {
+      data: { user }
+    } = await this.supabase.auth.getUser();
     if (!user) return;
 
     const today = new Date();
@@ -178,11 +180,11 @@ export class DashboardComponent implements OnInit {
     const endStr = lastWeekEnd.toISOString().split('T')[0];
 
     const { data, error } = await this.supabase
-    .from('meal_plans')
-    .select('date, recipes(calories)')
-    .eq('user_id', user.id)
-    .gte('date', startStr)
-    .lte('date', endStr);
+      .from('meal_plans')
+      .select('date, recipes(calories)')
+      .eq('user_id', user.id)
+      .gte('date', startStr)
+      .lte('date', endStr);
 
     if (error || !data) return;
 
@@ -202,16 +204,18 @@ export class DashboardComponent implements OnInit {
   }
 
   async fetchWeightHistory(): Promise<void> {
-    const { data: { user } } = await this.supabase.auth.getUser();
+    const {
+      data: { user }
+    } = await this.supabase.auth.getUser();
     if (!user) return;
 
     // Pobieramy 6 najnowszych pomiarów (sortując malejąco, żeby wziąć OSTATNIE 6)
     const { data, error } = await this.supabase
-    .from('weight_logs')
-    .select('date, weight')
-    .eq('user_id', user.id)
-    .order('date', { ascending: false })
-    .limit(6);
+      .from('weight_logs')
+      .select('date, weight')
+      .eq('user_id', user.id)
+      .order('date', { ascending: false })
+      .limit(6);
 
     if (!error && data && data.length > 0) {
       // Odwracamy tablicę, aby na wykresie punkty były ukłożone chronologicznie (od najstarszego do najnowszego)
@@ -220,7 +224,11 @@ export class DashboardComponent implements OnInit {
       this.weightHistory = sortedData.map((d: any) => {
         const rawDate = new Date(d.date);
         const formattedDate = !isNaN(rawDate.getTime())
-          ? rawDate.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric' })
+          ? rawDate.toLocaleDateString('pl-PL', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric'
+            })
           : String(d.date);
 
         return {
@@ -277,7 +285,7 @@ export class DashboardComponent implements OnInit {
     const drawHeight = this.svgHeight - this.padding.top - this.padding.bottom;
     const range = this.maxWeight - this.minWeight;
     const normalized = (weight - this.minWeight) / range;
-    return this.svgHeight - this.padding.bottom - (normalized * drawHeight);
+    return this.svgHeight - this.padding.bottom - normalized * drawHeight;
   }
 
   // Obliczenia współrzędnych punktów na wykresie SVG
@@ -285,14 +293,12 @@ export class DashboardComponent implements OnInit {
     if (this.weightHistory.length === 0) return [];
 
     const drawWidth = this.svgWidth - this.padding.left - this.padding.right;
-    const stepX = this.weightHistory.length > 1
-      ? drawWidth / (this.weightHistory.length - 1)
-      : drawWidth / 2;
+    const stepX =
+      this.weightHistory.length > 1 ? drawWidth / (this.weightHistory.length - 1) : drawWidth / 2;
 
     return this.weightHistory.map((item, index) => {
-      const x = this.weightHistory.length === 1
-        ? this.svgWidth / 2
-        : this.padding.left + index * stepX;
+      const x =
+        this.weightHistory.length === 1 ? this.svgWidth / 2 : this.padding.left + index * stepX;
       const y = this.getNormalizedY(item.weight);
 
       return {
@@ -310,14 +316,13 @@ export class DashboardComponent implements OnInit {
   }
 
   getMealsForType(mealType: string): PlannedMeal[] {
-    return this.todayMeals.filter(
-      m => m.meal_type.toLowerCase() === mealType.toLowerCase()
-    );
+    return this.todayMeals.filter(m => m.meal_type.toLowerCase() === mealType.toLowerCase());
   }
 
   calculateDailyTotals() {
     this.consumedCalories = this.todayMeals.reduce(
-      (sum, item) => sum + Number(item.recipe?.calories || 0), 0
+      (sum, item) => sum + Number(item.recipe?.calories || 0),
+      0
     );
 
     this.consumedProtein = Number(

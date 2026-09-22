@@ -1,25 +1,26 @@
 <div class="plan-container">
   <!-- Nawigacja tygodnia -->
   <header class="week-navigation">
-    <button class="btn-icon" (click)="changeWeek(-1)" [disabled]="weekOffset <= -1">
+    <button type="button" class="btn-icon" (click)="changeWeek(-1)" [disabled]="weekOffset <= -1">
       ‹
     </button>
 
     <div class="week-title-wrapper">
       <span class="week-range">{{ currentWeekRangeText }}</span>
-      <button class="btn-today" *ngIf="weekOffset !== 0" (click)="goToToday()">
+      <button type="button" class="btn-today" *ngIf="weekOffset !== 0" (click)="goToToday()">
         Wróć do dzisiaj
       </button>
     </div>
 
-    <button class="btn-icon" (click)="changeWeek(1)" [disabled]="weekOffset >= 2">
+    <button type="button" class="btn-icon" (click)="changeWeek(1)" [disabled]="weekOffset >= 2">
       ›
     </button>
   </header>
 
   <!-- Pasek z dniami tygodnia -->
   <div class="days-bar">
-    <div
+    <button
+      type="button"
       *ngFor="let day of weekDays"
       class="day-card"
       [class.active]="day.dateStr === selectedDate"
@@ -29,7 +30,7 @@
       <span class="badge-today" *ngIf="day.isToday">DZIŚ</span>
       <span class="day-name">{{ day.dayName }}</span>
       <span class="day-date">{{ day.fullDateStr }}</span>
-    </div>
+    </button>
   </div>
 
   <!-- Podsumowanie Makroskładników z Paskami Postępu -->
@@ -39,7 +40,10 @@
       <div class="macro-progress-item calories">
         <div class="macro-info">
           <span class="label">Kalorie</span>
-          <span class="values"><strong>{{ dayCalories }}</strong> / {{ targetCalories }} kcal</span>
+          <span class="values">
+            <strong>{{ dayCalories }}</strong>
+            / {{ targetCalories }} kcal
+          </span>
         </div>
         <div class="progress-bar-bg">
           <div class="progress-bar-fill" [style.width.%]="getCaloriesPercent()"></div>
@@ -52,7 +56,10 @@
         <div class="macro-progress-item protein">
           <div class="macro-info">
             <span class="label">Białko</span>
-            <span class="values"><strong>{{ dayProtein }}</strong>/{{ targetProtein }}g</span>
+            <span class="values">
+              <strong>{{ dayProtein }}</strong>
+              /{{ targetProtein }}g
+            </span>
           </div>
           <div class="progress-bar-bg">
             <div class="progress-bar-fill" [style.width.%]="getProteinPercent()"></div>
@@ -63,7 +70,10 @@
         <div class="macro-progress-item fat">
           <div class="macro-info">
             <span class="label">Tłuszcze</span>
-            <span class="values"><strong>{{ dayFat }}</strong>/{{ targetFat }}g</span>
+            <span class="values">
+              <strong>{{ dayFat }}</strong>
+              /{{ targetFat }}g
+            </span>
           </div>
           <div class="progress-bar-bg">
             <div class="progress-bar-fill" [style.width.%]="getFatPercent()"></div>
@@ -74,7 +84,10 @@
         <div class="macro-progress-item carbs">
           <div class="macro-info">
             <span class="label">Węgle</span>
-            <span class="values"><strong>{{ dayCarbs }}</strong>/{{ targetCarbs }}g</span>
+            <span class="values">
+              <strong>{{ dayCarbs }}</strong>
+              /{{ targetCarbs }}g
+            </span>
           </div>
           <div class="progress-bar-bg">
             <div class="progress-bar-fill" [style.width.%]="getCarbsPercent()"></div>
@@ -85,23 +98,24 @@
   </section>
 
   <!-- Wskaźnik ładowania -->
-  <div class="loading-spinner" *ngIf="loading">
-    Ładowanie planu posiłków...
-  </div>
+  <div class="loading-spinner" *ngIf="loading">Ładowanie planu posiłków...</div>
 
   <!-- Sekcje posiłków dla danego dnia -->
   <main class="meals-list" *ngIf="!loading">
     <div class="meal-type-section" *ngFor="let type of MEAL_TYPES">
       <div class="meal-header">
         <h2>{{ type }}</h2>
-        <button class="btn-add" (click)="openAddMealModal(type)">+ Dodaj</button>
+        <button type="button" class="btn-add" (click)="openAddMealModal(type)">+ Dodaj</button>
       </div>
 
       <div class="meals-grid">
         <div
           class="meal-card"
+          tabindex="0"
+          role="button"
           *ngFor="let meal of getMealsForType(type)"
           (click)="openRecipePreview(meal.recipeId)"
+          (keyup.enter)="openRecipePreview(meal.recipeId)"
         >
           <div class="meal-img-wrapper" *ngIf="meal.imageUrl">
             <img [src]="meal.imageUrl" [alt]="meal.recipeName" />
@@ -109,13 +123,16 @@
           <div class="meal-details">
             <h3>{{ meal.recipeName }}</h3>
             <div class="meal-macros">
-              <span>{{ meal.calories }} kcal</span> •
-              <span>B: {{ meal.protein }}g</span> •
-              <span>T: {{ meal.fat }}g</span> •
+              <span>{{ meal.calories }} kcal</span>
+              •
+              <span>B: {{ meal.protein }}g</span>
+              •
+              <span>T: {{ meal.fat }}g</span>
+              •
               <span>W: {{ meal.carbs }}g</span>
             </div>
           </div>
-          <button class="btn-delete" (click)="removeMeal(meal.id, $event)">✕</button>
+          <button type="button" class="btn-delete" (click)="removeMeal(meal.id, $event)">✕</button>
         </div>
 
         <div class="empty-meal" *ngIf="getMealsForType(type).length === 0">
@@ -126,11 +143,23 @@
   </main>
 
   <!-- Modal dodawania posiłku z filtrowaniem -->
-  <div class="modal-backdrop" *ngIf="isModalOpen" (click)="closeModal()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
+  <div
+    class="modal-backdrop"
+    tabindex="0"
+    role="button"
+    *ngIf="isModalOpen"
+    (click)="closeModal()"
+    (keyup.enter)="closeModal()"
+  >
+    <div
+      class="modal-content"
+      tabindex="-1"
+      (click)="$event.stopPropagation()"
+      (keyup)="$event.stopPropagation()"
+    >
       <div class="modal-header">
         <h3>Dodaj do: {{ selectedMealType }}</h3>
-        <button class="btn-close" (click)="closeModal()">✕</button>
+        <button type="button" class="btn-close" (click)="closeModal()">✕</button>
       </div>
       <div class="modal-body">
         <input
@@ -138,13 +167,34 @@
           class="search-input"
           placeholder="Filtruj po nazwie..."
           [(ngModel)]="searchTerm"
-          (input)="applyFilter()">
+          (input)="applyFilter()"
+        />
 
         <div class="filters-grid">
-          <input type="number" placeholder="Max kcal" [(ngModel)]="maxCalories" (input)="applyFilter()">
-          <input type="number" placeholder="Min białko" [(ngModel)]="minProtein" (input)="applyFilter()">
-          <input type="number" placeholder="Min węgle" [(ngModel)]="minCarbs" (input)="applyFilter()">
-          <input type="number" placeholder="Min tłuszcz" [(ngModel)]="minFat" (input)="applyFilter()">
+          <input
+            type="number"
+            placeholder="Max kcal"
+            [(ngModel)]="maxCalories"
+            (input)="applyFilter()"
+          />
+          <input
+            type="number"
+            placeholder="Min białko"
+            [(ngModel)]="minProtein"
+            (input)="applyFilter()"
+          />
+          <input
+            type="number"
+            placeholder="Min węgle"
+            [(ngModel)]="minCarbs"
+            (input)="applyFilter()"
+          />
+          <input
+            type="number"
+            placeholder="Min tłuszcz"
+            [(ngModel)]="minFat"
+            (input)="applyFilter()"
+          />
         </div>
 
         <div class="recipe-list">
@@ -153,10 +203,17 @@
           </div>
           <div
             class="recipe-item"
+            tabindex="0"
+            role="button"
             *ngFor="let recipe of filteredRecipes"
             (click)="addMealToPlan(recipe.id)"
+            (keyup.enter)="addMealToPlan(recipe.id)"
           >
-            <img [src]="recipe.image_url || 'assets/placeholder.png'" [alt]="recipe.title" class="recipe-item-img">
+            <img
+              [src]="recipe.image_url || 'assets/placeholder.png'"
+              [alt]="recipe.title"
+              class="recipe-item-img"
+            />
             <div class="recipe-item-details">
               <div class="recipe-title">{{ recipe.title }}</div>
               <div class="recipe-macros">
@@ -173,11 +230,23 @@
   </div>
 
   <!-- Modal podglądu przepisu -->
-  <div class="modal-backdrop" *ngIf="isPreviewOpen" (click)="closePreviewModal()">
-    <div class="modal-content preview-modal" (click)="$event.stopPropagation()">
+  <div
+    class="modal-backdrop"
+    tabindex="0"
+    role="button"
+    *ngIf="isPreviewOpen"
+    (click)="closePreviewModal()"
+    (keyup.enter)="closePreviewModal()"
+  >
+    <div
+      class="modal-content preview-modal"
+      tabindex="-1"
+      (click)="$event.stopPropagation()"
+      (keyup)="$event.stopPropagation()"
+    >
       <div class="modal-header">
         <h3>{{ selectedRecipeForPreview?.title }}</h3>
-        <button class="btn-close" (click)="closePreviewModal()">✕</button>
+        <button type="button" class="btn-close" (click)="closePreviewModal()">✕</button>
       </div>
       <div class="modal-body" *ngIf="selectedRecipeForPreview">
         <img
@@ -192,7 +261,9 @@
           <span>Tłuszcz: {{ selectedRecipeForPreview.fat }}g</span>
           <span>Węglowodany: {{ selectedRecipeForPreview.carbs }}g</span>
         </div>
-        <p *ngIf="selectedRecipeForPreview.description">{{ selectedRecipeForPreview.description }}</p>
+        <p *ngIf="selectedRecipeForPreview.description">
+          {{ selectedRecipeForPreview.description }}
+        </p>
         <div *ngIf="selectedRecipeForPreview.instructions" class="instructions">
           <h4>Sposób przygotowania:</h4>
           <p>{{ selectedRecipeForPreview.instructions }}</p>

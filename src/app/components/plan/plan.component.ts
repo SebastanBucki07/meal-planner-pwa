@@ -1,12 +1,12 @@
-import {Component, OnInit} from '@angular/core';
-import {SupabaseService} from '../../services/supabase.service';
-import {NavbarComponent} from '../navbar/navbar.component';
-import {CommonModule} from '@angular/common';
-import {FormsModule} from '@angular/forms';
-import {WeekDay} from '../../models';
-import {MEAL_TYPES} from '../../models/mealTypes.model';
-import {dbKeyToMealType} from '../../helpers/mealType.helper';
-import {RecipeStep} from '../../models/recipeStep.model';
+import { Component, OnInit } from '@angular/core';
+import { SupabaseService } from '../../services/supabase.service';
+import { NavbarComponent } from '../navbar/navbar.component';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { WeekDay } from '../../models';
+import { MEAL_TYPES } from '../../models/mealTypes.model';
+import { dbKeyToMealType } from '../../helpers/mealType.helper';
+import { RecipeStep } from '../../models/recipeStep.model';
 
 export interface PlannedMeal {
   id: string;
@@ -64,34 +64,33 @@ export interface Recipe {
   styleUrls: ['./plan.component.scss']
 })
 export class PlanComponent implements OnInit {
-  loading: boolean = false;
-  weekOffset: number = 0;
-  currentWeekRangeText: string = '';
-  selectedDate: string = '';
+  loading = false;
+  weekOffset = 0;
+  currentWeekRangeText = '';
+  selectedDate = '';
   weekDays: WeekDay[] = [];
   dayMeals: PlannedMeal[] = [];
-  targetCalories: number = 2500;
-  targetProtein: number = 160;
-  targetFat: number = 80;
-  targetCarbs: number = 280;
+  targetCalories = 2500;
+  targetProtein = 160;
+  targetFat = 80;
+  targetCarbs = 280;
 
   // Modale
-  isModalOpen: boolean = false;
-  isPreviewOpen: boolean = false;
-  selectedMealType: string = '';
+  isModalOpen = false;
+  isPreviewOpen = false;
+  selectedMealType = '';
   selectedRecipeForPreview: PlanRecipe | null = null;
 
   // Logika listy przepisów i filtrowania
   availableRecipes: PlanRecipe[] = [];
   filteredRecipes: PlanRecipe[] = [];
-  searchTerm: string = '';
+  searchTerm = '';
   maxCalories: number | null = null;
   minProtein: number | null = null;
   minCarbs: number | null = null;
   minFat: number | null = null;
 
-  constructor(private supabase: SupabaseService) {
-  }
+  constructor(private supabase: SupabaseService) {}
 
   ngOnInit(): void {
     const today = new Date();
@@ -107,9 +106,7 @@ export class PlanComponent implements OnInit {
     // Filtr po nazwie
     if (this.searchTerm) {
       const lowerCaseSearch = this.searchTerm.toLowerCase();
-      recipes = recipes.filter(recipe =>
-        recipe.title.toLowerCase().includes(lowerCaseSearch)
-      );
+      recipes = recipes.filter(recipe => recipe.title.toLowerCase().includes(lowerCaseSearch));
     }
 
     // Filtr po kaloriach (max)
@@ -156,10 +153,10 @@ export class PlanComponent implements OnInit {
 
   async loadAvailableRecipes(): Promise<void> {
     try {
-      const {data, error} = await this.supabase.client
-      .from('recipes')
-      .select('id, title, image_url, calories, protein, fat, carbs')
-      .order('title', {ascending: true});
+      const { data, error } = await this.supabase.client
+        .from('recipes')
+        .select('id, title, image_url, calories, protein, fat, carbs')
+        .order('title', { ascending: true });
 
       if (error) {
         console.error('Błąd pobierania przepisów:', error);
@@ -176,18 +173,18 @@ export class PlanComponent implements OnInit {
   // Reszta metod bez zmian
   private mealTypeToDbKey(type: string): string {
     const map: Record<string, string> = {
-      'Śniadanie': 'Śniadanie',
+      Śniadanie: 'Śniadanie',
       'II śniadanie': 'Drugie Śniadanie',
-      'Obiad': 'Obiad',
-      'Kolacja': 'Kolacja',
-      'Przekąska': 'Przekąska'
+      Obiad: 'Obiad',
+      Kolacja: 'Kolacja',
+      Przekąska: 'Przekąska'
     };
     return map[type] || type;
   }
 
   async addMealToPlan(recipeId: string): Promise<void> {
     try {
-      const {data: authData} = await this.supabase.client.auth.getUser();
+      const { data: authData } = await this.supabase.client.auth.getUser();
       const userId = authData.user?.id;
       const payload: any = {
         date: this.selectedDate,
@@ -198,7 +195,7 @@ export class PlanComponent implements OnInit {
         payload.user_id = userId;
       }
 
-      const {error} = await this.supabase.client.from('meal_plans').insert([payload]);
+      const { error } = await this.supabase.client.from('meal_plans').insert([payload]);
       if (error) {
         throw error;
       }
@@ -214,11 +211,11 @@ export class PlanComponent implements OnInit {
   async openRecipePreview(recipeId: string): Promise<void> {
     try {
       const { data, error } = await this.supabase.client
-      .from('recipes')
-      .select('*')
-      .eq('id', recipeId)
-      .returns<Recipe>() // <-- Poprawne typowanie w Supabase v2
-      .single();
+        .from('recipes')
+        .select('*')
+        .eq('id', recipeId)
+        .returns<Recipe>() // <-- Poprawne typowanie w Supabase v2
+        .single();
 
       if (error) {
         throw error;
@@ -239,7 +236,7 @@ export class PlanComponent implements OnInit {
   async removeMeal(mealId: string, event: Event): Promise<void> {
     event.stopPropagation();
     try {
-      const {error} = await this.supabase.client.from('meal_plans').delete().eq('id', mealId);
+      const { error } = await this.supabase.client.from('meal_plans').delete().eq('id', mealId);
       if (error) {
         throw error;
       }
@@ -258,15 +255,15 @@ export class PlanComponent implements OnInit {
 
   async loadUserProfileTargets(): Promise<void> {
     try {
-      const {data: authData} = await this.supabase.client.auth.getUser();
+      const { data: authData } = await this.supabase.client.auth.getUser();
       const userId = authData.user?.id;
       if (!userId) return;
 
-      const {data, error} = await this.supabase.client
-      .from('profiles')
-      .select('target_calories, target_protein, target_fat, target_carbs')
-      .eq('id', userId)
-      .single();
+      const { data, error } = await this.supabase.client
+        .from('profiles')
+        .select('target_calories, target_protein, target_fat, target_carbs')
+        .eq('id', userId)
+        .single();
 
       if (data && !error) {
         if (data.target_calories) this.targetCalories = data.target_calories;
@@ -275,7 +272,7 @@ export class PlanComponent implements OnInit {
         if (data.target_carbs) this.targetCarbs = data.target_carbs;
       }
     } catch (e) {
-      console.log('Używam domyślnych celów makro');
+      console.log(`Używam domyślnych celów makro ${e}`);
     }
   }
 
@@ -322,7 +319,7 @@ export class PlanComponent implements OnInit {
     currentMonday.setDate(today.getDate() + distanceToMonday);
 
     const targetMonday = new Date(currentMonday);
-    targetMonday.setDate(currentMonday.getDate() + (offset * 7));
+    targetMonday.setDate(currentMonday.getDate() + offset * 7);
 
     this.weekDays = [];
     const dayNamesShort = ['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'Sob', 'Nd'];
@@ -359,12 +356,13 @@ export class PlanComponent implements OnInit {
   async loadPlanForSelectedDate(): Promise<void> {
     this.loading = true;
     try {
-      const {data: authData} = await this.supabase.client.auth.getUser();
+      const { data: authData } = await this.supabase.client.auth.getUser();
       const userId = authData.user?.id;
 
       let query = this.supabase.client
-      .from('meal_plans')
-      .select(`
+        .from('meal_plans')
+        .select(
+          `
           id,
           date,
           meal_type,
@@ -381,14 +379,15 @@ export class PlanComponent implements OnInit {
             description,
             instructions
           )
-        `)
-      .eq('date', this.selectedDate);
+        `
+        )
+        .eq('date', this.selectedDate);
 
       if (userId) {
         query = query.eq('user_id', userId);
       }
 
-      const {data, error} = await query;
+      const { data, error } = await query;
 
       if (error) {
         console.error('Błąd podczas pobierania planu:', error);

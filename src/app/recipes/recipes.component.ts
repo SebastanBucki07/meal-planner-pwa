@@ -9,26 +9,21 @@ import { NavbarComponent } from '../components/navbar/navbar.component';
 @Component({
   selector: 'app-recipes',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterLink,
-    FormsModule,
-    NavbarComponent
-  ],
+  imports: [CommonModule, RouterLink, FormsModule, NavbarComponent],
   templateUrl: './recipes.component.html',
   styleUrls: ['./recipes.component.scss']
 })
 export class RecipesComponent implements OnInit {
   private supabase: SupabaseClient;
   recipes: any[] = [];
-  loading: boolean = true;
+  loading = true;
 
   // Właściwości do filtrowania
-  searchTerm: string = '';
+  searchTerm = '';
   maxCalories: number | null = null;
   minProtein: number | null = null;
   minCarbs: number | null = null; // Dodane
-  minFat: number | null = null;   // Dodane
+  minFat: number | null = null; // Dodane
 
   private filterTimeout: any;
 
@@ -50,10 +45,7 @@ export class RecipesComponent implements OnInit {
   async fetchRecipes() {
     this.loading = true;
 
-    let query = this.supabase
-      .from('recipes')
-      .select('*')
-      .order('created_at', { ascending: false });
+    let query = this.supabase.from('recipes').select('*').order('created_at', { ascending: false });
 
     // Filtrowanie po słowie kluczowym
     if (this.searchTerm) {
