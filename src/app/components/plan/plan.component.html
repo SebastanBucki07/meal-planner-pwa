@@ -256,10 +256,10 @@
           class="preview-img"
         />
         <div class="preview-macros">
-          <span>Kcal: {{ selectedRecipeForPreview.calories }}</span>
-          <span>Białko: {{ selectedRecipeForPreview.protein }}g</span>
-          <span>Tłuszcz: {{ selectedRecipeForPreview.fat }}g</span>
-          <span>Węglowodany: {{ selectedRecipeForPreview.carbs }}g</span>
+          <span>{{ selectedRecipeForPreview.calories }} kcal</span>
+          <span>B: {{ selectedRecipeForPreview.protein || 0 }}g</span>
+          <span>T: {{ selectedRecipeForPreview.fat || 0 }}g</span>
+          <span>W: {{ selectedRecipeForPreview.carbs || 0 }}g</span>
         </div>
         <p *ngIf="selectedRecipeForPreview.description">
           {{ selectedRecipeForPreview.description }}
