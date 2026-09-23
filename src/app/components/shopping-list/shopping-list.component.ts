@@ -22,6 +22,9 @@ export class ShoppingListComponent implements OnInit {
   startDate = '';
   endDate = '';
 
+  // Stan zakładki mobilnej: 'list' | 'history'
+  activeTab: 'list' | 'history' = 'list';
+
   constructor(private supabase: SupabaseService) {}
 
   ngOnInit(): void {
@@ -50,6 +53,7 @@ export class ShoppingListComponent implements OnInit {
   selectListFromHistory(list: ShoppingList): void {
     this.activeList = list;
     this.updateCategories();
+    this.activeTab = 'list'; // Po kliknięciu w historię na mobilce przełącz na widok listy
   }
 
   async generateShoppingList(): Promise<void> {
@@ -62,7 +66,6 @@ export class ShoppingListComponent implements OnInit {
         return;
       }
 
-      // Pobierz ID użytkownika
       const {
         data: { user }
       } = await this.supabase.client.auth.getUser();
@@ -71,7 +74,7 @@ export class ShoppingListComponent implements OnInit {
       const { data, error } = await this.supabase.client
         .from('shopping_lists')
         .insert({
-          user_id: user.id, // Dodaj user_id do zapisu
+          user_id: user.id,
           start_date: this.startDate,
           end_date: this.endDate,
           items: generatedItems,
@@ -85,6 +88,7 @@ export class ShoppingListComponent implements OnInit {
       this.activeList = data as ShoppingList;
       await this.loadHistory();
       this.updateCategories();
+      this.activeTab = 'list';
     } catch (error) {
       console.error('Błąd generowania listy zakupów:', error);
       alert('Nie udało się wygenerować listy zakupów.');

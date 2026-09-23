@@ -6,10 +6,20 @@ import { NgForOf, NgIf } from '@angular/common';
 import { Ingredient } from '../../services/recipe.service';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { environment } from '../../../environment';
+
+// Import oryginalnego modelu
 import { IngredientRow, StepRow, Unit } from '../../models';
+
+// Rozszerzenie modelu o pola lokalne UI dla Autocomplete (nie modyfikuje pliku w models)
+export interface RecipeIngredientFormRow extends IngredientRow {
+  searchText?: string;
+  showDropdown?: boolean;
+  filteredIngredients?: Ingredient[];
+}
 
 @Component({
   selector: 'app-add-recipe',
+  standalone: true,
   imports: [NavbarComponent, FormsModule, NgIf, NgForOf],
   templateUrl: './add-recipe.component.html',
   styleUrl: './add-recipe.component.scss'
@@ -17,17 +27,14 @@ import { IngredientRow, StepRow, Unit } from '../../models';
 export class AddRecipeComponent implements OnInit {
   private supabase: SupabaseClient;
 
-  // Dane do kontrolek
   title = '';
   imageUrl = '';
   videoUrl = '';
 
-  // Słowniki pobierane z Supabase
   availableIngredients: Ingredient[] = [];
   availableUnits: Unit[] = [];
 
-  // Wiersze w formularzu
-  ingredientRows: IngredientRow[] = [];
+  ingredientRows: RecipeIngredientFormRow[] = [];
   stepRows: StepRow[] = [];
 
   constructor(private router: Router) {
@@ -36,13 +43,10 @@ export class AddRecipeComponent implements OnInit {
 
   async ngOnInit() {
     await Promise.all([this.fetchIngredients(), this.fetchUnits()]);
-
-    // Domyślne wiersze na start
     this.addIngredientRow();
     this.addStepRow();
   }
 
-  // 1. Pobieranie danych z Supabase
   async fetchIngredients() {
     const { data, error } = await this.supabase
       .from('ingredients')
@@ -69,7 +73,6 @@ export class AddRecipeComponent implements OnInit {
     }
   }
 
-  // 2. Zarządzanie wierszami składników
   addIngredientRow() {
     const defaultUnit = this.availableUnits.length > 0 ? this.availableUnits[0].name : 'g';
 
@@ -78,11 +81,14 @@ export class AddRecipeComponent implements OnInit {
       name: '',
       amount: 100,
       unit: defaultUnit,
-      unitMultiplier: 1, // <-- Dodaj to pole
+      unitMultiplier: 1, // Wymagane przez oryginalny interfejs IngredientRow
       calories: 0,
       protein: 0,
       carbs: 0,
-      fat: 0
+      fat: 0,
+      searchText: '',
+      showDropdown: false,
+      filteredIngredients: []
     });
   }
 
@@ -90,20 +96,57 @@ export class AddRecipeComponent implements OnInit {
     this.ingredientRows.splice(index, 1);
   }
 
-  onIngredientChange(row: IngredientRow) {
-    const selected = this.availableIngredients.find(ing => ing.id === row.ingredientId);
-    if (selected) {
-      row.name = selected.name;
+  // Metody Autocomplete dla szablonu HTML
+  onInputFocus(row: RecipeIngredientFormRow) {
+    row.showDropdown = true;
+    this.filterIngredients(row);
+  }
+
+  onInputBlur(row: RecipeIngredientFormRow) {
+    setTimeout(() => {
+      row.showDropdown = false;
+    }, 150);
+  }
+
+  onSearchInput(row: RecipeIngredientFormRow) {
+    row.showDropdown = true;
+    if (row.name !== row.searchText) {
+      row.ingredientId = '';
+      row.name = '';
+      this.calculateRowMacro(row);
     }
+    this.filterIngredients(row);
+  }
+
+  filterIngredients(row: RecipeIngredientFormRow) {
+    const query = (row.searchText || '').toLowerCase().trim();
+    if (!query) {
+      row.filteredIngredients = this.availableIngredients.slice(0, 10);
+    } else {
+      row.filteredIngredients = this.availableIngredients
+        .filter(ing => ing.name.toLowerCase().includes(query))
+        .slice(0, 10);
+    }
+  }
+
+  selectIngredient(row: RecipeIngredientFormRow, ingredient: Ingredient) {
+    row.ingredientId = ingredient.id;
+    row.name = ingredient.name;
+    row.searchText = ingredient.name;
+    row.showDropdown = false;
+
     this.calculateRowMacro(row);
   }
 
-  onUnitChange(row: IngredientRow) {
+  onIngredientChange(row: RecipeIngredientFormRow) {
     this.calculateRowMacro(row);
   }
 
-  // 3. Przeliczanie makroskładników dla pojedynczego wiersza
-  calculateRowMacro(row: IngredientRow) {
+  onUnitChange(row: RecipeIngredientFormRow) {
+    this.calculateRowMacro(row);
+  }
+
+  calculateRowMacro(row: RecipeIngredientFormRow) {
     const ingredient = this.availableIngredients.find(ing => ing.id === row.ingredientId);
     const unitObj = this.availableUnits.find(u => u.name === row.unit);
 
@@ -115,18 +158,16 @@ export class AddRecipeComponent implements OnInit {
       return;
     }
 
-    // Przelicznik jednostki na gramy (domyślnie 1)
     const multiplier = unitObj ? Number(unitObj.multiplier_to_grams) : 1;
+    row.unitMultiplier = multiplier;
     const totalGrams = row.amount * multiplier;
 
-    // Przeliczenie wartości odżywczych na podstawie gramatury
     row.calories = Math.round((ingredient.calories_per_100g * totalGrams) / 100);
     row.protein = Number(((ingredient.protein_per_100g * totalGrams) / 100).toFixed(1));
     row.carbs = Number(((ingredient.carbs_per_100g * totalGrams) / 100).toFixed(1));
     row.fat = Number(((ingredient.fat_per_100g * totalGrams) / 100).toFixed(1));
   }
 
-  // 4. Podsumowanie makro (Gettery do Live Preview)
   get totalCalories(): number {
     return this.ingredientRows.reduce((sum, row) => sum + (row.calories || 0), 0);
   }
@@ -143,7 +184,6 @@ export class AddRecipeComponent implements OnInit {
     return Number(this.ingredientRows.reduce((sum, row) => sum + (row.fat || 0), 0).toFixed(1));
   }
 
-  // 5. Zarządzanie krokami instrukcji
   addStepRow() {
     this.stepRows.push({
       stepNumber: this.stepRows.length + 1,
@@ -153,15 +193,12 @@ export class AddRecipeComponent implements OnInit {
 
   removeStepRow(index: number) {
     this.stepRows.splice(index, 1);
-    // Przeliczenie numerów kroków po usunięciu
     this.stepRows.forEach((step, idx) => (step.stepNumber = idx + 1));
   }
 
-  // 6. Zapis przepisu w Supabase
   async saveRecipe() {
     if (!this.title.trim()) return;
 
-    // Przygotowanie danych do zapisu
     const preparedIngredients = this.ingredientRows
       .filter(row => row.ingredientId)
       .map(row => ({
@@ -194,13 +231,12 @@ export class AddRecipeComponent implements OnInit {
       fat: this.totalFat
     };
 
-    const { data, error } = await this.supabase.from('recipes').insert([newRecipe]);
+    const { error } = await this.supabase.from('recipes').insert([newRecipe]);
 
     if (error) {
       console.error('Błąd zapisu przepisu:', error);
-      alert('Nie udało się zapisać przepisu. Sprawdź konsolę.');
+      alert('Nie udało się zapisać przepisu.');
     } else {
-      console.log('Przepis zapisany pomyślnie:', data);
       this.router.navigate(['/recipes']);
     }
   }

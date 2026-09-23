@@ -1,6 +1,26 @@
 <div class="page-layout">
+  <!-- Przełącznik zakładek (widoczny tylko na urządzeniach mobilnych) -->
+  <div class="mobile-tabs">
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="activeTab === 'list'"
+      (click)="activeTab = 'list'"
+    >
+      🛒 Lista zakupów
+    </button>
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="activeTab === 'history'"
+      (click)="activeTab = 'history'"
+    >
+      📜 Historia list
+    </button>
+  </div>
+
   <!-- Panel boczny z historią list -->
-  <aside class="sidebar">
+  <aside class="sidebar" [class.mobile-hidden]="activeTab !== 'history'">
     <h3>Historia List</h3>
     <div class="history-list">
       <button
@@ -18,11 +38,11 @@
   </aside>
 
   <!-- Główna zawartość -->
-  <main class="main-content">
+  <main class="main-content" [class.mobile-hidden]="activeTab !== 'list'">
     <div class="shopping-list-container">
       <header class="header">
         <h1>Lista Zakupów 🛒</h1>
-        <p>Wybierz zakres dat i wygeneruj nową listę, lub wybierz istniejącą z historii.</p>
+        <p>Wybierz zakres dat i wygeneruj nową listę lub wybierz istniejącą z historii.</p>
       </header>
 
       <!-- Generator nowej listy -->

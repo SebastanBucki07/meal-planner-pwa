@@ -18,12 +18,18 @@ export class RecipesComponent implements OnInit {
   recipes: any[] = [];
   loading = true;
 
-  // Właściwości do filtrowania
+  // Filtry
   searchTerm = '';
   maxCalories: number | null = null;
   minProtein: number | null = null;
-  minCarbs: number | null = null; // Dodane
-  minFat: number | null = null; // Dodane
+  minCarbs: number | null = null;
+  minFat: number | null = null;
+
+  // Paginacja
+  currentPage = 1;
+  pageSize = 12; // Liczba przepisów na stronę (idealna pod 2, 3 lub 4 kolumny)
+  totalRecipes = 0;
+  totalPages = 1;
 
   private filterTimeout: any;
 
@@ -36,6 +42,7 @@ export class RecipesComponent implements OnInit {
   }
 
   applyFilters() {
+    this.currentPage = 1; // Reset do 1. strony po zmianie filtrów
     clearTimeout(this.filterTimeout);
     this.filterTimeout = setTimeout(() => {
       this.fetchRecipes();
@@ -45,40 +52,51 @@ export class RecipesComponent implements OnInit {
   async fetchRecipes() {
     this.loading = true;
 
-    let query = this.supabase.from('recipes').select('*').order('created_at', { ascending: false });
+    // Pobieramy dane z licznikiem (count: 'exact')
+    let query = this.supabase
+      .from('recipes')
+      .select('*', { count: 'exact' })
+      .order('created_at', { ascending: false });
 
-    // Filtrowanie po słowie kluczowym
     if (this.searchTerm) {
       query = query.ilike('title', `%${this.searchTerm}%`);
     }
-
-    // Filtrowanie po kaloryczności
     if (this.maxCalories !== null && this.maxCalories > 0) {
       query = query.lte('calories', this.maxCalories);
     }
-
-    // Filtrowanie po białku
     if (this.minProtein !== null && this.minProtein > 0) {
       query = query.gte('protein', this.minProtein);
     }
-
-    // Filtrowanie po węglowodanach (nowe)
     if (this.minCarbs !== null && this.minCarbs > 0) {
       query = query.gte('carbs', this.minCarbs);
     }
-
-    // Filtrowanie po tłuszczach (nowe)
     if (this.minFat !== null && this.minFat > 0) {
       query = query.gte('fat', this.minFat);
     }
 
-    const { data, error } = await query;
+    // Obliczanie zakresu stron
+    const from = (this.currentPage - 1) * this.pageSize;
+    const to = from + this.pageSize - 1;
+
+    query = query.range(from, to);
+
+    const { data, count, error } = await query;
 
     if (error) {
       console.error('Błąd pobierania przepisów:', error);
     } else if (data) {
       this.recipes = data;
+      this.totalRecipes = count || 0;
+      this.totalPages = Math.ceil(this.totalRecipes / this.pageSize) || 1;
     }
     this.loading = false;
+  }
+
+  changePage(newPage: number) {
+    if (newPage >= 1 && newPage <= this.totalPages && newPage !== this.currentPage) {
+      this.currentPage = newPage;
+      this.fetchRecipes();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 }

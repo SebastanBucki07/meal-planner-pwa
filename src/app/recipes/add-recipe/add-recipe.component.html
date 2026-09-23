@@ -2,7 +2,9 @@
   <div class="editor-layout">
     <!-- LEWA KOLUMNA: Formularz edycji -->
     <div class="form-section">
-      <h2>Nowy Przepis 🍳</h2>
+      <div class="header-title">
+        <h2>Nowy Przepis 🍳</h2>
+      </div>
 
       <div class="form-group">
         <label for="recipeTitle">Nazwa przepisu</label>
@@ -11,12 +13,19 @@
           type="text"
           [(ngModel)]="title"
           placeholder="np. Kurczak w sosie słodko-kwaśnym"
+          class="form-control"
         />
       </div>
 
       <div class="form-group">
         <label for="recipeImageUrl">Link do zdjęcia (opcjonalnie)</label>
-        <input id="recipeImageUrl" type="text" [(ngModel)]="imageUrl" placeholder="https://..." />
+        <input
+          id="recipeImageUrl"
+          type="text"
+          [(ngModel)]="imageUrl"
+          placeholder="https://..."
+          class="form-control"
+        />
       </div>
 
       <div class="form-group">
@@ -26,6 +35,7 @@
           type="text"
           [(ngModel)]="videoUrl"
           placeholder="https://youtube.com/watch?v=..."
+          class="form-control"
         />
       </div>
 
@@ -35,45 +45,75 @@
         <table class="ingredients-table">
           <thead>
             <tr>
-              <th scope="col">Składnik</th>
-              <th scope="col">Ilość</th>
-              <th scope="col">Jednostka</th>
-              <th scope="col">kcal</th>
-              <th scope="col">B</th>
-              <th scope="col">W</th>
-              <th scope="col">T</th>
-              <th scope="col"></th>
+              <th scope="col" style="width: 40%">Składnik</th>
+              <th scope="col" style="width: 15%">Ilość</th>
+              <th scope="col" style="width: 20%">Jednostka</th>
+              <th scope="col" class="text-center">kcal</th>
+              <th scope="col" class="text-center">B</th>
+              <th scope="col" class="text-center">W</th>
+              <th scope="col" class="text-center">T</th>
+              <th scope="col" style="width: 5%"></th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let row of ingredientRows; let i = index">
-              <td>
-                <select [(ngModel)]="row.ingredientId" (change)="onIngredientChange(row)">
-                  <option value="" disabled>Wybierz...</option>
-                  <option *ngFor="let ing of availableIngredients" [value]="ing.id">
-                    {{ ing.name }}
-                  </option>
-                </select>
+              <td class="autocomplete-cell">
+                <!-- AUTOCOMPLETE INPUT -->
+                <div class="autocomplete-wrapper">
+                  <input
+                    type="text"
+                    [(ngModel)]="row.searchText"
+                    (input)="onSearchInput(row)"
+                    (focus)="onInputFocus(row)"
+                    (blur)="onInputBlur(row)"
+                    placeholder="Szukaj składnika..."
+                    class="autocomplete-input"
+                  />
+                  <!-- Rozwijana lista podpowiedzi z pozycjonowaniem absolute -->
+                  <ul
+                    class="autocomplete-dropdown"
+                    *ngIf="row.showDropdown && row.filteredIngredients?.length"
+                  >
+                    <li
+                      *ngFor="let ing of row.filteredIngredients"
+                      (mousedown)="selectIngredient(row, ing)"
+                      class="dropdown-item"
+                    >
+                      {{ ing.name }}
+                    </li>
+                  </ul>
+                </div>
               </td>
               <td>
                 <input
                   type="number"
                   [(ngModel)]="row.amount"
                   (input)="onIngredientChange(row)"
-                  class="num-input"
+                  class="form-control num-input"
                 />
               </td>
               <td>
-                <select [(ngModel)]="row.unit" (change)="onUnitChange(row)">
+                <select
+                  [(ngModel)]="row.unit"
+                  (change)="onUnitChange(row)"
+                  class="form-control select-input"
+                >
                   <option *ngFor="let u of availableUnits" [value]="u.name">{{ u.name }}</option>
                 </select>
               </td>
-              <td class="macro-cell">{{ row.calories }}</td>
-              <td class="macro-cell">{{ row.protein }}</td>
-              <td class="macro-cell">{{ row.carbs }}</td>
-              <td class="macro-cell">{{ row.fat }}</td>
-              <td>
-                <button type="button" (click)="removeIngredientRow(i)" class="btn-del">❌</button>
+              <td class="macro-cell text-center">{{ row.calories }}</td>
+              <td class="macro-cell text-center">{{ row.protein }}</td>
+              <td class="macro-cell text-center">{{ row.carbs }}</td>
+              <td class="macro-cell text-center">{{ row.fat }}</td>
+              <td class="text-center">
+                <button
+                  type="button"
+                  (click)="removeIngredientRow(i)"
+                  class="btn-del"
+                  title="Usuń składnik"
+                >
+                  ❌
+                </button>
               </td>
             </tr>
           </tbody>
@@ -83,13 +123,20 @@
         </button>
       </div>
 
-      <!-- Tabela Instrukcji Krok po Kroku -->
+      <!-- Instrukcje Krok po Kroku -->
       <div class="section-box">
         <h3>Instrukcja przygotowania</h3>
         <div class="step-row" *ngFor="let step of stepRows; let i = index">
           <span class="step-num">Krok {{ step.stepNumber }}</span>
-          <textarea [(ngModel)]="step.instruction" rows="2" placeholder="Opisz krok..."></textarea>
-          <button type="button" (click)="removeStepRow(i)" class="btn-del">❌</button>
+          <textarea
+            [(ngModel)]="step.instruction"
+            rows="2"
+            placeholder="Opisz krok..."
+            class="form-control"
+          ></textarea>
+          <button type="button" (click)="removeStepRow(i)" class="btn-del" title="Usuń krok">
+            ❌
+          </button>
         </div>
         <button type="button" (click)="addStepRow()" class="btn-add-row">
           + Dodaj kolejny krok
