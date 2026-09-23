@@ -191,7 +191,7 @@
           </svg>
         </div>
 
-        <!-- Czytelna lista z historią pomiarów pod wykresem -->
+        <!-- Lista pomiarów pod wykresem -->
         <div class="weight-history-list">
           <h4>Ostatnie pomiary:</h4>
           <div class="history-grid">
@@ -219,7 +219,11 @@
       </div>
 
       <div class="meals-list">
-        <div class="meal-card" *ngFor="let meal of getMealsForType(type)">
+        <div
+          class="meal-card clickable"
+          *ngFor="let meal of getMealsForType(type)"
+          (click)="openRecipeModal(meal.recipe)"
+        >
           <div class="meal-thumb" *ngIf="meal.recipe.image_url">
             <img [src]="meal.recipe.image_url" [alt]="meal.recipe.title" />
           </div>
@@ -243,6 +247,123 @@
       </div>
     </div>
   </section>
+</div>
+
+<!-- Modal ze szczegółami przepisu -->
+<div class="modal-backdrop" *ngIf="selectedRecipe" (click)="closeRecipeModal()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <header class="modal-header">
+      <h2>{{ selectedRecipe.title }}</h2>
+      <button class="btn-close" (click)="closeRecipeModal()">✕</button>
+    </header>
+
+    <div class="modal-body">
+      <!-- 1. Odtwarzacz YT (jeśli istnieje) -->
+      <div
+        class="video-container"
+        *ngIf="selectedRecipe.youtube_url || selectedRecipe.youtube_link"
+      >
+        <iframe
+          *ngIf="getSafeYoutubeUrl(selectedRecipe.youtube_url || selectedRecipe.youtube_link)"
+          [src]="getSafeYoutubeUrl(selectedRecipe.youtube_url || selectedRecipe.youtube_link)"
+          title="Odtwarzacz przepis wideo"
+          frameborder="0"
+          allow="
+            accelerometer;
+            autoplay;
+            clipboard-write;
+            encrypted-media;
+            gyroscope;
+            picture-in-picture;
+          "
+          allowfullscreen
+        ></iframe>
+      </div>
+
+      <!-- 2. Zdjęcie przepisu (jeśli brak wideo YT) -->
+      <div
+        class="recipe-image"
+        *ngIf="!(selectedRecipe.youtube_url || selectedRecipe.youtube_link) && selectedRecipe.image_url"
+      >
+        <img [src]="selectedRecipe.image_url" [alt]="selectedRecipe.title" />
+      </div>
+
+      <!-- 3. Odznaki z makroskładnikami -->
+      <div class="recipe-macros">
+        <div class="macro-badge kcal">
+          <strong>{{ selectedRecipe.calories }}</strong>
+          kcal
+        </div>
+        <div class="macro-badge protein">
+          Białko:
+          <strong>{{ selectedRecipe.protein }}g</strong>
+        </div>
+        <div class="macro-badge fat">
+          Tłuszcze:
+          <strong>{{ selectedRecipe.fat }}g</strong>
+        </div>
+        <div class="macro-badge carbs">
+          Węgle:
+          <strong>{{ selectedRecipe.carbs }}g</strong>
+        </div>
+      </div>
+
+      <!-- 4. Składniki -->
+      <div
+        class="recipe-section"
+        *ngIf="selectedRecipe.ingredients || selectedRecipe.ingredients_list"
+      >
+        <h3>Składniki</h3>
+        <ul
+          class="ingredients-list"
+          *ngIf="isArray(selectedRecipe.ingredients || selectedRecipe.ingredients_list); else textIngredients"
+        >
+          <li *ngFor="let item of (selectedRecipe.ingredients || selectedRecipe.ingredients_list)">
+            <ng-container *ngIf="isArray(item); else singleIngredientObject">
+              <span>{{ item.join(' ') }}</span>
+            </ng-container>
+            <ng-template #singleIngredientObject>
+              <span *ngIf="item.name || item.ingredient">{{ item.name || item.ingredient }}</span>
+              <span *ngIf="item.amount || item.quantity">- {{ item.amount || item.quantity }}</span>
+              <span *ngIf="item.unit">{{ item.unit }}</span>
+              <span *ngIf="!item.name && !item.ingredient && !item.amount && !item.quantity">
+                {{ item }}
+              </span>
+            </ng-template>
+          </li>
+        </ul>
+        <ng-template #textIngredients>
+          <p class="formatted-text">
+            {{ selectedRecipe.ingredients || selectedRecipe.ingredients_list }}
+          </p>
+        </ng-template>
+      </div>
+
+      <!-- 5. Sposób przygotowania (z możliwością odznaczania kroków jako done) -->
+      <div
+        class="recipe-section"
+        *ngIf="selectedRecipe.steps || selectedRecipe.instructions || selectedRecipe.description || selectedRecipe.preparation"
+      >
+        <h3>Sposób przygotowania</h3>
+        <ul class="interactive-steps">
+          <li
+            *ngFor="let stepText of getParsedSteps(selectedRecipe); let i = index"
+            [class.completed]="completedSteps[i]"
+            (click)="toggleStep(i)"
+          >
+            <div class="step-checkbox">
+              <span *ngIf="completedSteps[i]">✓</span>
+            </div>
+            <span class="step-text">{{ stepText }}</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <footer class="modal-footer">
+      <button class="btn-primary" (click)="closeRecipeModal()">Zamknij</button>
+    </footer>
+  </div>
 </div>
 
 <app-navbar></app-navbar>

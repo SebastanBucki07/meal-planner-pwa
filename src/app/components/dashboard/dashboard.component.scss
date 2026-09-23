@@ -436,3 +436,282 @@
   color: #94a3b8;
   font-size: 0.875rem;
 }
+/* --- STYLE DLA MODALA PRZEPISU --- */
+
+// Ciemne tło zasłaniające ekran
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px); // Delikatne rozmycie tła
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+// Karta/Okno modala
+.modal-card {
+  background: #ffffff;
+  border-radius: 12px;
+  max-width: 650px;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  animation: modalFadeIn 0.2s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+// Nagłówek modala
+.modal-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #0f172a;
+  }
+
+  .btn-close {
+    background: transparent;
+    border: none;
+    font-size: 1.25rem;
+    color: #64748b;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    transition:
+      background-color 0.2s,
+      color 0.2s;
+
+    &:hover {
+      background-color: #f1f5f9;
+      color: #0f172a;
+    }
+  }
+}
+
+// Zawartość modala (przewijana)
+.modal-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+
+  // 1. Odtwarzacz wideo YouTube (proporcje 16:9)
+  .video-container {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 */
+    height: 0;
+    overflow: hidden;
+    border-radius: 8px;
+    background-color: #000;
+
+    iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+  }
+
+  // 2. Zdjęcie potrawy
+  .recipe-image {
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+  }
+
+  // 3. Makroskładniki (Odznaki)
+  .recipe-macros {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 0.75rem;
+
+    .macro-badge {
+      padding: 0.6rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      text-align: center;
+      background-color: #f8fafc;
+      border: 1px solid #e2e8f0;
+      color: #334155;
+
+      strong {
+        color: #0f172a;
+      }
+
+      &.kcal {
+        background-color: #fef2f2;
+        border-color: #fecaca;
+        color: #991b1b;
+      }
+      &.protein {
+        background-color: #f0fdf4;
+        border-color: #bbf7d0;
+        color: #166534;
+      }
+      &.fat {
+        background-color: #fefce8;
+        border-color: #fef08a;
+        color: #854d0e;
+      }
+      &.carbs {
+        background-color: #eff6ff;
+        border-color: #bfdbfe;
+        color: #1e40af;
+      }
+    }
+  }
+
+  // Sekcje (Składniki / Sposób przygotowania)
+  .recipe-section {
+    h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #1e293b;
+      margin-top: 0;
+      margin-bottom: 0.75rem;
+    }
+
+    .ingredients-list {
+      list-style: disc;
+      padding-left: 1.25rem;
+      margin: 0;
+
+      li {
+        margin-bottom: 0.35rem;
+        color: #334155;
+      }
+    }
+
+    .formatted-text {
+      white-space: pre-line;
+      color: #334155;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    // Interaktywna lista kroków (odznaczanie)
+    .interactive-steps {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      li {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        padding: 0.6rem 0.75rem;
+        border-radius: 6px;
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        cursor: pointer;
+        transition: background-color 0.2s;
+
+        &:hover {
+          background-color: #f1f5f9;
+        }
+
+        .step-checkbox {
+          width: 20px;
+          height: 20px;
+          border-radius: 4px;
+          border: 2px solid #cbd5e1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          margin-top: 2px;
+          font-size: 0.75rem;
+          font-weight: bold;
+          color: #ffffff;
+          background-color: #ffffff;
+        }
+
+        .step-text {
+          color: #334155;
+          line-height: 1.4;
+          font-size: 0.95rem;
+        }
+
+        // Stan ukończonego kroku
+        &.completed {
+          background-color: #f0fdf4;
+          border-color: #bbf7d0;
+
+          .step-checkbox {
+            background-color: #22c55e;
+            border-color: #22c55e;
+          }
+
+          .step-text {
+            text-decoration: line-through;
+            color: #86efac;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Stopka modala
+.modal-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: flex-end;
+
+  .btn-primary {
+    background-color: #2563eb;
+    color: #ffffff;
+    border: none;
+    padding: 0.5rem 1.25rem;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #1d4ed8;
+    }
+  }
+}
