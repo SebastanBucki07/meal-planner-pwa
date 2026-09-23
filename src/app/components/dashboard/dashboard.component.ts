@@ -1,6 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { environment } from '../../../environment';
@@ -20,6 +21,7 @@ import { dbKeyToMealType } from '../../helpers/mealType.helper';
 export class DashboardComponent implements OnInit {
   private supabase: SupabaseClient;
   private router = inject(Router);
+  private sanitizer = inject(DomSanitizer);
 
   loading = true;
   todayDate: string = new Date().toISOString().split('T')[0];
@@ -53,6 +55,10 @@ export class DashboardComponent implements OnInit {
   minWeight = 0;
   maxWeight = 100;
   yGridLines: { value: number; y: number }[] = [];
+
+  // --- Stan Modala Przepisu ---
+  selectedRecipe: any = null;
+  completedSteps: { [key: number]: boolean } = {};
 
   constructor() {
     this.supabase = createClient(environment.SUPABASE_URL, environment.SUPABASE_ANON_KEY);
@@ -209,7 +215,6 @@ export class DashboardComponent implements OnInit {
     } = await this.supabase.auth.getUser();
     if (!user) return;
 
-    // Pobieramy 6 najnowszych pomiarów (sortując malejąco, żeby wziąć OSTATNIE 6)
     const { data, error } = await this.supabase
       .from('weight_logs')
       .select('date, weight')
@@ -218,7 +223,6 @@ export class DashboardComponent implements OnInit {
       .limit(6);
 
     if (!error && data && data.length > 0) {
-      // Odwracamy tablicę, aby na wykresie punkty były ukłożone chronologicznie (od najstarszego do najnowszego)
       const sortedData = data.reverse();
 
       this.weightHistory = sortedData.map((d: any) => {
@@ -246,12 +250,10 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-  // Getter ułatwiający pobranie dokładnie ostatnich 6 pomiarów bezpośrednio w pliku HTML
   get recentWeightHistory(): WeightEntry[] {
     return this.weightHistory.slice(-6);
   }
 
-  // Oblicza dynamiczny zakres osi Y z zachowaniem marginesu
   private calculateYScale(): void {
     if (this.weightHistory.length === 0) return;
 
@@ -259,7 +261,6 @@ export class DashboardComponent implements OnInit {
     const min = Math.min(...weights);
     const max = Math.max(...weights);
 
-    // Margines ±2 kg
     this.minWeight = Math.floor(min - 2);
     this.maxWeight = Math.ceil(max + 2);
 
@@ -268,7 +269,6 @@ export class DashboardComponent implements OnInit {
       this.maxWeight += 5;
     }
 
-    // Podział na 3 odcinki (4 poziome linie)
     const steps = 3;
     const stepValue = (this.maxWeight - this.minWeight) / steps;
     this.yGridLines = [];
@@ -280,7 +280,6 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-  // Zamiana wartości wagowych w kg na współrzędną Y układu SVG
   private getNormalizedY(weight: number): number {
     const drawHeight = this.svgHeight - this.padding.top - this.padding.bottom;
     const range = this.maxWeight - this.minWeight;
@@ -288,7 +287,6 @@ export class DashboardComponent implements OnInit {
     return this.svgHeight - this.padding.bottom - normalized * drawHeight;
   }
 
-  // Obliczenia współrzędnych punktów na wykresie SVG
   get chartPoints(): ChartPoint[] {
     if (this.weightHistory.length === 0) return [];
 
@@ -310,7 +308,6 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  // Ciąg punktów do parametru points w polyline / path SVG
   get polylinePoints(): string {
     return this.chartPoints.map(p => `${p.x},${p.y}`).join(' ');
   }
@@ -352,6 +349,76 @@ export class DashboardComponent implements OnInit {
       return 'exceeded';
     }
     return 'ok';
+  }
+
+  // --- LOGIKA MODALA PRZEPISU ---
+
+  openRecipeModal(recipe: any): void {
+    this.selectedRecipe = recipe;
+    this.completedSteps = {};
+  }
+
+  closeRecipeModal(): void {
+    this.selectedRecipe = null;
+    this.completedSteps = {};
+  }
+
+  toggleStep(index: number): void {
+    this.completedSteps[index] = !this.completedSteps[index];
+  }
+
+  isArray(val: any): boolean {
+    return Array.isArray(val);
+  }
+
+  getSafeYoutubeUrl(url: string): SafeResourceUrl | null {
+    if (!url) return null;
+    let videoId = '';
+    if (url.includes('youtu.be/')) {
+      videoId = url.split('youtu.be/')[1].split('?')[0];
+    } else if (url.includes('youtube.com/watch')) {
+      const urlParams = new URLSearchParams(url.split('?')[1]);
+      videoId = urlParams.get('v') || '';
+    } else if (url.includes('youtube.com/embed/')) {
+      videoId = url.split('youtube.com/embed/')[1].split('?')[0];
+    }
+
+    if (videoId) {
+      return this.sanitizer.bypassSecurityTrustResourceUrl(
+        `https://www.youtube.com/embed/${videoId}`
+      );
+    }
+    return null;
+  }
+
+  getParsedSteps(recipe: any): string[] {
+    if (!recipe) return [];
+
+    const rawSteps =
+      recipe.steps ||
+      recipe.instructions ||
+      recipe.preparation ||
+      recipe.sposob_przygotowania ||
+      recipe.description;
+
+    if (!rawSteps) return [];
+
+    if (Array.isArray(rawSteps)) {
+      return rawSteps.map(s =>
+        typeof s === 'object' ? s.text || s.instruction || JSON.stringify(s) : String(s)
+      );
+    }
+
+    if (typeof rawSteps === 'string') {
+      const steps = rawSteps
+        .split(/\r?\n|\.(?=\s|[A-Z]|$)/)
+        .map(s => s.trim())
+        .filter(s => s.length > 0);
+
+      return steps.length > 0 ? steps : [rawSteps];
+    }
+
+    return [];
   }
 
   protected readonly MEAL_TYPES = MEAL_TYPES;
