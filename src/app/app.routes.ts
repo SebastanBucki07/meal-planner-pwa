@@ -7,7 +7,8 @@ import { AddRecipeComponent } from './recipes/add-recipe/add-recipe.component';
 import { RecipeDetailsComponent } from './recipes/recipe-details/recipe-details.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { PlanComponent } from './components/plan/plan.component';
-import { ShoppingListComponent } from './components/shopping-list/shopping-list.component'; // Import
+import { ShoppingListComponent } from './components/shopping-list/shopping-list.component';
+import { AddIngredientComponent } from './components/add-ingredient/add-ingredient.component'; // Import
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -18,7 +19,12 @@ export const routes: Routes = [
   { path: 'recipes', component: RecipesComponent, canActivate: [authGuard] },
   { path: 'profile', component: ProfileComponent },
   { path: 'plan', component: PlanComponent },
-  { path: 'shopping-list', component: ShoppingListComponent, canActivate: [authGuard] }, // Dodana ścieżka
+  { path: 'shopping-list', component: ShoppingListComponent, canActivate: [authGuard] },
+  {
+    path: 'add-ingredient',
+    component: AddIngredientComponent,
+    canActivate: [authGuard]
+  },
 
   { path: '**', redirectTo: 'dashboard' }
 ];

@@ -1,0 +1,133 @@
+// add-ingredient.component.scss
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.container {
+  max-width: 500px;
+  margin: 30px auto 100px;
+  padding: 0 16px;
+
+  .card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow:
+      0 10px 25px -5px rgba(0, 0, 0, 0.05),
+      0 8px 10px -6px rgba(0, 0, 0, 0.01);
+    border: 1px solid #e2e8f0;
+
+    h2 {
+      margin: 0 0 20px 0;
+      color: #0f172a;
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    h3 {
+      font-size: 0.95rem;
+      color: #64748b;
+      margin: 20px 0 16px;
+      font-weight: 600;
+    }
+
+    hr {
+      border: 0;
+      border-top: 1px solid #f1f5f9;
+      margin: 20px 0;
+    }
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+  width: 100%;
+
+  label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 6px;
+  }
+
+  input,
+  select {
+    width: 100%; // Zapobiega wychodzeniu poza krawędzie
+    padding: 10px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    color: #1e293b;
+    background-color: #ffffff;
+    outline: none;
+    transition: all 0.2s ease-in-out;
+
+    &:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    &::placeholder {
+      color: #94a3b8;
+    }
+  }
+
+  select {
+    cursor: pointer;
+    appearance: auto;
+  }
+}
+
+/* Układy kolumnowe z obsługą elastyczności */
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  width: 100%;
+
+  &.macros {
+    grid-template-columns: repeat(3, 1fr); // Poprawne dzielenie na 3 równe kolumny
+  }
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 12px 16px;
+  background-color: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 12px;
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease;
+
+  &:hover:not(:disabled) {
+    background-color: #1d4ed8;
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.99);
+  }
+
+  &:disabled {
+    background-color: #94a3b8;
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+}
+
+/* Dostosowanie dla małych ekranów smartfonów */
+@media (max-width: 480px) {
+  .form-row.macros {
+    grid-template-columns: 1fr; // Na bardzo małych ekranach układa makra pionowo
+  }
+}
