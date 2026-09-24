@@ -9,10 +9,14 @@
     <li
       *ngFor="let meal of dashboardService.todayMeals()"
       [class.completed]="meal.completed"
+      role="button"
+      tabindex="0"
       (click)="toggleMeal(meal.id, meal.completed)"
+      (keyup.enter)="toggleMeal(meal.id, meal.completed)"
+      (keyup.space)="toggleMeal(meal.id, meal.completed); $event.preventDefault()"
       class="meal-item"
     >
-      <input type="checkbox" [checked]="meal.completed" readonly />
+      <input type="checkbox" [checked]="meal.completed" aria-hidden="true" readonly />
       <span class="meal-name">{{ meal.name }}</span>
       <span class="meal-calories">{{ meal.calories }} kcal</span>
     </li>

@@ -74,17 +74,69 @@ export class AuthService {
     return await this.supabase.auth.signInWithPassword({ email, password: pass });
   }
 
-  async signUp(email: string, pass: string, displayName: string) {
-    const response = await this.supabase.auth.signUp({ email, password: pass });
+  // w auth.service.ts
+  async signUp(
+    email: string,
+    password: string,
+    displayName: string,
+    profileData?: {
+      height: number | null;
+      weight: number | null;
+      age: number | null;
+      gender: 'male' | 'female';
+      workType: 'sedentary' | 'physical';
+      workoutsPerWeek: number;
+      goal: 'lose' | 'maintain' | 'gain';
+    }
+  ) {
+    // 1. Rejestracja w Auth
+    const { data, error } = await this.supabase.auth.signUp({ email, password });
+    if (error) return { error };
 
-    if (response.data.user) {
-      await this.supabase.from('new_profiles').insert({
-        id: response.data.user.id,
-        display_name: displayName
+    if (data.user && profileData) {
+      // 2. Wstępne obliczenia makro na podstawie podanych danych
+      const weight = profileData.weight || 75;
+      const height = profileData.height || 180;
+      const age = profileData.age || 30;
+
+      let bmr = 10 * weight + 6.25 * height - 5 * age;
+      bmr += profileData.gender === 'male' ? 5 : -161;
+
+      const pal = profileData.workType === 'sedentary' ? 1.3 : 1.4;
+      let tdee = bmr * pal;
+
+      if (profileData.goal === 'lose') tdee -= 300;
+      if (profileData.goal === 'gain') tdee += 200;
+
+      const targetCalories = Math.round(tdee);
+      const targetProtein = Math.round(weight * 2.0);
+      const targetFat = Math.round((targetCalories * 0.25) / 9);
+      const targetCarbs = Math.max(
+        0,
+        Math.round((targetCalories - (targetProtein * 4 + targetFat * 9)) / 4)
+      );
+
+      // 3. Zapis pełnego profilu w tabeli new_profiles
+      const { error: profileError } = await this.supabase.from('new_profiles').insert({
+        id: data.user.id,
+        display_name: displayName,
+        height: profileData.height,
+        weight: profileData.weight,
+        age: profileData.age,
+        gender: profileData.gender,
+        work_type: profileData.workType,
+        workouts_per_week: profileData.workoutsPerWeek,
+        goal: profileData.goal,
+        target_calories: targetCalories,
+        target_protein: targetProtein,
+        target_carbs: targetCarbs,
+        target_fat: targetFat
       });
+
+      if (profileError) return { error: profileError };
     }
 
-    return response;
+    return { data, error: null };
   }
 
   async signOut(): Promise<void> {

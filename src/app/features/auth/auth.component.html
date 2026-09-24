@@ -7,6 +7,7 @@
     </div>
 
     <form (ngSubmit)="onSubmit()" #authForm="ngForm">
+      <!-- Ksywka (tylko rejestracja) -->
       <div class="form-group" *ngIf="isRegisterMode">
         <label for="displayName">Ksywka / Imię</label>
         <input
@@ -19,6 +20,86 @@
         />
       </div>
 
+      <!-- DODATKOWE POLA BIOMETRYCZNE I CELE (tylko rejestracja) -->
+      <ng-container *ngIf="isRegisterMode">
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="height">Wzrost (cm)</label>
+            <input type="number" id="height" [(ngModel)]="height" name="height" placeholder="180" />
+          </div>
+          <div class="form-group">
+            <label for="weight">Waga (kg)</label>
+            <input type="number" id="weight" [(ngModel)]="weight" name="weight" placeholder="75" />
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="age">Wiek</label>
+            <input type="number" id="age" [(ngModel)]="age" name="age" placeholder="30" />
+          </div>
+          <div class="form-group">
+            <label for="gender">Płeć</label>
+            <select id="gender" [(ngModel)]="gender" name="gender">
+              <option value="male">Mężczyzna</option>
+              <option value="female">Kobieta</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <span class="label">Tryb pracy</span>
+          <div class="toggle-buttons">
+            <button
+              type="button"
+              [class.active]="workType === 'sedentary'"
+              (click)="workType = 'sedentary'"
+            >
+              Siedząca
+            </button>
+            <button
+              type="button"
+              [class.active]="workType === 'physical'"
+              (click)="workType = 'physical'"
+            >
+              Fizyczna
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="workouts">
+            Treningi w tygodniu:
+            <strong>{{ workoutsPerWeek }}x</strong>
+          </label>
+          <input
+            id="workouts"
+            type="range"
+            min="0"
+            max="6"
+            step="1"
+            [(ngModel)]="workoutsPerWeek"
+            name="workoutsPerWeek"
+          />
+        </div>
+
+        <div class="form-group">
+          <span class="label">Jaki jest Twój cel?</span>
+          <div class="goal-buttons">
+            <button type="button" [class.active]="goal === 'lose'" (click)="goal = 'lose'">
+              📉 Schudnąć
+            </button>
+            <button type="button" [class.active]="goal === 'maintain'" (click)="goal = 'maintain'">
+              ⚖️ Utrzymać
+            </button>
+            <button type="button" [class.active]="goal === 'gain'" (click)="goal = 'gain'">
+              📈 Przytyć
+            </button>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- Standardowe pola logowania / rejestracji -->
       <div class="form-group">
         <label for="email">E-mail</label>
         <input
@@ -46,19 +127,23 @@
       <div class="error-box" *ngIf="errorMessage">{{ errorMessage }}</div>
 
       <button type="submit" class="btn-submit" [disabled]="loading || !authForm.valid">
-        {{ loading ? 'Proszę czekać...' : (isRegisterMode ? 'Zarejestruj się' : 'Zaloguj się') }}
+        {{ loading ? 'Proszę czekać...' : (isRegisterMode ? 'Zarejestruj się i oblicz cele' :
+        'Zaloguj się') }}
       </button>
     </form>
 
     <div class="toggle-mode">
-      <p *ngIf="!isRegisterMode">
+      @if (!isRegisterMode) {
+      <p>
         Nie masz konta?
-        <a (click)="toggleMode()">Zarejestruj się</a>
+        <button type="button" class="btn-link" (click)="toggleMode()">Zarejestruj się</button>
       </p>
-      <p *ngIf="isRegisterMode">
+      } @else {
+      <p>
         Masz już konto?
-        <a (click)="toggleMode()">Zaloguj się</a>
+        <button type="button" class="btn-link" (click)="toggleMode()">Zaloguj się</button>
       </p>
+      }
     </div>
   </div>
 </div>

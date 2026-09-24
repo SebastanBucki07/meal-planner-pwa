@@ -3,7 +3,7 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 import { ProfileMapper } from '../mappers/profile.mapper';
 import { environment } from '../../../environment';
-import { NewProfileDTO, Profile } from '../models';
+import { Profile } from '../models';
 
 @Injectable({
   providedIn: 'root'
@@ -20,90 +20,69 @@ export class ProfileService {
   }
 
   async loadProfile(): Promise<Profile | null> {
-    this.loading.set(true);
-    try {
-      const {
-        data: { user }
-      } = await this.supabase.auth.getUser();
-      if (!user) return null;
+    const {
+      data: { user },
+      error: authError
+    } = await this.supabase.auth.getUser();
+    if (authError || !user) return null;
 
-      // 1. Pobranie danych profilu z new_profiles
-      const { data: profileData, error: profileError } = await this.supabase
-        .from('new_profiles')
-        .select('*')
-        .eq('id', user.id)
-        .maybeSingle();
+    const userId = user.id;
 
-      if (profileError) {
-        console.error('Błąd pobierania profilu:', profileError);
-        return null;
-      }
+    // 1. Pobranie profilu z tabeli new_profiles
+    const { data: profileData, error } = await this.supabase
+      .from('new_profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
 
-      // 2. Pobranie najnowszej wagi z new_weight_logs
-      const { data: weightData } = await this.supabase
-        .from('new_weight_logs')
-        .select('weight')
-        .eq('user_id', user.id)
-        .order('date', { ascending: false })
-        .limit(1)
-        .maybeSingle();
+    if (error || !profileData) return null;
 
-      const latestWeight = weightData?.weight ? Number(weightData.weight) : undefined;
+    // 2. Pobranie najnowszej wagi z new_weight_logs
+    const { data: latestWeightData } = await this.supabase
+      .from('new_weight_logs')
+      .select('weight')
+      .eq('user_id', userId)
+      .order('recorded_at', { ascending: false })
+      .limit(1)
+      .single();
 
-      if (profileData) {
-        const mappedProfile = ProfileMapper.toDomain(profileData as NewProfileDTO, latestWeight);
-        this.profile.set(mappedProfile);
-        return mappedProfile;
-      }
+    // Fallback: jeśli nie ma wpisów w new_weight_logs, bierzemy wagę z profilu (profileData.weight)
+    const latestWeight = latestWeightData?.weight ?? profileData.weight ?? undefined;
 
-      return null;
-    } finally {
-      this.loading.set(false);
-    }
+    // 3. Mapowanie do modelu domeny
+    const domainProfile = ProfileMapper.toDomain(profileData, latestWeight);
+
+    this.profile.set(domainProfile);
+    return domainProfile;
   }
 
-  async saveProfile(updatedProfile: Profile): Promise<boolean> {
-    this.saving.set(true);
-    try {
-      const {
-        data: { user }
-      } = await this.supabase.auth.getUser();
-      if (!user) return false;
+  async saveProfile(profile: Profile): Promise<boolean> {
+    const userId = profile.id;
 
-      // 1. Zapis tylko pól profilowych w new_profiles (bez weight)
-      const dto = ProfileMapper.toDTO({ ...updatedProfile, id: user.id });
+    // 1. Zapisujemy dane profilu w tabeli new_profiles
+    const dto = ProfileMapper.toDTO(profile);
+    const { error: profileError } = await this.supabase
+      .from('new_profiles')
+      .update(dto)
+      .eq('id', userId);
 
-      const { error: profileError } = await this.supabase
-        .from('new_profiles')
-        .upsert(dto, { onConflict: 'id' });
-
-      if (profileError) {
-        console.error('Błąd zapisu profilu:', profileError);
-        return false;
-      }
-
-      // 2. Zapis dzisiejszej wagi w new_weight_logs
-      if (updatedProfile.weight) {
-        const todayStr = new Date().toISOString().split('T')[0];
-        const { error: weightError } = await this.supabase.from('new_weight_logs').upsert(
-          {
-            user_id: user.id,
-            weight: updatedProfile.weight,
-            date: todayStr
-          },
-          { onConflict: 'user_id,date' }
-        );
-
-        if (weightError) {
-          console.warn('Błąd zapisu wagi w new_weight_logs:', weightError.message);
-        }
-      }
-
-      this.profile.set(updatedProfile);
-      return true;
-    } finally {
-      this.saving.set(false);
+    if (profileError) {
+      console.error('Błąd zapisu profilu:', profileError);
+      return false;
     }
+
+    // 2. Jeśli podano wagę, zapisujemy nowy wpis w historii (new_weight_logs)
+    if (profile.weight) {
+      await this.supabase.from('new_weight_logs').insert({
+        user_id: userId,
+        weight: profile.weight,
+        recorded_at: new Date().toISOString()
+      });
+    }
+
+    // 3. Aktualizacja sygnału profilu (używamy właściwej nazwy `profile`)
+    this.profile.set(profile);
+    return true;
   }
 
   async logout(): Promise<void> {
@@ -112,135 +91,40 @@ export class ProfileService {
 
   // Dodaj tę metodę do klasy ProfileService:
   async updateWeight(newWeight: number): Promise<boolean> {
-    try {
-      const {
-        data: { user }
-      } = await this.supabase.auth.getUser();
-      if (!user) return false;
+    const {
+      data: { user },
+      error: authError
+    } = await this.supabase.auth.getUser();
+    if (authError || !user) return false;
+    const userId = user.id;
 
-      const todayStr = new Date().toISOString().split('T')[0];
+    // 1. Zapisz nowy pomiar w historii (to zaktualizuje wykresy i najnowszą wagę)
+    const { error: logError } = await this.supabase.from('new_weight_logs').insert({
+      user_id: userId,
+      weight: newWeight,
+      recorded_at: new Date().toISOString()
+    });
 
-      // 1. Zapis w tabeli logów wagi
-      const { error: weightError } = await this.supabase.from('new_weight_logs').upsert(
-        {
-          user_id: user.id,
-          weight: newWeight,
-          date: todayStr
-        },
-        { onConflict: 'user_id,date' }
-      );
-
-      if (weightError) {
-        console.error('Błąd zapisu wagi:', weightError);
-        return false;
-      }
-
-      // 2. Aktualizacja w locie sygnału profile, żeby zmieniła się waga (i automatycznie przeliczyły kalorie, jeśli z niej korzystasz)
-      const current = this.profile();
-      if (current) {
-        this.profile.set({
-          ...current,
-          weight: newWeight
-        });
-      }
-
-      return true;
-    } catch (e) {
-      console.error('Nie udało się zaktualizować wagi:', e);
+    if (logError) {
+      console.error('Błąd zapisu wagi do logów:', logError);
       return false;
     }
-  }
 
-  // w profile.service.ts
-
-  private calculateNewTargets(weight: number, profile: Profile) {
-    // Bazujemy na polu height z Twojego profilu (lub domyślnej wartości, jeśli opcjonalne)
-    const height = profile.height || 175;
-    const age = 30; // Jeśli nie masz wieku w profilu, przyjmujemy domyślny lub dodaj pole do interfejsu
-
-    // Wzór Mifflin-St Jeor (przykładowy dla mężczyzn)
-    const bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5;
-    const tdee = bmr * 1.2; // Domyślný współczynnik aktywności, jeśli brak w modelu
-
-    let targetCalories = Math.round(tdee);
-
-    // Zależnie od tego, jakie pola masz w Profile, dopasuj warunki:
-    // np. jeśli masz pole target_calories lub calories w profilu:
-    const targetProtein = Math.round(weight * 2.0);
-
-    return {
-      weight: weight,
-      calories: targetCalories, // Upewnij się, że Twoja tabela new_profiles ma taką kolumnę
-      protein: targetProtein
-    };
-  }
-
-  async updateWeightAndRecalculateTargets(newWeight: number): Promise<boolean> {
-    try {
-      const { data: { user } } = await this.supabase.auth.getUser();
-      if (!user) return false;
-
-      const currentProfile = this.profile();
-      if (!currentProfile) return false;
-
-      // 1. Pobieramy wzrost z profilu (lub domyślnie 180)
-      const height = currentProfile.height || 180;
-
-      // Parametry bazowe (możesz je trzymać w profilu lub przyjąć standardowe dla użytkownika)
-      const age = 30;
-      const isMale = true; // płeć
-      const pal = 1.375;  // domyślny współczynnik aktywności (np. lekka aktywność / praca siedząca + treningi)
-
-      // 2. Dokładny wzór Mifflina-St Jeor (taki sam jak w ProfileComponent)
-      let bmr = 10 * newWeight + 6.25 * height - 5 * age;
-      bmr += isMale ? 5 : -161;
-
-      let tdee = bmr * pal;
-
-      // Załóżmy zachowanie obecnego celu lub domyślnie 'maintain'
-      const targetCalories = Math.round(tdee);
-      const targetProtein = Math.round(newWeight * 2.0); // 2g na kg masy ciała
-      const targetFat = Math.round((targetCalories * 0.25) / 9); // 25% kcal z tłuszczu
-
-      const proteinCalories = targetProtein * 4;
-      const fatCalories = targetFat * 9;
-      const carbCalories = targetCalories - (proteinCalories + fatCalories);
-      const targetCarbs = Math.max(0, Math.round(carbCalories / 4));
-
-      // 3. Tworzymy zaktualizowany model domeny
-      const updatedProfile: Profile = {
-        ...currentProfile,
-        weight: newWeight,
-        targets: {
-          calories: targetCalories,
-          protein: targetProtein,
-          carbs: targetCarbs,
-          fat: targetFat
-        }
-      };
-
-      // 4. Używamy mappera, aby zamienić model na DTO dla Supabase
-      const dto = ProfileMapper.toDTO(updatedProfile);
-
-      // 5. Zapis w tabeli new_profiles
-      const { error: profileError } = await this.supabase
+    // 2. Opcjonalnie: zaktualizuj też kolumnę weight w new_profiles (jeśli tam też ją trzymasz jako cache)
+    await this.supabase
       .from('new_profiles')
-      .update(dto)
-      .eq('id', user.id);
+      .update({ weight: newWeight, updated_at: new Date().toISOString() })
+      .eq('id', userId);
 
-      if (profileError) {
-        console.error('Błąd aktualizacji celów po zmianie wagi:', profileError);
-        return false;
-      }
-
-      // 6. Aktualizacja lokalnego sygnału – cała aplikacja widzi zmiany od razu!
-      this.profile.set(updatedProfile);
-
-      return true;
-    } catch (e) {
-      console.error('Błąd podczas przeliczania celów:', e);
-      return false;
+    // 3. Odśwież lokalny sygnał profilu, żeby cała aplikacja od razu widziała nową wagę
+    const currentProfile = this.profile();
+    if (currentProfile) {
+      this.profile.set({
+        ...currentProfile,
+        weight: newWeight
+      });
     }
-  }
 
+    return true;
+  }
 }

@@ -20,7 +20,7 @@ export class ProfileComponent implements OnInit {
 
   // Stan formularza kalkulatora
   height: number | null = null;
-  weight: number | null = null;
+  weight: number | null = null; // <-- Tutaj trafia waga
   age: number | null = 30;
   gender: 'male' | 'female' = 'male';
   workType: 'sedentary' | 'physical' = 'sedentary';
@@ -41,8 +41,16 @@ export class ProfileComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     const data = await this.profileService.loadProfile();
     if (data) {
+      // 1. Wczytanie danych biometrycznych i celów z profilu (w tym najnowszej wagi z logów)
       this.height = data.height || null;
-      this.weight = data.weight || null;
+      this.weight = data.weight || null; // <-- TUTAJ PRZYPISUJEMY WAGĘ DO FORMULARZA
+      this.age = data.age ?? 30;
+      this.gender = data.gender || 'male';
+      this.workType = data.workType || 'sedentary';
+      this.workoutsPerWeek = data.workoutsPerWeek ?? 2;
+      this.goal = data.goal || 'maintain';
+
+      // 2. Wczytanie wyliczonych celów makroskładników
       this.targetCalories = data.targets.calories;
       this.targetProtein = data.targets.protein;
       this.targetCarbs = data.targets.carbs;
@@ -120,7 +128,12 @@ export class ProfileComponent implements OnInit {
       id: current?.id || '',
       displayName: current?.displayName || 'Użytkownik',
       height: this.height ? Number(this.height) : undefined,
-      weight: this.weight ? Number(this.weight) : undefined,
+      weight: this.weight ? Number(this.weight) : undefined, // Przekazujemy wagę do zapisu (co stworzy też wpis w historii)
+      age: this.age ? Number(this.age) : undefined,
+      gender: this.gender,
+      workType: this.workType,
+      workoutsPerWeek: Number(this.workoutsPerWeek),
+      goal: this.goal,
       targets: {
         calories: Number(this.targetCalories),
         protein: Number(this.targetProtein),
@@ -131,7 +144,9 @@ export class ProfileComponent implements OnInit {
 
     const success = await this.profileService.saveProfile(updatedProfile);
 
-    this.message = success ? 'Ustawienia i nowa waga zostały zapisane! 🎉' : 'Nie udało się zapisać zmian w bazie.';
+    this.message = success
+      ? 'Ustawienia i nowa waga zostały zapisane! 🎉'
+      : 'Nie udało się zapisać zmian w bazie.';
     if (success) setTimeout(() => (this.message = ''), 4000);
   }
 

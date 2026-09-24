@@ -7,7 +7,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent {
-  @Input() displayName: string = 'Użytkownik';
+  @Input() displayName = 'Użytkownik';
   @Output() logout = new EventEmitter<void>();
 
   onLogout(): void {

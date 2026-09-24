@@ -1,17 +1,15 @@
-import {Injectable, signal, computed, inject} from '@angular/core';
+import { Injectable, signal, computed } from '@angular/core';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 import { NewWeightLogDTO, WeightEntry } from '../models';
 import { DaySummary, MealLogDTO, DashboardMealItem } from '../models/dashboard.model';
 import { environment } from '../../../environment';
-import {ProfileService} from './profile.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DashboardService {
   private supabase: SupabaseClient;
-  private profileService = inject(ProfileService);
 
   weightHistory = signal<WeightEntry[]>([]);
   todaySummary = signal<DaySummary>({ calories: 0, protein: 0, carbs: 0, fat: 0 });
@@ -99,25 +97,37 @@ export class DashboardService {
   }
 
   async logWeight(weight: number): Promise<boolean> {
-    const { data: { user } } = await this.supabase.auth.getUser();
-    if (!user) return false;
+    const {
+      data: { user },
+      error: authError
+    } = await this.supabase.auth.getUser();
+    if (authError || !user) return false;
+    const userId = user.id;
 
     const todayStr = new Date().toISOString().split('T')[0];
 
-    // 1. Zapis do tabeli historycznej logów wagi
-    const { error: logError } = await this.supabase
-    .from('new_weight_logs')
-    .insert({ user_id: user.id, weight, date: todayStr });
+    // 1. Zapisz wpis w historii (new_weight_logs).
+    // Uwaga: Sprawdź, czy w Twojej tabeli kolumna z datą nazywa się 'recorded_at', 'logged_at' czy 'date'!
+    // Poniżej używamy 'date' oraz 'logged_at' zależnie od tego, co masz w bazie. Bezpieczniej wysłać te, które wymagane są przez DTO.
+    const { error: logError } = await this.supabase.from('new_weight_logs').insert({
+      user_id: userId,
+      weight: weight,
+      date: todayStr, // Jeśli Twoja tabela używa kolumny 'date'
+      logged_at: new Date().toISOString() // Jeśli używa 'logged_at' / 'recorded_at'
+    });
 
     if (logError) {
-      console.error('Błąd zapisu w historycznych logach wagi:', logError);
+      console.error('Błąd zapisu wagi w logach:', logError);
       return false;
     }
 
-    // 2. Aktualizacja wagi oraz PRZELICZENIE CELÓW KALORYCZNYCH w tabeli new_profiles
-    await this.profileService.updateWeightAndRecalculateTargets(weight);
+    // 2. Zaktualizuj też kolumnę weight w new_profiles (dla cache)
+    await this.supabase
+      .from('new_profiles')
+      .update({ weight: weight, updated_at: new Date().toISOString() })
+      .eq('id', userId);
 
-    // 3. Odświeżenie danych na dashboardzie
+    // 3. Odśwież dane na dashboardzie, żeby wykres natychmiast się zaktualizował
     await this.loadDashboardData();
 
     return true;

@@ -19,6 +19,15 @@ export class AuthComponent {
   errorMessage = '';
   loading = false;
 
+  // Nowe pola do rejestracji
+  height: number | null = 180;
+  weight: number | null = 75;
+  age: number | null = 30;
+  gender: 'male' | 'female' = 'male';
+  workType: 'sedentary' | 'physical' = 'sedentary';
+  workoutsPerWeek = 2;
+  goal: 'lose' | 'maintain' | 'gain' = 'maintain';
+
   constructor(
     private authService: AuthService,
     private router: Router
@@ -44,7 +53,16 @@ export class AuthComponent {
         const { error } = await this.authService.signUp(
           this.email,
           this.password,
-          this.displayName
+          this.displayName,
+          {
+            height: this.height,
+            weight: this.weight,
+            age: this.age,
+            gender: this.gender,
+            workType: this.workType,
+            workoutsPerWeek: this.workoutsPerWeek,
+            goal: this.goal
+          }
         );
         if (error) throw error;
 
@@ -55,8 +73,9 @@ export class AuthComponent {
 
         this.router.navigate(['/dashboard']);
       }
-    } catch (err: any) {
-      this.errorMessage = err.message || 'Wystąpił błąd podczas autoryzacji.';
+    } catch (error: unknown) {
+      const err = error as Error;
+      this.errorMessage = err.message || 'Wystąpił błąd autoryzacji.';
     } finally {
       this.loading = false;
     }

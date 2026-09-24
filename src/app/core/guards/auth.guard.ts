@@ -7,7 +7,9 @@ export const authGuard: CanActivateFn = async () => {
   const router = inject(Router);
 
   // CZEKAMY na odczytanie sesji przez klienta Supabase
-  const { data: { session } } = await authService.getSessionPormise();
+  const {
+    data: { session }
+  } = await authService.getSessionPormise();
 
   if (session) {
     return true; // Użytkownik jest zalogowany, przepuszczamy

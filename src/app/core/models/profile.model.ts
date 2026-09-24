@@ -8,6 +8,11 @@ export interface NewProfileDTO {
   target_carbs: number;
   target_fat: number;
   height: number | null;
+  age?: number | null;
+  gender?: 'male' | 'female' | null;
+  work_type?: 'sedentary' | 'physical' | null;
+  workouts_per_week?: number | null;
+  goal?: 'lose' | 'maintain' | 'gain' | null;
   updated_at?: string;
 }
 
@@ -17,4 +22,9 @@ export interface Profile {
   targets: MacroNutrients;
   height?: number;
   weight?: number; // Pobierane z najnowszego wpisu w new_weight_logs
+  age?: number;
+  gender?: 'male' | 'female';
+  workType?: 'sedentary' | 'physical';
+  workoutsPerWeek?: number;
+  goal?: 'lose' | 'maintain' | 'gain';
 }
