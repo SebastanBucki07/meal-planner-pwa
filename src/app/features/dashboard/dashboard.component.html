@@ -1,0 +1,133 @@
+<div class="dashboard-container">
+  <h1>Dashboard</h1>
+
+  <div *ngIf="dashboardService.loading()" class="loading-state">Ładowanie danych...</div>
+
+  <div *ngIf="!dashboardService.loading()" class="dashboard-grid">
+    <!-- SEKCJA 1: Podsumowanie Kalorii i Makroskładników -->
+    <section class="card summary-card">
+      <h2>Dzisiejszy bilans</h2>
+
+      <!-- Kalorie -->
+      <div class="macro-item main-macro">
+        <div class="macro-header">
+          <span>Kalorie</span>
+          <span>
+            <strong class="current">{{ progress().consumed.calories }}</strong>
+            <small class="target">/ {{ progress().targets.calories }} kcal</small>
+          </span>
+        </div>
+        <div class="progress-bar">
+          <div class="bar-fill cal-fill" [style.width.%]="progress().caloriesPct"></div>
+        </div>
+      </div>
+
+      <!-- Makro: Białko, Węglowodany, Tłuszcze -->
+      <div class="macros-breakdown">
+        <!-- Białko -->
+        <div class="macro-item">
+          <div class="macro-header">
+            <span>Białko</span>
+            <small>{{ progress().consumed.protein }} / {{ progress().targets.protein }}g</small>
+          </div>
+          <div class="progress-bar">
+            <div class="bar-fill protein-fill" [style.width.%]="progress().proteinPct"></div>
+          </div>
+        </div>
+
+        <!-- Węglowodany -->
+        <div class="macro-item">
+          <div class="macro-header">
+            <span>Węglowodany</span>
+            <small>{{ progress().consumed.carbs }} / {{ progress().targets.carbs }}g</small>
+          </div>
+          <div class="progress-bar">
+            <div class="bar-fill carbs-fill" [style.width.%]="progress().carbsPct"></div>
+          </div>
+        </div>
+
+        <!-- Tłuszcze -->
+        <div class="macro-item">
+          <div class="macro-header">
+            <span>Tłuszcze</span>
+            <small>{{ progress().consumed.fat }} / {{ progress().targets.fat }}g</small>
+          </div>
+          <div class="progress-bar">
+            <div class="bar-fill fat-fill" [style.width.%]="progress().fatPct"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEKCJA 2: Zapis wagi i wykres -->
+    <section class="card weight-card">
+      <div class="card-header">
+        <h2>Pomiary wagi</h2>
+        <button *ngIf="!isEditingWeight" class="btn-secondary" (click)="isEditingWeight = true">
+          {{ dashboardService.todayWeight() ? 'Zmień wagę' : 'Zapisz wagę' }}
+        </button>
+      </div>
+
+      <!-- Wprowadzanie nowej wagi -->
+      <div *ngIf="isEditingWeight" class="weight-input-group">
+        <input
+          type="number"
+          step="0.1"
+          [(ngModel)]="weightInput"
+          placeholder="np. 80.5"
+          class="input-field"
+        />
+        <button class="btn-primary" (click)="onSaveWeight()">OK</button>
+        <button class="btn-cancel" (click)="isEditingWeight = false">✕</button>
+      </div>
+
+      <!-- Dzisiejszy wpis wagi -->
+      <div *ngIf="dashboardService.todayWeight() && !isEditingWeight" class="today-weight-display">
+        Dzisiejsza waga:
+        <strong>{{ dashboardService.todayWeight() }} kg</strong>
+      </div>
+
+      <!-- Wykres SVG -->
+      <div *ngIf="chartData(); else noChart" class="chart-wrapper">
+        <svg
+          [attr.viewBox]="'0 0 ' + chartData()!.width + ' ' + chartData()!.height"
+          class="weight-chart"
+        >
+          <!-- Linia trendu -->
+          <path [attr.d]="chartData()!.svgPath" class="chart-line" />
+
+          <!-- Punkty wagi -->
+          <g *ngFor="let point of chartData()!.points">
+            <circle [attr.cx]="point.x" [attr.cy]="point.y" r="4" class="chart-point" />
+            <title>{{ point.date }}: {{ point.weight }} kg</title>
+          </g>
+        </svg>
+      </div>
+      <ng-template #noChart>
+        <p class="empty-state">Brak wystarczającej liczby pomiarów do wyświetlenia wykresu.</p>
+      </ng-template>
+    </section>
+
+    <!-- SEKCJA 3: Dzisiejsze posiłki -->
+    <section class="card meals-card">
+      <h2>Dzisiejsze posiłki</h2>
+
+      <div *ngIf="dashboardService.todayMeals().length === 0" class="empty-meals">
+        Brak zarejestrowanych posiłków na dziś.
+      </div>
+
+      <ul *ngIf="dashboardService.todayMeals().length > 0" class="meals-list">
+        <li
+          *ngFor="let meal of dashboardService.todayMeals()"
+          [class.completed]="meal.completed"
+          (click)="toggleMeal(meal.id, meal.completed)"
+          class="meal-item"
+        >
+          <input type="checkbox" [checked]="meal.completed" readonly />
+          <span class="meal-name">{{ meal.name }}</span>
+          <span class="meal-calories">{{ meal.calories }} kcal</span>
+        </li>
+      </ul>
+    </section>
+  </div>
+</div>

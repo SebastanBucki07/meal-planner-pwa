@@ -1,50 +1,17 @@
-/* You can add global styles to this file, and also import other style files */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
-:root {
-  --primary: #10b981;
-  --primary-hover: #059669;
-  --bg-color: #f8fafc;
-  --card-bg: #ffffff;
-  --text-main: #0f172a;
-  --text-muted: #64748b;
-  --border-color: #e2e8f0;
-  --radius: 12px;
-  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
-
-* {
+/* Kluczowa klasa zapewniająca jednolitą szerokość w całej aplikacji */
+.app-container {
+  max-width: 1000px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 1rem;
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family:
-    'Inter',
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    Roboto,
-    sans-serif;
 }
 
 body {
-  background-color: var(--bg-color);
-  color: var(--text-main);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  padding: 16px;
-}
-
-html {
-  overflow-y: scroll; /* Wymusza widoczność paska, zapobiegając skakaniu układu */
-}
-
-/* w styles.scss */
-.app-container {
-  max-width: 1100px; /* Albo 1200px - stała szerokość dla całej aplikacji */
-  margin: 0 auto;
-  padding: 0 1rem;
-  width: 100%;
-  box-sizing: border-box;
+  /* Zapobiega przewijaniu "przelewowemu" (elastic bounce w iOS) */
+  overscroll-behavior-y: none;
+  /* Wyłącza niechciane podświetlenia przy dotknięciu w Safari/Chrome */
+  -webkit-tap-highlight-color: transparent;
+  /* Daje wrażenie natywnej aplikacji */
+  user-select: none;
 }

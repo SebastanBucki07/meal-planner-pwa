@@ -1,0 +1,12 @@
+.layout-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f8fafc;
+}
+
+.main-content {
+  flex: 1;
+  padding-top: 1.5rem;
+  padding-bottom: calc(75px + env(safe-area-inset-bottom, 0px));
+}

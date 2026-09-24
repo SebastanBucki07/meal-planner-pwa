@@ -1,0 +1,60 @@
+.app-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background-color: #ffffff;
+  border-top: 1px solid #e2e8f0;
+  /* Zabezpieczenie przed paskiem gestów iOS / Android */
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.03);
+
+  .bottom-nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    max-width: 600px;
+    margin: 0 auto;
+    height: 60px;
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      height: 100%;
+      color: #64748b;
+      text-decoration: none;
+      font-size: 0.725rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+
+      .nav-icon {
+        width: 22px;
+        height: 22px;
+        margin-bottom: 3px;
+        transition:
+          transform 0.2s ease,
+          stroke 0.2s ease;
+      }
+
+      /* Aktywna zakładka */
+      &.active {
+        color: #22c55e;
+        font-weight: 700;
+
+        .nav-icon {
+          stroke: #22c55e;
+          transform: translateY(-2px);
+        }
+      }
+
+      &:active {
+        transform: scale(0.95);
+      }
+    }
+  }
+}

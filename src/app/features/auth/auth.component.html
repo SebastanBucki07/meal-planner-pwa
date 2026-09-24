@@ -1,0 +1,64 @@
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <div class="brand-header">
+      <span class="logo">🥑</span>
+      <h2>{{ isRegisterMode ? 'Stwórz konto' : 'Zaloguj się' }}</h2>
+      <p>Planner Posiłków & Makro</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #authForm="ngForm">
+      <div class="form-group" *ngIf="isRegisterMode">
+        <label for="displayName">Ksywka / Imię</label>
+        <input
+          type="text"
+          id="displayName"
+          [(ngModel)]="displayName"
+          name="displayName"
+          placeholder="np. Seba"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="email">E-mail</label>
+        <input
+          type="email"
+          id="email"
+          [(ngModel)]="email"
+          name="email"
+          placeholder="twoj@email.com"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Hasło</label>
+        <input
+          type="password"
+          id="password"
+          [(ngModel)]="password"
+          name="password"
+          placeholder="••••••••"
+          required
+        />
+      </div>
+
+      <div class="error-box" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+      <button type="submit" class="btn-submit" [disabled]="loading || !authForm.valid">
+        {{ loading ? 'Proszę czekać...' : (isRegisterMode ? 'Zarejestruj się' : 'Zaloguj się') }}
+      </button>
+    </form>
+
+    <div class="toggle-mode">
+      <p *ngIf="!isRegisterMode">
+        Nie masz konta?
+        <a (click)="toggleMode()">Zarejestruj się</a>
+      </p>
+      <p *ngIf="isRegisterMode">
+        Masz już konto?
+        <a (click)="toggleMode()">Zaloguj się</a>
+      </p>
+    </div>
+  </div>
+</div>
