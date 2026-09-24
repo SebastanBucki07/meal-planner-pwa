@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { AuthComponent } from './features/auth/auth.component';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
 import { authGuard } from './core/guards/auth.guard';
+import {RECIPE_ROUTES} from './features/recipes/recipes.routes';
 
 export const routes: Routes = [
   // Ekran Logowania / Rejestracji (Publiczny)
@@ -28,9 +29,8 @@ export const routes: Routes = [
           import('./features/planner/planner.component').then(m => m.PlannerComponent)
       },
       {
-        path: 'recipes', // <-- DODANE: dopasowane do routerLink="/recipes"
-        loadComponent: () =>
-          import('./features/recipes/recipes.component').then(m => m.RecipesComponent)
+        path: 'recipes',
+        loadChildren: () => import('./features/recipes/recipes.routes').then(m => RECIPE_ROUTES)
       },
       {
         path: 'shopping-list', // <-- ZMIENIONE: 'shopping' -> 'shopping-list'
