@@ -1,0 +1,87 @@
+:host {
+  display: block;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f1f5f9;
+
+  h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 16px;
+  }
+}
+
+.summary-card {
+  .main-macro {
+    margin-bottom: 20px;
+
+    .macro-header {
+      font-size: 16px;
+      margin-bottom: 8px;
+
+      .current {
+        font-weight: 700;
+        color: #0f172a;
+        font-size: 18px;
+      }
+
+      .target {
+        color: #64748b;
+      }
+    }
+
+    .progress-bar {
+      height: 12px;
+    }
+  }
+}
+
+.macro-item {
+  .macro-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+    font-size: 14px;
+    color: #334155;
+  }
+}
+
+.macros-breakdown {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background-color: #e2e8f0;
+  border-radius: 999px;
+  overflow: hidden;
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.3s ease;
+
+    &.cal-fill {
+      background: linear-gradient(90deg, #10b981, #059669);
+    }
+    &.protein-fill {
+      background: linear-gradient(90deg, #3b82f6, #2563eb);
+    }
+    &.carbs-fill {
+      background: linear-gradient(90deg, #f59e0b, #d97706);
+    }
+    &.fat-fill {
+      background: linear-gradient(90deg, #ec4899, #db2777);
+    }
+  }
+}

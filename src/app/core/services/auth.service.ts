@@ -9,32 +9,47 @@ import { environment } from '../../../environment';
 export class AuthService {
   private supabase: SupabaseClient;
 
-  // Sygnały do reaktywnego zarządzania stanem w Angularze
   currentUser = signal<User | null>(null);
   displayName = signal<string>('Użytkownik');
 
   constructor(private router: Router) {
-    this.supabase = createClient(environment.SUPABASE_URL, environment.SUPABASE_ANON_KEY);
+    // 1. Jawnie włączamy zapamiętywanie sesji w localStorage oraz auto-refreshing
+    this.supabase = createClient(environment.SUPABASE_URL, environment.SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
+      }
+    });
     this.initAuth();
   }
 
+  // Dodaj to wewnątrz klasy AuthService
+  public async getSessionPormise() {
+    return await this.supabase.auth.getSession();
+  }
+
   private async initAuth(): Promise<void> {
+    // Odczyt aktualnej sesji z localStorage przy starcie
     const {
       data: { session }
     } = await this.supabase.auth.getSession();
+
     if (session?.user) {
       this.currentUser.set(session.user);
       await this.loadUserProfile(session.user.id);
     }
 
-    // Słuchanie zmian stanu autoryzacji (np. zalogowanie / wylogowanie)
+    // 2. Słuchanie zmian autoryzacji
     this.supabase.auth.onAuthStateChange(async (event, session) => {
       const user = session?.user ?? null;
       this.currentUser.set(user);
 
       if (user) {
         await this.loadUserProfile(user.id);
-      } else {
+      } else if (event === 'SIGNED_OUT') {
+        // Zamiast przekierowywać przy każdym braku użytkownika (np. przejściowym podczas HMR),
+        // przekierowujemy TYLKO wtedy, gdy użytkownik kliknął "Wyloguj" (zdarzenie SIGNED_OUT)
         this.displayName.set('Użytkownik');
         this.router.navigate(['/auth']);
       }
@@ -42,7 +57,7 @@ export class AuthService {
   }
 
   async loadUserProfile(userId: string): Promise<void> {
-    const { data, error } = await this.supabase
+    const { data } = await this.supabase
       .from('new_profiles')
       .select('display_name')
       .eq('id', userId)
@@ -62,7 +77,6 @@ export class AuthService {
   async signUp(email: string, pass: string, displayName: string) {
     const response = await this.supabase.auth.signUp({ email, password: pass });
 
-    // Jeśli rejestracja się powiodła, tworzymy rekord w new_profiles
     if (response.data.user) {
       await this.supabase.from('new_profiles').insert({
         id: response.data.user.id,
@@ -75,7 +89,7 @@ export class AuthService {
 
   async signOut(): Promise<void> {
     await this.supabase.auth.signOut();
-    this.router.navigate(['/auth']);
+    // Przekierowanie obsłuży onAuthStateChange po wyemitowaniu 'SIGNED_OUT'
   }
 
   get isAuthenticated(): boolean {

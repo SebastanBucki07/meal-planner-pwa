@@ -1,0 +1,176 @@
+<section class="card weight-card">
+  <!-- Nagłówek Karty z nowym przyciskiem akcji -->
+  <div class="card-header">
+    <div class="title-group">
+      <h2>Pomiary wagi</h2>
+      <span class="subtitle">Śledzenie postępów i trend wagi</span>
+    </div>
+
+    <button *ngIf="!isEditingWeight" class="btn-pill" (click)="isEditingWeight = true">
+      <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 5v14M5 12h14" stroke-linecap="round" />
+      </svg>
+      <span>{{ dashboardService.todayWeight() ? 'Zmień wagę' : 'Dodaj wpis' }}</span>
+    </button>
+  </div>
+
+  <!-- Formularz dodawania/edycji wagi -->
+  <div *ngIf="isEditingWeight" class="weight-input-container">
+    <div class="input-wrapper">
+      <input
+        type="number"
+        step="0.1"
+        [(ngModel)]="weightInput"
+        placeholder="80.5"
+        class="input-field"
+        autofocus
+      />
+      <span class="unit">kg</span>
+    </div>
+    <button class="btn-action btn-save" (click)="onSaveWeight()">Zapisz</button>
+    <button class="btn-action btn-close" (click)="isEditingWeight = false" aria-label="Anuluj">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Baner z dzisiejszym pomiarem -->
+  <div *ngIf="dashboardService.todayWeight() && !isEditingWeight" class="today-badge">
+    <span class="badge-label">Dzisiejsza waga:</span>
+    <span class="badge-value">
+      {{ dashboardService.todayWeight() }}
+      <small>kg</small>
+    </span>
+  </div>
+
+  <!-- Sekcja Wykresu i Statystyk -->
+  <div *ngIf="chartData() as chart; else noChart" class="chart-wrapper">
+    <!-- Pasek Informacyjny / Legenda -->
+    <div class="chart-legend">
+      <div class="legend-item">
+        <span class="legend-label">Ostatni pomiar</span>
+        <span class="legend-value">{{ chart.latestWeight }} kg</span>
+      </div>
+
+      <div class="legend-item highlight-item" *ngIf="selectedPoint() as active">
+        <span class="legend-label">Wybrany ({{ active.date }})</span>
+        <span class="legend-value text-emerald">{{ active.weight }} kg</span>
+      </div>
+
+      <div class="legend-item" *ngIf="chart.weightChange !== undefined">
+        <span class="legend-label">Zmiana (zakres)</span>
+        <span
+          class="legend-value status-pill"
+          [class.pill-green]="chart.weightChange < 0"
+          [class.pill-red]="chart.weightChange > 0"
+        >
+          {{ chart.weightChange > 0 ? '+' : '' }}{{ chart.weightChange }} kg
+        </span>
+      </div>
+    </div>
+
+    <div class="chart-layout">
+      <!-- Panel z kartami Min / Max -->
+      <div class="stats-panel">
+        <div class="stat-box min-stat">
+          <div class="stat-header">
+            <span class="dot green-dot"></span>
+            <span class="stat-label">Najniższa</span>
+          </div>
+          <span class="stat-value">
+            {{ chart.minWeight.weight }}
+            <small>kg</small>
+          </span>
+          <span class="stat-date">{{ chart.minWeight.date }}</span>
+        </div>
+
+        <div class="stat-box max-stat">
+          <div class="stat-header">
+            <span class="dot red-dot"></span>
+            <span class="stat-label">Najwyższa</span>
+          </div>
+          <span class="stat-value">
+            {{ chart.maxWeight.weight }}
+            <small>kg</small>
+          </span>
+          <span class="stat-date">{{ chart.maxWeight.date }}</span>
+        </div>
+      </div>
+
+      <!-- Obszar SVG z wykresem -->
+      <div class="chart-area">
+        <svg [attr.viewBox]="'0 0 ' + chart.width + ' ' + chart.height" class="weight-chart">
+          <defs>
+            <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#10b981" stop-opacity="0.28" />
+              <stop offset="100%" stop-color="#10b981" stop-opacity="0.0" />
+            </linearGradient>
+          </defs>
+
+          <!-- Oś pomocnicza -->
+          <line
+            [attr.x1]="20"
+            [attr.y1]="chart.height - 30"
+            [attr.x2]="chart.width - 20"
+            [attr.y2]="chart.height - 30"
+            stroke="#f1f5f9"
+            stroke-dasharray="4"
+          />
+
+          <!-- Gradientowe wypełnienie -->
+          <path [attr.d]="chart.areaPath" fill="url(#chartGradient)" class="chart-area-fill" />
+
+          <!-- Gładka linia wykresu -->
+          <path [attr.d]="chart.linePath" class="chart-line" />
+
+          <!-- Punkty wykresu -->
+          <g *ngFor="let point of chart.points">
+            <circle
+              *ngIf="selectedPoint()?.date === point.date"
+              [attr.cx]="point.x"
+              [attr.cy]="point.y"
+              r="11"
+              class="chart-point-pulse"
+            />
+
+            <circle
+              [attr.cx]="point.x"
+              [attr.cy]="point.y"
+              r="5"
+              class="chart-point"
+              [class.active]="selectedPoint()?.date === point.date"
+              (mouseenter)="selectPoint(point)"
+              (click)="selectPoint(point)"
+            />
+
+            <text
+              [attr.x]="point.x"
+              [attr.y]="point.y - 14"
+              text-anchor="middle"
+              class="text-weight"
+            >
+              {{ point.weight }}kg
+            </text>
+
+            <text
+              [attr.x]="point.x"
+              [attr.y]="chart.height - 10"
+              text-anchor="middle"
+              class="text-date"
+            >
+              {{ point.date }}
+            </text>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #noChart>
+    <div class="empty-state">
+      <p>Brak wystarczającej liczby pomiarów do wyświetlenia wykresu.</p>
+    </div>
+  </ng-template>
+</section>

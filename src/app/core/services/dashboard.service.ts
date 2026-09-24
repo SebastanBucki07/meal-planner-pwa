@@ -1,15 +1,17 @@
-import { Injectable, signal, computed } from '@angular/core';
+import {Injectable, signal, computed, inject} from '@angular/core';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 import { NewWeightLogDTO, WeightEntry } from '../models';
 import { DaySummary, MealLogDTO, DashboardMealItem } from '../models/dashboard.model';
 import { environment } from '../../../environment';
+import {ProfileService} from './profile.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DashboardService {
   private supabase: SupabaseClient;
+  private profileService = inject(ProfileService);
 
   weightHistory = signal<WeightEntry[]>([]);
   todaySummary = signal<DaySummary>({ calories: 0, protein: 0, carbs: 0, fat: 0 });
@@ -38,21 +40,27 @@ export class DashboardService {
 
       const todayStr = new Date().toISOString().split('T')[0];
 
-      // 1. Historia wagi
       const { data: weightData, error: weightError } = await this.supabase
         .from('new_weight_logs')
-        .select('id, user_id, weight, date, created_at')
+        .select('id, user_id, weight, date, logged_at')
         .eq('user_id', user.id)
-        .order('date', { ascending: true })
+        .order('logged_at', { ascending: true })
         .limit(30);
 
       if (!weightError && weightData) {
         const dtoList = weightData as NewWeightLogDTO[];
-        const domainList: WeightEntry[] = dtoList.map(dto => ({
-          id: dto.id,
-          date: dto.date,
-          weight: Number(dto.weight)
-        }));
+        const domainList: WeightEntry[] = dtoList.map(dto => {
+          // Sformatowanie daty z logged_at lub date
+          const rawDate = dto.logged_at || dto.date || new Date().toISOString();
+          const formattedDate = rawDate.split('T')[0].split(' ')[0];
+
+          return {
+            id: dto.id,
+            date: formattedDate,
+            weight: Number(dto.weight)
+          };
+        });
+
         this.weightHistory.set(domainList);
       }
 
@@ -91,22 +99,28 @@ export class DashboardService {
   }
 
   async logWeight(weight: number): Promise<boolean> {
-    const {
-      data: { user }
-    } = await this.supabase.auth.getUser();
+    const { data: { user } } = await this.supabase.auth.getUser();
     if (!user) return false;
 
     const todayStr = new Date().toISOString().split('T')[0];
 
-    const { error } = await this.supabase
-      .from('new_weight_logs')
-      .insert({ user_id: user.id, weight, date: todayStr });
+    // 1. Zapis do tabeli historycznej logów wagi
+    const { error: logError } = await this.supabase
+    .from('new_weight_logs')
+    .insert({ user_id: user.id, weight, date: todayStr });
 
-    if (!error) {
-      await this.loadDashboardData();
-      return true;
+    if (logError) {
+      console.error('Błąd zapisu w historycznych logach wagi:', logError);
+      return false;
     }
-    return false;
+
+    // 2. Aktualizacja wagi oraz PRZELICZENIE CELÓW KALORYCZNYCH w tabeli new_profiles
+    await this.profileService.updateWeightAndRecalculateTargets(weight);
+
+    // 3. Odświeżenie danych na dashboardzie
+    await this.loadDashboardData();
+
+    return true;
   }
 
   async toggleMealCompleted(mealId: string, completed: boolean): Promise<void> {

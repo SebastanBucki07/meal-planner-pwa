@@ -1,0 +1,20 @@
+<section class="card meals-card">
+  <h2>Dzisiejsze posiłki</h2>
+
+  <div *ngIf="dashboardService.todayMeals().length === 0" class="empty-meals">
+    Brak zarejestrowanych posiłków na dziś.
+  </div>
+
+  <ul *ngIf="dashboardService.todayMeals().length > 0" class="meals-list">
+    <li
+      *ngFor="let meal of dashboardService.todayMeals()"
+      [class.completed]="meal.completed"
+      (click)="toggleMeal(meal.id, meal.completed)"
+      class="meal-item"
+    >
+      <input type="checkbox" [checked]="meal.completed" readonly />
+      <span class="meal-name">{{ meal.name }}</span>
+      <span class="meal-calories">{{ meal.calories }} kcal</span>
+    </li>
+  </ul>
+</section>
