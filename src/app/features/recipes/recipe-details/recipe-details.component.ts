@@ -47,16 +47,18 @@ export class RecipeDetailsComponent implements OnInit {
   }
 
   // Pomocniczegettery bezpiecznie obsługujące różne warianty pól w RecipeIngredient
+  // Poprawione gettery w RecipeDetailsComponent
   getIngredientName(ing: any): string {
     return ing.name || ing.ingredientName || 'Składnik';
   }
 
   getIngredientAmount(ing: any): number {
-    return ing.amount ?? ing.quantity ?? 0;
+    // Sprawdzamy też amountInGrams, które zwraca mapper z bazy
+    return ing.amount ?? ing.amountInGrams ?? ing.quantity ?? 0;
   }
 
   getIngredientUnit(ing: any): string {
-    return ing.unit || ing.unitName || '';
+    return ing.unit || ing.unitName || 'g';
   }
 
   getIngredientCalories(ing: any): number {

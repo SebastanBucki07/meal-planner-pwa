@@ -7,7 +7,6 @@ import { environment } from '../../../../environment';
 import { Ingredient, Unit, UnitDto } from '../../../core/models';
 
 import { RecipeMapper } from '../../../core/mappers/recipe.mapper';
-import {RecipeService} from '../../../core/services/recipe.service';
 
 export interface RecipeIngredientFormRow {
   ingredientId: string;
@@ -38,7 +37,6 @@ export interface RecipeStepFormRow {
 })
 export class RecipeAddComponent implements OnInit {
   private router = inject(Router);
-  private recipeService = inject(RecipeService);
   private supabase: SupabaseClient;
 
   // Pola formularza
@@ -263,11 +261,18 @@ export class RecipeAddComponent implements OnInit {
     // 2. Przygotuj wiersze składników do tabeli łącznikowej `new_recipe_ingredients`
     const validIngredients = this.ingredientRows
     .filter(row => row.ingredientId && row.amount > 0)
-    .map(row => ({
-      recipe_id: recipeId,
-      ingredient_id: row.ingredientId,
-      amount_in_grams: row.amount * (row.unitMultiplier || 1) // Przeliczenie na gramy zgodnie ze schematem bazy
-    }));
+    .map(row => {
+      const unitObj = this.availableUnits.find(u => u.name === row.unit);
+      const multiplier = unitObj ? unitObj.multiplierToGrams : 1;
+
+      return {
+        recipe_id: recipeId,
+        ingredient_id: row.ingredientId,
+        amount: row.amount, // <--- Czysta liczba z formularza (np. 1)
+        amount_in_grams: row.amount * multiplier, // <--- Waga w gramach (np. 150)
+        unit: row.unit || 'g'
+      };
+    });
 
     // 3. Wstaw powiązane składniki, jeśli zostały wybrane
     if (validIngredients.length > 0) {

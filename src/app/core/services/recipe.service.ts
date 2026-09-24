@@ -86,8 +86,11 @@ export class RecipeService {
     .select(`
         *,
         new_recipe_ingredients (
+          id,
           amount_in_grams,
+          unit,
           new_ingredients (
+            id,
             name,
             calories_per_100g,
             protein_per_100g,
