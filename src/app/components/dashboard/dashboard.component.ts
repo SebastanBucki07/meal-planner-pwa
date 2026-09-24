@@ -2,7 +2,6 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { NavbarComponent } from '../navbar/navbar.component';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { environment } from '../../../environment';
 import { ChartPoint } from '../../models/chartPoint.model';
@@ -14,7 +13,7 @@ import { dbKeyToMealType } from '../../helpers/mealType.helper';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, NavbarComponent],
+  imports: [CommonModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
@@ -73,11 +72,6 @@ export class DashboardComponent implements OnInit {
       this.fetchWeightHistory()
     ]);
     this.loading = false;
-  }
-
-  async logout(): Promise<void> {
-    await this.supabase.auth.signOut();
-    this.router.navigate(['/auth']);
   }
 
   async fetchUserProfile() {

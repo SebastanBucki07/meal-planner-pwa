@@ -2,12 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { environment } from '../../../environment';
 import { FormsModule } from '@angular/forms';
-import { NavbarComponent } from '../navbar/navbar.component';
 import { NgClass, NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-profile',
-  imports: [FormsModule, NavbarComponent, NgIf, NgClass],
+  imports: [FormsModule, NgIf, NgClass],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss'
 })

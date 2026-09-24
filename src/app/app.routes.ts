@@ -8,23 +8,37 @@ import { RecipeDetailsComponent } from './recipes/recipe-details/recipe-details.
 import { ProfileComponent } from './components/profile/profile.component';
 import { PlanComponent } from './components/plan/plan.component';
 import { ShoppingListComponent } from './components/shopping-list/shopping-list.component';
-import { AddIngredientComponent } from './components/add-ingredient/add-ingredient.component'; // Import
+import { AddIngredientComponent } from './components/add-ingredient/add-ingredient.component';
+import { MainComponent } from './main/main.component';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-  { path: 'auth', component: AuthComponent },
-  { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
-  { path: 'recipes/add', component: AddRecipeComponent, canActivate: [authGuard] },
-  { path: 'recipes/:id', component: RecipeDetailsComponent, canActivate: [authGuard] },
-  { path: 'recipes', component: RecipesComponent, canActivate: [authGuard] },
-  { path: 'profile', component: ProfileComponent },
-  { path: 'plan', component: PlanComponent },
-  { path: 'shopping-list', component: ShoppingListComponent, canActivate: [authGuard] },
+  // 1. Ekran logowania / rejestracji (bez Headera i Footera)
   {
-    path: 'add-ingredient',
-    component: AddIngredientComponent,
-    canActivate: [authGuard]
+    path: 'auth',
+    component: AuthComponent
   },
 
-  { path: '**', redirectTo: 'dashboard' }
+  // 2. Główny obszar aplikacji (z Headerem i Footerem w MainLayoutComponent)
+  {
+    path: '',
+    component: MainComponent,
+    canActivate: [authGuard], // Guard chroni teraz całą sekcję za jednym razem
+    children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: 'dashboard', component: DashboardComponent },
+      { path: 'recipes', component: RecipesComponent },
+      { path: 'recipes/add', component: AddRecipeComponent },
+      { path: 'recipes/:id', component: RecipeDetailsComponent },
+      { path: 'profile', component: ProfileComponent },
+      { path: 'plan', component: PlanComponent },
+      { path: 'shopping-list', component: ShoppingListComponent },
+      { path: 'add-ingredient', component: AddIngredientComponent }
+    ]
+  },
+
+  // 3. Fallback dla nieznanych adresów URL
+  {
+    path: '**',
+    redirectTo: 'dashboard'
+  }
 ];

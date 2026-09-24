@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { SupabaseService } from '../../services/supabase.service';
-import { NavbarComponent } from '../navbar/navbar.component';
 import { Unit } from '../../models';
 import { IngredientCategory } from '../../models/indegredient-category.model';
 
@@ -12,7 +11,7 @@ import { IngredientCategory } from '../../models/indegredient-category.model';
 @Component({
   selector: 'app-add-ingredient',
   standalone: true,
-  imports: [CommonModule, FormsModule, NavbarComponent],
+  imports: [CommonModule, FormsModule],
   templateUrl: './add-ingredient.component.html',
   styleUrls: ['./add-ingredient.component.scss']
 })

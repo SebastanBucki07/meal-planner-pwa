@@ -1,0 +1,43 @@
+<header class="app-header">
+  <div class="header-container">
+    <!-- Logo i Tytuł Aplikacji -->
+    <div class="brand-section">
+      <div class="brand-icon">
+        <span class="icon-emoji" role="img" aria-label="Avo-Chef">🥑</span>
+        <span class="sparkle">✨</span>
+      </div>
+      <div class="brand-text">
+        <h1 class="app-title">Planner Posiłków Seby</h1>
+        <p class="app-subtitle">Zdrowie & Trening pod kontrolą 💪</p>
+      </div>
+    </div>
+
+    <!-- Akcje / Profil -->
+    <div class="user-actions">
+      <a routerLink="/profile" class="profile-pill" title="Mój profil">
+        <div class="avatar">
+          <span>S</span>
+        </div>
+        <span class="user-name">Seba</span>
+      </a>
+
+      <button class="btn-logout" (click)="onLogout()" title="Wyloguj się">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <polyline points="16 17 21 12 16 7"></polyline>
+          <line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>

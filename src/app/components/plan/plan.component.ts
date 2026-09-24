@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { SupabaseService } from '../../services/supabase.service';
-import { NavbarComponent } from '../navbar/navbar.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { WeekDay } from '../../models';
@@ -59,7 +58,7 @@ export interface Recipe {
 @Component({
   selector: 'app-plan',
   standalone: true,
-  imports: [CommonModule, NavbarComponent, FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './plan.component.html',
   styleUrls: ['./plan.component.scss']
 })

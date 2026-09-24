@@ -12,35 +12,6 @@
   color: #1e293b;
 }
 
-/* Nagłówek */
-.dashboard-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-
-  h1 {
-    font-size: 1.75rem;
-    font-weight: 800;
-    margin: 0;
-  }
-
-  .btn-logout {
-    background-color: #fef2f2;
-    color: #ef4444;
-    border: 1px solid #fee2e2;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-
-    &:hover {
-      background-color: #fee2e2;
-    }
-  }
-}
-
 /* Ogólne karty informacyjne */
 .summary-card,
 .info-card {
@@ -436,9 +407,9 @@
   color: #94a3b8;
   font-size: 0.875rem;
 }
+
 /* --- STYLE DLA MODALA PRZEPISU --- */
 
-// Ciemne tło zasłaniające ekran
 .modal-backdrop {
   position: fixed;
   top: 0;
@@ -446,7 +417,7 @@
   width: 100vw;
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(4px); // Delikatne rozmycie tła
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -454,7 +425,6 @@
   padding: 1rem;
 }
 
-// Karta/Okno modala
 .modal-card {
   background: #ffffff;
   border-radius: 12px;
@@ -481,7 +451,6 @@
   }
 }
 
-// Nagłówek modala
 .modal-header {
   padding: 1.25rem 1.5rem;
   border-bottom: 1px solid #e2e8f0;
@@ -515,7 +484,6 @@
   }
 }
 
-// Zawartość modala (przewijana)
 .modal-body {
   padding: 1.5rem;
   overflow-y: auto;
@@ -523,10 +491,9 @@
   flex-direction: column;
   gap: 1.25rem;
 
-  // 1. Odtwarzacz wideo YouTube (proporcje 16:9)
   .video-container {
     position: relative;
-    padding-bottom: 56.25%; /* 16:9 */
+    padding-bottom: 56.25%;
     height: 0;
     overflow: hidden;
     border-radius: 8px;
@@ -542,7 +509,6 @@
     }
   }
 
-  // 2. Zdjęcie potrawy
   .recipe-image {
     width: 100%;
     border-radius: 8px;
@@ -557,7 +523,6 @@
     }
   }
 
-  // 3. Makroskładniki (Odznaki)
   .recipe-macros {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
@@ -599,7 +564,6 @@
     }
   }
 
-  // Sekcje (Składniki / Sposób przygotowania)
   .recipe-section {
     h3 {
       font-size: 1.1rem;
@@ -627,7 +591,6 @@
       margin: 0;
     }
 
-    // Interaktywna lista kroków (odznaczanie)
     .interactive-steps {
       list-style: none;
       padding: 0;
@@ -673,7 +636,6 @@
           font-size: 0.95rem;
         }
 
-        // Stan ukończonego kroku
         &.completed {
           background-color: #f0fdf4;
           border-color: #bbf7d0;
@@ -693,7 +655,6 @@
   }
 }
 
-// Stopka modala
 .modal-footer {
   padding: 1rem 1.5rem;
   border-top: 1px solid #e2e8f0;

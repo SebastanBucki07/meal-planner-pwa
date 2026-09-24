@@ -1,0 +1,16 @@
+<div class="app-shell">
+  <!-- Stały Header na górze -->
+  <header class="app-header">
+    <app-header (logout)="handleLogout()"></app-header>
+  </header>
+
+  <!-- Zmienna treść strony w środku -->
+  <main class="app-main">
+    <router-outlet></router-outlet>
+  </main>
+
+  <!-- Stała nawigacja na dole (Footer/Navbar) -->
+  <footer class="app-footer">
+    <app-navbar></app-navbar>
+  </footer>
+</div>

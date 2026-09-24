@@ -4,12 +4,11 @@ import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { environment } from '../../environment';
-import { NavbarComponent } from '../components/navbar/navbar.component';
 
 @Component({
   selector: 'app-recipes',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, NavbarComponent],
+  imports: [CommonModule, RouterLink, FormsModule],
   templateUrl: './recipes.component.html',
   styleUrls: ['./recipes.component.scss']
 })
