@@ -183,17 +183,31 @@ export class ProfileService {
       const currentProfile = this.profile();
       if (!currentProfile) return false;
 
-      // 1. Przeliczamy nowe cele na bazie nowej wagi i obecnego wzrostu z modelu domeny
+      // 1. Pobieramy wzrost z profilu (lub domyślnie 180)
       const height = currentProfile.height || 180;
-      const bmr = (10 * newWeight) + (6.25 * height) - (5 * 30) + 5; // przykładowy wiek 30
-      const tdee = bmr * 1.375; // umiarkowana aktywność
 
+      // Parametry bazowe (możesz je trzymać w profilu lub przyjąć standardowe dla użytkownika)
+      const age = 30;
+      const isMale = true; // płeć
+      const pal = 1.375;  // domyślny współczynnik aktywności (np. lekka aktywność / praca siedząca + treningi)
+
+      // 2. Dokładny wzór Mifflina-St Jeor (taki sam jak w ProfileComponent)
+      let bmr = 10 * newWeight + 6.25 * height - 5 * age;
+      bmr += isMale ? 5 : -161;
+
+      let tdee = bmr * pal;
+
+      // Załóżmy zachowanie obecnego celu lub domyślnie 'maintain'
       const targetCalories = Math.round(tdee);
-      const targetProtein = Math.round(newWeight * 2.0); // np. 2g na kg masy ciała
-      const targetCarbs = Math.round((targetCalories * 0.4) / 4);
-      const targetFat = Math.round((targetCalories * 0.25) / 9);
+      const targetProtein = Math.round(newWeight * 2.0); // 2g na kg masy ciała
+      const targetFat = Math.round((targetCalories * 0.25) / 9); // 25% kcal z tłuszczu
 
-      // 2. Tworzymy zaktualizowany model domeny (z uwzględnieniem struktury targets)
+      const proteinCalories = targetProtein * 4;
+      const fatCalories = targetFat * 9;
+      const carbCalories = targetCalories - (proteinCalories + fatCalories);
+      const targetCarbs = Math.max(0, Math.round(carbCalories / 4));
+
+      // 3. Tworzymy zaktualizowany model domeny
       const updatedProfile: Profile = {
         ...currentProfile,
         weight: newWeight,
@@ -205,26 +219,26 @@ export class ProfileService {
         }
       };
 
-      // 3. Używamy mappera, aby zamienić model domeny na DTO gotowe do wysłania do Supabase
+      // 4. Używamy mappera, aby zamienić model na DTO dla Supabase
       const dto = ProfileMapper.toDTO(updatedProfile);
 
-      // 4. Zapis do bazy danych
+      // 5. Zapis w tabeli new_profiles
       const { error: profileError } = await this.supabase
       .from('new_profiles')
       .update(dto)
       .eq('id', user.id);
 
       if (profileError) {
-        console.error('Błąd aktualizacji celów w profilu:', profileError);
+        console.error('Błąd aktualizacji celów po zmianie wagi:', profileError);
         return false;
       }
 
-      // 5. Aktualizujemy lokalny sygnał – UI odświeży się natychmiast w całej aplikacji
+      // 6. Aktualizacja lokalnego sygnału – cała aplikacja widzi zmiany od razu!
       this.profile.set(updatedProfile);
 
       return true;
     } catch (e) {
-      console.error('Błąd podczas przeliczania celów po zmianie wagi:', e);
+      console.error('Błąd podczas przeliczania celów:', e);
       return false;
     }
   }
