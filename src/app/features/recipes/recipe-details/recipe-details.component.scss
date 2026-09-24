@@ -1,0 +1,284 @@
+/* --- GŁÓWNY KONTENER I LAYOUT --- */
+
+.page-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px 16px 90px 16px; // Dodatkowe miejsce na dole pod navbar PWA
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  color: #1e293b;
+  box-sizing: border-box;
+}
+
+.details-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.recipe-main-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* --- KARTA NAGŁÓWKA --- */
+
+.recipe-header-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+
+  .recipe-image-wrapper {
+    width: 100%;
+    height: 260px;
+    background: #f1f5f9;
+
+    @media (min-width: 640px) {
+      height: 340px;
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .recipe-title-section {
+    padding: 20px 20px 10px 20px;
+
+    .btn-back {
+      display: inline-block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #6366f1;
+      text-decoration: none;
+      margin-bottom: 12px;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 0 0 8px 0;
+      line-height: 1.2;
+    }
+
+    .recipe-description {
+      font-size: 0.95rem;
+      color: #475569;
+      margin: 0;
+      line-height: 1.5;
+    }
+  }
+}
+
+/* --- SIATKA MAKROSKŁADNIKÓW --- */
+
+.macro-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  padding: 16px 20px 20px 20px;
+
+  @media (min-width: 550px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .macro-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 12px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .value {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 2px;
+    }
+
+    .label {
+      font-size: 0.75rem;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    &.kcal {
+      background: #fdf2f8;
+      border-color: #fbcfe8;
+      .value { color: #db2777; }
+    }
+
+    &.protein {
+      background: #eff6ff;
+      border-color: #bfdbfe;
+      .value { color: #2563eb; }
+    }
+
+    &.carbs {
+      background: #fefce8;
+      border-color: #fef08a;
+      .value { color: #ca8a04; }
+    }
+
+    &.fat {
+      background: #f0fdf4;
+      border-color: #bbf7d0;
+      .value { color: #16a34a; }
+    }
+  }
+}
+
+/* --- SEKCJE TREŚCI (BOXy) --- */
+
+.content-box {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+
+  h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-top: 0;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #f1f5f9;
+  }
+
+  .empty-text {
+    font-size: 0.9rem;
+    color: #94a3b8;
+    margin: 0;
+    font-style: italic;
+  }
+}
+
+/* --- LISTA SKŁADNIKÓW --- */
+
+.ingredients-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #f1f5f9;
+
+    .ing-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+
+      .ing-name {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #1e293b;
+      }
+
+      .ing-amount {
+        font-size: 0.8rem;
+        color: #64748b;
+      }
+    }
+
+    .ing-kcal {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #475569;
+      background: #ffffff;
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+    }
+  }
+}
+
+/* --- KROKI PRZYGOTOWANIA --- */
+
+.instructions-text {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  .instruction-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: #f8fafc;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #f1f5f9;
+
+    .step-badge {
+      background: #6366f1;
+      color: #ffffff;
+      font-size: 0.8rem;
+      font-weight: 700;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.95rem;
+      color: #334155;
+      line-height: 1.5;
+    }
+  }
+}
+
+/* --- SEKCJA WIDEO --- */
+
+.video-box {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+
+  .video-icon {
+    font-size: 1.5rem;
+  }
+
+  .video-btn {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #2563eb;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

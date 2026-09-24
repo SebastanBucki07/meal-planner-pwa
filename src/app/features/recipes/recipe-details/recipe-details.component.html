@@ -1,0 +1,100 @@
+@if (recipe(); as currentRecipe) {
+  <div class="page-container">
+    <div class="details-layout">
+
+      <div class="recipe-main-content">
+
+        <!-- Nagłówek i tytuł -->
+        <div class="recipe-header-card">
+          @if (currentRecipe.imageUrl) {
+            <div class="recipe-image-wrapper">
+              <img [src]="currentRecipe.imageUrl" [alt]="currentRecipe.title" />
+            </div>
+          }
+
+          <div class="recipe-title-section">
+            <a routerLink="/recipes" class="btn-back">← Powrót do listy</a>
+            <h1>{{ currentRecipe.title }}</h1>
+            @if (currentRecipe.description) {
+              <p class="recipe-description">{{ currentRecipe.description }}</p>
+            }
+          </div>
+
+          <!-- Główne podsumowanie makroskładników -->
+          <div class="macro-summary-grid">
+            <div class="macro-card kcal">
+              <span class="value">{{ currentRecipe.calories }}</span>
+              <span class="label">Kalorie (kcal)</span>
+            </div>
+            <div class="macro-card protein">
+              <span class="value">{{ currentRecipe.protein }}g</span>
+              <span class="label">Białko</span>
+            </div>
+            <div class="macro-card carbs">
+              <span class="value">{{ currentRecipe.carbs }}g</span>
+              <span class="label">Węglowodany</span>
+            </div>
+            <div class="macro-card fat">
+              <span class="value">{{ currentRecipe.fat }}g</span>
+              <span class="label">Tłuszcze</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sekcja Składników -->
+        <div class="content-box">
+          <h3>Składniki</h3>
+          @if (currentRecipe.ingredients && currentRecipe.ingredients.length > 0) {
+            <ul class="ingredients-list">
+              @for (ing of currentRecipe.ingredients; track $index) {
+                <li>
+                  <div class="ing-info">
+                    <!-- Odwołanie do bezpiecznych metod pomocniczych, niezależnie od struktury DTO/Domain -->
+                    <span class="ing-name">{{ getIngredientName(ing) }}</span>
+                    <span class="ing-amount">{{ getIngredientAmount(ing) }} {{ getIngredientUnit(ing) }}</span>
+                  </div>
+                  <div class="ing-kcal">{{ getIngredientCalories(ing) }} kcal</div>
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="empty-text">Brak zdefiniowanych składników dla tego przepisu.</p>
+          }
+        </div>
+
+        <!-- Sekcja Sposób przygotowania -->
+        <div class="content-box">
+          <h3>Sposób przygotowania</h3>
+          @if (formattedSteps.length > 0) {
+            <div class="instructions-text">
+              @for (stepText of formattedSteps; track $index) {
+                <div class="instruction-step">
+                  <div class="step-badge">{{ $index + 1 }}</div>
+                  <p>{{ stepText }}</p>
+                </div>
+              }
+            </div>
+          } @else {
+            <p class="empty-text">Brak instrukcji przygotowania.</p>
+          }
+        </div>
+
+        <!-- Link do wideo -->
+        @if (currentRecipe.videoUrl) {
+          <div class="video-box">
+            <span class="video-icon">🎬</span>
+            <a [href]="currentRecipe.videoUrl" target="_blank" rel="noopener noreferrer" class="video-btn">
+              Obejrzyj wideo z przygotowania
+            </a>
+          </div>
+        }
+
+      </div>
+
+    </div>
+  </div>
+} @else {
+  <div class="page-container">
+    <p class="loading-text">Ładowanie szczegółów przepisu...</p>
+  </div>
+}

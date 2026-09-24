@@ -1,0 +1,235 @@
+
+
+<div class="page-container">
+  <div class="editor-layout">
+
+    <!-- LEWA KOLUMNA: Formularz edycji -->
+    <div class="form-section">
+      <div class="header-title">
+        <h2>Nowy Przepis 🍳</h2>
+      </div>
+
+      <div class="form-group">
+        <label for="recipeTitle">Nazwa przepisu</label>
+        <input
+          id="recipeTitle"
+          type="text"
+          [(ngModel)]="title"
+          placeholder="np. Kurczak w sosie słodko-kwaśnym"
+          class="form-control"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="recipeImageUrl">Link do zdjęcia (opcjonalnie)</label>
+        <input
+          id="recipeImageUrl"
+          type="text"
+          [(ngModel)]="imageUrl"
+          placeholder="https://..."
+          class="form-control"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="recipeVideoUrl">Link do filmu Video (YouTube / TikTok)</label>
+        <input
+          id="recipeVideoUrl"
+          type="text"
+          [(ngModel)]="videoUrl"
+          placeholder="https://youtube.com/watch?v=..."
+          class="form-control"
+        />
+      </div>
+
+      <!-- Tabela Składników -->
+      <div class="section-box">
+        <h3>Składniki</h3>
+        <div class="table-responsive">
+          <table class="ingredients-table">
+            <thead>
+            <tr>
+              <th scope="col" style="min-width: 160px;">Składnik</th>
+              <th scope="col" style="width: 80px;">Ilość</th>
+              <th scope="col" style="width: 110px;">Jednostka</th>
+              <th scope="col" class="text-center">kcal</th>
+              <th scope="col" class="text-center">B</th>
+              <th scope="col" class="text-center">W</th>
+              <th scope="col" class="text-center">T</th>
+              <th scope="col" style="width: 40px;"></th>
+            </tr>
+            </thead>
+            <tbody>
+              @for (row of ingredientRows; track $index; let i = $index) {
+                <tr>
+                  <td class="autocomplete-cell">
+                    <div class="autocomplete-wrapper">
+                      <input
+                        type="text"
+                        [(ngModel)]="row.searchText"
+                        (input)="onSearchInput(row)"
+                        (focus)="onInputFocus(row)"
+                        (blur)="onInputBlur(row)"
+                        placeholder="Szukaj składnika..."
+                        class="autocomplete-input"
+                      />
+                      @if (row.showDropdown && row.filteredIngredients?.length) {
+                        <ul class="autocomplete-dropdown">
+                          @for (ing of row.filteredIngredients; track ing.id) {
+                            <li
+                              (mousedown)="selectIngredient(row, ing)"
+                              class="dropdown-item"
+                            >
+                              {{ ing.name }}
+                            </li>
+                          }
+                        </ul>
+                      }
+                    </div>
+                  </td>
+                  <td>
+                    <input
+                      type="number"
+                      [(ngModel)]="row.amount"
+                      (input)="onIngredientChange(row)"
+                      class="form-control num-input"
+                    />
+                  </td>
+                  <td>
+                    <select
+                      [(ngModel)]="row.unit"
+                      (change)="onUnitChange(row)"
+                      class="form-control select-input"
+                    >
+                      @for (u of availableUnits; track u.id) {
+                        <option [value]="u.name">{{ u.name }}</option>
+                      }
+                    </select>
+                  </td>
+                  <td class="macro-cell text-center">{{ row.calories }}</td>
+                  <td class="macro-cell text-center">{{ row.protein }}</td>
+                  <td class="macro-cell text-center">{{ row.carbs }}</td>
+                  <td class="macro-cell text-center">{{ row.fat }}</td>
+                  <td class="text-center">
+                    <button
+                      type="button"
+                      (click)="removeIngredientRow(i)"
+                      class="btn-del"
+                      title="Usuń składnik"
+                    >
+                      ❌
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <button type="button" (click)="addIngredientRow()" class="btn-add-row">
+          + Dodaj składnik
+        </button>
+      </div>
+
+      <!-- Instrukcje Krok po Kroku -->
+      <div class="section-box">
+        <h3>Instrukcja przygotowania</h3>
+        @for (step of stepRows; track $index; let i = $index) {
+          <div class="step-row">
+            <span class="step-num">Krok {{ step.stepNumber }}</span>
+            <textarea
+              [(ngModel)]="step.instruction"
+              rows="2"
+              placeholder="Opisz krok..."
+              class="form-control"
+            ></textarea>
+            <button type="button" (click)="removeStepRow(i)" class="btn-del" title="Usuń krok">
+              ❌
+            </button>
+          </div>
+        }
+        <button type="button" (click)="addStepRow()" class="btn-add-row">
+          + Dodaj kolejny krok
+        </button>
+      </div>
+
+      <button
+        type="button"
+        (click)="saveRecipe()"
+        [disabled]="!title || ingredientRows.length === 0"
+        class="btn-save"
+      >
+        💾 Zapisz Przepis
+      </button>
+    </div>
+
+    <!-- PRAWA KOLUMNA: Podgląd Live -->
+    <div class="preview-section">
+      <div class="preview-card">
+        <div class="live-badge">LIVE PREVIEW</div>
+
+        @if (imageUrl) {
+          <div class="image-preview">
+            <img [src]="imageUrl" alt="Zdjęcie potrawy" />
+          </div>
+        }
+
+        <h2>{{ title || 'Nazwa Twojego przepisu' }}</h2>
+
+        <!-- Sumaryczny pasek kalorii i makro -->
+        <div class="macro-summary">
+          <div class="macro-box kcal">
+            <span class="val">{{ totalCalories }}</span>
+            <span class="lbl">kcal</span>
+          </div>
+          <div class="macro-box protein">
+            <span class="val">{{ totalProtein }}g</span>
+            <span class="lbl">Białko</span>
+          </div>
+          <div class="macro-box carbs">
+            <span class="val">{{ totalCarbs }}g</span>
+            <span class="lbl">Węgle</span>
+          </div>
+          <div class="macro-box fat">
+            <span class="val">{{ totalFat }}g</span>
+            <span class="lbl">Tłuszcze</span>
+          </div>
+        </div>
+
+        <div class="preview-block">
+          <h4>Składniki:</h4>
+          <ul>
+            @for (ing of ingredientRows; track $index) {
+              <li>
+                <strong>{{ ing.name || 'Wybierz składnik' }}</strong>
+                — {{ ing.amount }} {{ ing.unit }} ({{ ing.calories }} kcal)
+              </li>
+            }
+          </ul>
+        </div>
+
+        @if (stepRows.length > 0) {
+          <div class="preview-block">
+            <h4>Sposób przygotowania:</h4>
+            <ol>
+              @for (step of stepRows; track $index) {
+                @if (step.instruction) {
+                  <li>{{ step.instruction }}</li>
+                }
+              }
+            </ol>
+          </div>
+        }
+
+        @if (videoUrl) {
+          <div class="video-link">
+            🎬
+            <a [href]="videoUrl" target="_blank" rel="noopener noreferrer">
+              Obejrzyj wideo w nowej karcie
+            </a>
+          </div>
+        }
+      </div>
+    </div>
+
+  </div>
+</div>
