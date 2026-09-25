@@ -1,179 +1,40 @@
 <div class="planner-wrapper">
-  <!-- 1. Nawigacja tygodnia z przyciskiem "Dzisiaj" -->
-  <header class="planner-header">
-    <button class="btn-arrow" (click)="previousWeek()" aria-label="Poprzedni tydzień">‹</button>
+  <!-- 1. Kalendarz -->
+  <app-planner-calendar
+    [weekDays]="weekDays()"
+    [weekRange]="weekRangeString()"
+    (daySelected)="selectDay($event)"
+    (prevWeek)="previousWeek()"
+    (nextWeek)="nextWeek()"
+    (todayClicked)="goToToday()">
+  </app-planner-calendar>
 
-    <div class="header-center">
-      <h2>{{ weekRangeString() }}</h2>
-      <button class="btn-today" (click)="goToToday()">Dzisiaj</button>
-    </div>
-
-    <button class="btn-arrow" (click)="nextWeek()" aria-label="Następny tydzień">›</button>
-  </header>
-
-  <!-- 2. Pasek dni tygodnia -->
-  <nav class="days-bar">
-    @for (day of weekDays(); track day.dateString) {
-      <div
-        class="day-card"
-        [class.selected]="day.isSelected"
-        [class.today]="day.isToday"
-        (click)="selectDay(day.dateString)">
-
-        @if (day.isToday) {
-          <span class="today-badge">DZIŚ</span>
-        }
-
-        <span class="day-name">{{ day.name }}</span>
-        <span class="day-date">{{ day.dayNumber }}.{{ day.monthNumber }}</span>
-      </div>
-    }
-  </nav>
-
-  <!-- 3. Powiększona Karta Podsumowania Makroskładników -->
+  <!-- 2. Makroskładniki -->
   @let currentDayString = selectedDate().toISOString().split('T')[0];
-  @let dailySummary = getDailySummary(currentDayString);
+  <app-macro-summary
+    [consumed]="getDailySummary(currentDayString)"
+    [targets]="targetSummary">
+  </app-macro-summary>
 
-  <section class="macro-summary-card">
-    <!-- Główne Kalorie -->
-    <div class="macro-row main-calories">
-      <div class="macro-label-group">
-        <span class="macro-title">Kalorie</span>
-        <span class="macro-values"><strong>{{ dailySummary.calories }}</strong> / {{ targetSummary.calories }} kcal</span>
-      </div>
-      <div class="progress-bar-bg main-bar">
-        <div class="progress-bar-fill cal" [style.width.%]="getPercent(dailySummary.calories, targetSummary.calories)"></div>
-      </div>
-    </div>
-
-    <!-- Siatka Makro (Białko, Tłuszcze, Węgle) -->
-    <div class="macro-grid">
-      <!-- Białko -->
-      <div class="macro-item">
-        <div class="macro-label-group">
-          <span class="macro-title">Białko</span>
-          <span class="macro-values"><strong>{{ dailySummary.protein }}</strong> / {{ targetSummary.protein }}g</span>
-        </div>
-        <div class="progress-bar-bg">
-          <div class="progress-bar-fill protein" [style.width.%]="getPercent(dailySummary.protein, targetSummary.protein)"></div>
-        </div>
-      </div>
-
-      <!-- Tłuszcze -->
-      <div class="macro-item">
-        <div class="macro-label-group">
-          <span class="macro-title">Tłuszcze</span>
-          <span class="macro-values"><strong>{{ dailySummary.fat }}</strong> / {{ targetSummary.fat }}g</span>
-        </div>
-        <div class="progress-bar-bg">
-          <div class="progress-bar-fill fat" [style.width.%]="getPercent(dailySummary.fat, targetSummary.fat)"></div>
-        </div>
-      </div>
-
-      <!-- Węglowodany -->
-      <div class="macro-item">
-        <div class="macro-label-group">
-          <span class="macro-title">Węgle</span>
-          <span class="macro-values"><strong>{{ dailySummary.carbs }}</strong> / {{ targetSummary.carbs }}g</span>
-        </div>
-        <div class="progress-bar-bg">
-          <div class="progress-bar-fill carbs" [style.width.%]="getPercent(dailySummary.carbs, targetSummary.carbs)"></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 4. Sekcje Posiłków -->
+  <!-- 3. Sloty Posiłków -->
   <main class="meals-list">
     @for (mealType of mealTypes; track mealType) {
-      @let mealsForSlot = getMealsForSlot(currentDayString, mealType);
-
-      <section class="meal-slot-card">
-        <div class="slot-header">
-          <h3>{{ mealType }}</h3>
-          <button class="btn-add-meal" (click)="openAddModal(mealType)">+ Dodaj</button>
-        </div>
-
-        @if (mealsForSlot.length > 0) {
-          <div class="assigned-meals-container">
-            @for (meal of mealsForSlot; track meal.id) {
-              <div class="assigned-recipe-item">
-                <div class="meal-img-wrapper">
-                  @if (meal.recipe?.imageUrl) {
-                    <img [src]="meal.recipe!.imageUrl" [alt]="meal.recipe!.title" (error)="onImageError($event)" />
-                    <div class="meal-placeholder" style="display: none;">🍽️</div>
-                  } @else {
-                    <div class="meal-placeholder">🍽️</div>
-                  }
-                </div>
-
-                <div class="meal-info">
-                  <span class="meal-title">{{ meal.recipe ? meal.recipe.title : meal.customName }}</span>
-                  <span class="meal-macros">
-                    {{ meal.calories }} kcal • B: {{ meal.protein }}g • T: {{ meal.fat }}g • W: {{ meal.carbs }}g
-                  </span>
-                </div>
-
-                <button class="btn-close-item" (click)="removeMeal(meal.id)" title="Usuń posiłek">✕</button>
-              </div>
-            }
-          </div>
-        } @else {
-          <p class="empty-slot-text">Brak posiłków w tej sekcji.</p>
-        }
-      </section>
+      <app-meal-slot
+        [mealType]="mealType"
+        [meals]="getMealsForSlot(currentDayString, mealType)"
+        (addMealClicked)="activeModalSlot.set($event)"
+        (removeMeal)="removeMeal($event)">
+      </app-meal-slot>
     }
   </main>
 
-  <!-- 5. Modal Wyboru Przepisu -->
+  <!-- 4. Modal -->
   @if (activeModalSlot(); as slot) {
-    <div class="modal-backdrop" (click)="closeModal()">
-      <div class="modal-content" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h3>Dodaj do: {{ slot }}</h3>
-          <button class="btn-modal-close" (click)="closeModal()">✕</button>
-        </div>
-
-        <div class="modal-filters">
-          <input
-            type="text"
-            class="filter-input full-width"
-            placeholder="Filtruj po nazwie..."
-            [value]="searchQuery()"
-            (input)="updateSearch($event)" />
-
-          <div class="filter-grid">
-            <input type="number" class="filter-input" placeholder="Max kcal" [ngModel]="filterMaxKcal()" (ngModelChange)="filterMaxKcal.set($event)" />
-            <input type="number" class="filter-input" placeholder="Min białko" [ngModel]="filterMinProtein()" (ngModelChange)="filterMinProtein.set($event)" />
-            <input type="number" class="filter-input" placeholder="Min węgle" [ngModel]="filterMinCarbs()" (ngModelChange)="filterMinCarbs.set($event)" />
-            <input type="number" class="filter-input" placeholder="Min tłuszcz" [ngModel]="filterMinFat()" (ngModelChange)="filterMinFat.set($event)" />
-          </div>
-        </div>
-
-        <div class="modal-recipes-list">
-          @for (recipe of filteredRecipes(); track recipe.id) {
-            <div class="recipe-select-card" (click)="selectRecipeForSlot(recipe.id)">
-              <div class="meal-img-wrapper">
-                @if (recipe.imageUrl) {
-                  <img [src]="recipe.imageUrl" [alt]="recipe.title" (error)="onImageError($event)" />
-                  <div class="meal-placeholder" style="display: none;">🍽️</div>
-                } @else {
-                  <div class="meal-placeholder">🍽️</div>
-                }
-              </div>
-
-              <div class="meal-info">
-                <span class="meal-title">{{ recipe.title }}</span>
-                <span class="meal-macros">
-                  {{ recipe.calories }} kcal B: {{ recipe.protein }}g W: {{ recipe.carbs }}g T: {{ recipe.fat }}g
-                </span>
-              </div>
-            </div>
-          } @empty {
-            <p class="no-recipes-text">Brak przepisów spełniających kryteria.</p>
-          }
-        </div>
-      </div>
-    </div>
+    <app-recipe-select-modal
+      [slotName]="slot"
+      [availableRecipes]="availableRecipes()"
+      (recipeSelected)="selectRecipeForSlot($event)"
+      (closeModal)="activeModalSlot.set(null)">
+    </app-recipe-select-modal>
   }
 </div>

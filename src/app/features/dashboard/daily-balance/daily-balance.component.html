@@ -1,48 +1,5 @@
-<section class="card summary-card">
-  <h2>Dzisiejszy bilans</h2>
-
-  <div class="macro-item main-macro">
-    <div class="macro-header">
-      <span>Kalorie</span>
-      <span>
-        <strong class="current">{{ progress().consumed.calories }}</strong>
-        <small class="target">/ {{ progress().targets.calories }} kcal</small>
-      </span>
-    </div>
-    <div class="progress-bar">
-      <div class="bar-fill cal-fill" [style.width.%]="progress().caloriesPct"></div>
-    </div>
-  </div>
-
-  <div class="macros-breakdown">
-    <div class="macro-item">
-      <div class="macro-header">
-        <span>Białko</span>
-        <small>{{ progress().consumed.protein }} / {{ progress().targets.protein }}g</small>
-      </div>
-      <div class="progress-bar">
-        <div class="bar-fill protein-fill" [style.width.%]="progress().proteinPct"></div>
-      </div>
-    </div>
-
-    <div class="macro-item">
-      <div class="macro-header">
-        <span>Węglowodany</span>
-        <small>{{ progress().consumed.carbs }} / {{ progress().targets.carbs }}g</small>
-      </div>
-      <div class="progress-bar">
-        <div class="bar-fill carbs-fill" [style.width.%]="progress().carbsPct"></div>
-      </div>
-    </div>
-
-    <div class="macro-item">
-      <div class="macro-header">
-        <span>Tłuszcze</span>
-        <small>{{ progress().consumed.fat }} / {{ progress().targets.fat }}g</small>
-      </div>
-      <div class="progress-bar">
-        <div class="bar-fill fat-fill" [style.width.%]="progress().fatPct"></div>
-      </div>
-    </div>
-  </div>
-</section>
+<app-macro-summary
+  title="Dzisiejszy bilans"
+  [consumed]="consumed()"
+  [targets]="targets()">
+</app-macro-summary>

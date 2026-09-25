@@ -1,16 +1,28 @@
 import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { environment } from '../../../environment';
 import { MealPlan, MealType, Recipe } from '../../core/models';
 import { RecipeMapper } from '../../core/mappers/recipe.mapper';
 import { MealPlanMapper } from '../../core/mappers/meal-plan.mapper';
 
+// Importy nowych pod-komponentów
+import { PlannerCalendarComponent } from './components/planner-calendar/planner-calendar.component';
+import { MealSlotComponent } from './components/meal-slot/meal-slot.component';
+import { RecipeSelectModalComponent } from './components/recipe-select-modal/recipe-select-modal.component';
+import { MacroSummaryComponent } from '../../shared/components/macro-summary/macro-summary.component';
+
+
 @Component({
   selector: 'app-planner',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule,
+    PlannerCalendarComponent,
+    MealSlotComponent,
+    MacroSummaryComponent,
+    RecipeSelectModalComponent,
+  ],
   templateUrl: './planner.component.html',
   styleUrl: './planner.component.scss'
 })
@@ -22,13 +34,7 @@ export class PlannerComponent implements OnInit {
   mealPlans = signal<MealPlan[]>([]);
   mealTypes: MealType[] = ['Śniadanie', 'II Śniadanie', 'Obiad', 'Kolacja', 'Przekąska'];
 
-  // Stan Modalu i Filtrów
   activeModalSlot = signal<MealType | null>(null);
-  searchQuery = signal<string>('');
-  filterMaxKcal = signal<number | null>(null);
-  filterMinProtein = signal<number | null>(null);
-  filterMinCarbs = signal<number | null>(null);
-  filterMinFat = signal<number | null>(null);
 
   targetSummary = {
     calories: 2047,
@@ -82,28 +88,8 @@ export class PlannerComponent implements OnInit {
 
     const start = days[0];
     const end = days[6];
-    const yearStart = start.date.getFullYear();
-    const yearEnd = end.date.getFullYear();
 
-    return `${start.dayNumber}.${start.monthNumber}.${yearStart} - ${end.dayNumber}.${end.monthNumber}.${yearEnd}`;
-  });
-
-  filteredRecipes = computed(() => {
-    const query = this.searchQuery().toLowerCase().trim();
-    const maxKcal = this.filterMaxKcal();
-    const minProtein = this.filterMinProtein();
-    const minCarbs = this.filterMinCarbs();
-    const minFat = this.filterMinFat();
-
-    return this.availableRecipes().filter(r => {
-      const matchesQuery = !query || r.title.toLowerCase().includes(query);
-      const matchesKcal = maxKcal === null || maxKcal === undefined || r.calories <= maxKcal;
-      const matchesProtein = minProtein === null || minProtein === undefined || r.protein >= minProtein;
-      const matchesCarbs = minCarbs === null || minCarbs === undefined || r.carbs >= minCarbs;
-      const matchesFat = minFat === null || minFat === undefined || r.fat >= minFat;
-
-      return matchesQuery && matchesKcal && matchesProtein && matchesCarbs && matchesFat;
-    });
+    return `${start.dayNumber}.${start.monthNumber}.${start.date.getFullYear()} - ${end.dayNumber}.${end.monthNumber}.${end.date.getFullYear()}`;
   });
 
   goToToday(): void {
@@ -143,10 +129,7 @@ export class PlannerComponent implements OnInit {
 
     const { data, error } = await this.supabase
     .from('new_meal_plans')
-    .select(`
-        *,
-        new_recipes (*)
-      `)
+    .select(`*, new_recipes (*)`)
     .gte('date', startDate)
     .lte('date', endDate);
 
@@ -158,12 +141,9 @@ export class PlannerComponent implements OnInit {
   }
 
   getMealsForSlot(dateString: string, mealType: MealType): MealPlan[] {
-    return this.mealPlans().filter(
-      p => p.date === dateString && p.mealType === mealType
-    );
+    return this.mealPlans().filter(p => p.date === dateString && p.mealType === mealType);
   }
 
-  // Zaokrąglanie wartości do liczb całkowitych (eliminuje np. 21.800000000000004)
   getDailySummary(dateString: string) {
     const dayMeals = this.mealPlans().filter(p => p.date === dateString);
     const summary = dayMeals.reduce(
@@ -184,89 +164,37 @@ export class PlannerComponent implements OnInit {
     };
   }
 
-  getPercent(current: number, target: number): number {
-    if (!target) return 0;
-    return Math.min(Math.round((current / target) * 100), 100);
-  }
-
-  // Obsługa uszkodzonych linków do obrazków
-  onImageError(event: Event): void {
-    const img = event.target as HTMLImageElement;
-    img.style.display = 'none';
-    const sibling = img.nextElementSibling as HTMLElement;
-    if (sibling) {
-      sibling.style.display = 'flex';
-    }
-  }
-
-  openAddModal(mealType: MealType): void {
-    this.activeModalSlot.set(mealType);
-  }
-
-  closeModal(): void {
-    this.activeModalSlot.set(null);
-    this.searchQuery.set('');
-    this.filterMaxKcal.set(null);
-    this.filterMinProtein.set(null);
-    this.filterMinCarbs.set(null);
-    this.filterMinFat.set(null);
-  }
-
-  updateSearch(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.searchQuery.set(input.value);
-  }
-
   async selectRecipeForSlot(recipeId: string): Promise<void> {
     const slot = this.activeModalSlot();
     const dateStr = this.selectedDate().toISOString().split('T')[0];
 
-    if (slot) {
-      await this.assignRecipe(dateStr, slot, recipeId);
-      this.closeModal();
-    }
-  }
+    if (slot && recipeId) {
+      const recipe = this.availableRecipes().find(r => r.id === recipeId);
+      if (!recipe) return;
 
-  async assignRecipe(dateString: string, mealType: MealType, recipeId: string): Promise<void> {
-    if (!recipeId) return;
+      const payload = MealPlanMapper.toInsertDto({
+        date: dateStr,
+        mealType: slot,
+        recipeId: recipe.id,
+        calories: recipe.calories,
+        protein: recipe.protein,
+        carbs: recipe.carbs,
+        fat: recipe.fat,
+        servings: 1
+      });
 
-    const recipe = this.availableRecipes().find(r => r.id === recipeId);
-    if (!recipe) return;
-
-    const payload = MealPlanMapper.toInsertDto({
-      date: dateString,
-      mealType: mealType,
-      recipeId: recipe.id,
-      calories: recipe.calories,
-      protein: recipe.protein,
-      carbs: recipe.carbs,
-      fat: recipe.fat,
-      servings: 1
-    });
-
-    const { error } = await this.supabase
-    .from('new_meal_plans')
-    .insert([payload]);
-
-    if (error) {
-      console.error('Błąd dodawania posiłku:', error);
-    } else {
-      await this.fetchMealPlansForWeek();
+      const { error } = await this.supabase.from('new_meal_plans').insert([payload]);
+      if (!error) {
+        await this.fetchMealPlansForWeek();
+      }
+      this.activeModalSlot.set(null);
     }
   }
 
   async removeMeal(mealPlanId: any): Promise<void> {
-    const { error } = await this.supabase
-    .from('new_meal_plans')
-    .delete()
-    .eq('id', mealPlanId);
-
+    const { error } = await this.supabase.from('new_meal_plans').delete().eq('id', mealPlanId);
     if (!error) {
       await this.fetchMealPlansForWeek();
-    } else {
-      console.error('Błąd usuwania posiłku:', error);
     }
   }
-
-
 }

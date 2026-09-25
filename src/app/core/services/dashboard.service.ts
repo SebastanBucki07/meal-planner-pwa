@@ -2,7 +2,7 @@ import { Injectable, signal, computed } from '@angular/core';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 import { NewWeightLogDTO, WeightEntry } from '../models';
-import { DaySummary, MealLogDTO, DashboardMealItem } from '../models/dashboard.model';
+import { DaySummary, DashboardMealItem } from '../models/dashboard.model';
 import { environment } from '../../../environment';
 
 @Injectable({
@@ -38,17 +38,17 @@ export class DashboardService {
 
       const todayStr = new Date().toISOString().split('T')[0];
 
+      // 1. Historia wagi
       const { data: weightData, error: weightError } = await this.supabase
-        .from('new_weight_logs')
-        .select('id, user_id, weight, date, logged_at')
-        .eq('user_id', user.id)
-        .order('logged_at', { ascending: true })
-        .limit(30);
+      .from('new_weight_logs')
+      .select('id, user_id, weight, date, logged_at')
+      .eq('user_id', user.id)
+      .order('logged_at', { ascending: true })
+      .limit(30);
 
       if (!weightError && weightData) {
         const dtoList = weightData as NewWeightLogDTO[];
         const domainList: WeightEntry[] = dtoList.map(dto => {
-          // Sformatowanie daty z logged_at lub date
           const rawDate = dto.logged_at || dto.date || new Date().toISOString();
           const formattedDate = rawDate.split('T')[0].split(' ')[0];
 
@@ -62,35 +62,42 @@ export class DashboardService {
         this.weightHistory.set(domainList);
       }
 
-      // 2. Dzisiejsze posiłki
+      // 2. Dzisiejsze posiłki (z nowymi polami image_url oraz makro)
       const { data: mealData, error: mealError } = await this.supabase
-        .from('new_meal_logs')
-        .select('id, name, calories, protein, carbs, fat, completed')
-        .eq('user_id', user.id)
-        .eq('date', todayStr);
+      .from('new_meal_plans')
+      .select('id, calories, protein, carbs, fat, completed, custom_name, meal_type, new_recipes(title, image_url)')
+      .eq('date', todayStr);
 
       if (!mealError && mealData) {
-        const dtoList = mealData as MealLogDTO[];
-
-        const mealsList: DashboardMealItem[] = dtoList.map(dto => ({
+        const mealsList: DashboardMealItem[] = mealData.map((dto: any) => ({
           id: dto.id || '',
-          name: dto.name || 'Posiłek',
-          calories: dto.calories || 0,
-          completed: !!dto.completed
+          name: dto.new_recipes?.title || dto.custom_name || 'Posiłek',
+          calories: Math.round(dto.calories || 0),
+          protein: Math.round(dto.protein || 0),
+          carbs: Math.round(dto.carbs || 0),
+          fat: Math.round(dto.fat || 0),
+          imageUrl: dto.new_recipes?.image_url || null,
+          completed: !!dto.completed,
+          mealType: dto.meal_type || 'Przekąska'
         }));
+
         this.todayMeals.set(mealsList);
 
-        const summary = dtoList.reduce<DaySummary>(
-          (acc, meal) => ({
-            calories: acc.calories + (meal.calories || 0),
-            protein: acc.protein + (meal.protein || 0),
-            carbs: acc.carbs + (meal.carbs || 0),
-            fat: acc.fat + (meal.fat || 0)
+        // Podsumowanie makro na dziś...
+        const summary = mealData.reduce<DaySummary>(
+          (acc, meal: any) => ({
+            calories: acc.calories + Math.round(meal.calories || 0),
+            protein: acc.protein + Math.round(meal.protein || 0),
+            carbs: acc.carbs + Math.round(meal.carbs || 0),
+            fat: acc.fat + Math.round(meal.fat || 0)
           }),
           { calories: 0, protein: 0, carbs: 0, fat: 0 }
         );
+
         this.todaySummary.set(summary);
       }
+    } catch (err) {
+      console.error('Błąd ładowania danych dashboardu:', err);
     } finally {
       this.loading.set(false);
     }
@@ -106,14 +113,11 @@ export class DashboardService {
 
     const todayStr = new Date().toISOString().split('T')[0];
 
-    // 1. Zapisz wpis w historii (new_weight_logs).
-    // Uwaga: Sprawdź, czy w Twojej tabeli kolumna z datą nazywa się 'recorded_at', 'logged_at' czy 'date'!
-    // Poniżej używamy 'date' oraz 'logged_at' zależnie od tego, co masz w bazie. Bezpieczniej wysłać te, które wymagane są przez DTO.
     const { error: logError } = await this.supabase.from('new_weight_logs').insert({
       user_id: userId,
       weight: weight,
-      date: todayStr, // Jeśli Twoja tabela używa kolumny 'date'
-      logged_at: new Date().toISOString() // Jeśli używa 'logged_at' / 'recorded_at'
+      date: todayStr,
+      logged_at: new Date().toISOString()
     });
 
     if (logError) {
@@ -121,21 +125,25 @@ export class DashboardService {
       return false;
     }
 
-    // 2. Zaktualizuj też kolumnę weight w new_profiles (dla cache)
     await this.supabase
-      .from('new_profiles')
-      .update({ weight: weight, updated_at: new Date().toISOString() })
-      .eq('id', userId);
+    .from('new_profiles')
+    .update({ weight: weight, updated_at: new Date().toISOString() })
+    .eq('id', userId);
 
-    // 3. Odśwież dane na dashboardzie, żeby wykres natychmiast się zaktualizował
     await this.loadDashboardData();
-
     return true;
   }
 
   async toggleMealCompleted(mealId: string, completed: boolean): Promise<void> {
-    await this.supabase.from('new_meal_logs').update({ completed }).eq('id', mealId);
+    const { error } = await this.supabase
+    .from('new_meal_plans')
+    .update({ completed })
+    .eq('id', mealId);
 
-    await this.loadDashboardData();
+    if (!error) {
+      await this.loadDashboardData();
+    } else {
+      console.error('Błąd zmiany statusu posiłku:', error);
+    }
   }
 }

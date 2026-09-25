@@ -1,0 +1,120 @@
+$bg-card: #ffffff;
+$border-color: #e2e8f0;
+$text-main: #1e293b;
+$text-muted: #64748b;
+$primary-blue: #2563eb;
+
+.planner-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: $bg-card;
+  border: 1px solid $border-color;
+  padding: 0.75rem 1rem;
+  border-radius: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  margin-bottom: 1.25rem;
+
+  .header-center {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    h2 {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .btn-today {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      color: #334155;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.25rem 0.65rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+
+      &:hover {
+        background: $primary-blue;
+        color: #ffffff;
+        border-color: $primary-blue;
+      }
+    }
+  }
+
+  .btn-arrow {
+    background: $bg-card;
+    border: 1px solid $border-color;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: $text-muted;
+    cursor: pointer;
+
+    &:hover {
+      background: #f8fafc;
+      color: $text-main;
+    }
+  }
+}
+
+.days-bar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+
+  .day-card {
+    background: $bg-card;
+    border: 1px solid $border-color;
+    border-radius: 12px;
+    padding: 0.6rem 0.25rem;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .day-name {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: $text-muted;
+    }
+
+    .day-date {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin-top: 2px;
+    }
+
+    &.selected {
+      background: $primary-blue;
+      border-color: $primary-blue;
+
+      .day-name, .day-date {
+        color: #ffffff;
+      }
+    }
+
+    .today-badge {
+      position: absolute;
+      top: -8px;
+      background: #00b87c;
+      color: #ffffff;
+      font-size: 0.55rem;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+  }
+}

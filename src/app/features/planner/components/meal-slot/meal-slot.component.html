@@ -1,0 +1,34 @@
+<section class="meal-slot-card">
+  <div class="slot-header">
+    <h3>{{ mealType() }}</h3>
+    <button class="btn-add-meal" (click)="addMealClicked.emit(mealType())">+ Dodaj</button>
+  </div>
+
+  @if (meals().length > 0) {
+    <div class="assigned-meals-container">
+      @for (meal of meals(); track meal.id) {
+        <div class="assigned-recipe-item">
+          <div class="meal-img-wrapper">
+            @if (meal.recipe?.imageUrl) {
+              <img [src]="meal.recipe!.imageUrl" [alt]="meal.recipe!.title" (error)="onImageError($event)" />
+              <div class="meal-placeholder" style="display: none;">🍽️</div>
+            } @else {
+              <div class="meal-placeholder">🍽️</div>
+            }
+          </div>
+
+          <div class="meal-info">
+            <span class="meal-title">{{ meal.recipe ? meal.recipe.title : meal.customName }}</span>
+            <span class="meal-macros">
+              {{ meal.calories }} kcal • B: {{ meal.protein }}g • T: {{ meal.fat }}g • W: {{ meal.carbs }}g
+            </span>
+          </div>
+
+          <button class="btn-close-item" (click)="removeMeal.emit(meal.id)" title="Usuń posiłek">✕</button>
+        </div>
+      }
+    </div>
+  } @else {
+    <p class="empty-slot-text">Brak posiłków w tej sekcji.</p>
+  }
+</section>

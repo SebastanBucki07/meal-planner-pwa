@@ -11,50 +11,87 @@
 
   h2 {
     font-size: 18px;
-    font-weight: 600;
+    font-weight: 800;
     color: #0f172a;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
   }
 }
 
-.meals-card {
-  .meals-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+.meal-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
 
-    .meal-item {
+.meal-group {
+  .group-title {
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    margin: 0 0 8px 4px;
+  }
+}
+
+.meals-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .meal-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid #f1f5f9;
+
+    .meal-img-wrapper {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: #e2e8f0;
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-      background: #f8fafc;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: background 0.2s;
+      justify-content: center;
 
-      &:hover {
-        background: #f1f5f9;
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
       }
 
-      &.completed {
-        opacity: 0.6;
-        .meal-name {
-          text-decoration: line-through;
-        }
+      .meal-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
       }
+    }
+
+    .meal-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
 
       .meal-name {
-        flex: 1;
-        font-weight: 500;
-        color: #1e293b;
+        font-weight: 700;
+        font-size: 14px;
+        color: #0f172a;
       }
 
-      .meal-calories {
-        font-size: 14px;
+      .meal-macros {
+        font-size: 12px;
         color: #64748b;
         font-weight: 600;
       }

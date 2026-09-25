@@ -1,6 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DashboardService } from '../../../core/services/dashboard.service';
+
+export type MealType = 'Śniadanie' | 'II Śniadanie' | 'Obiad' | 'Kolacja' | 'Przekąska';
 
 @Component({
   selector: 'app-today-meals',
@@ -12,7 +14,25 @@ import { DashboardService } from '../../../core/services/dashboard.service';
 export class TodayMealsComponent {
   public dashboardService = inject(DashboardService);
 
-  async toggleMeal(mealId: string, completed: boolean): Promise<void> {
-    await this.dashboardService.toggleMealCompleted(mealId, !completed);
+  readonly mealTypes: MealType[] = ['Śniadanie', 'II Śniadanie', 'Obiad', 'Kolacja', 'Przekąska'];
+
+  groupedMeals = computed(() => {
+    const meals = this.dashboardService.todayMeals();
+
+    return this.mealTypes
+    .map(type => ({
+      type,
+      meals: meals.filter(m => m.mealType === type)
+    }))
+    .filter(group => group.meals.length > 0);
+  });
+
+  onImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    img.style.display = 'none';
+    const sibling = img.nextElementSibling as HTMLElement;
+    if (sibling) {
+      sibling.style.display = 'flex';
+    }
   }
 }

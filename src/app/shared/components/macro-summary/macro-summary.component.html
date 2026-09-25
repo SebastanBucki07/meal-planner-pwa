@@ -1,0 +1,54 @@
+<section class="macro-summary-card">
+  @if (title()) {
+    <h2 class="card-title">{{ title() }}</h2>
+  }
+
+  <!-- Główne Kalorie -->
+  <div class="macro-row main-calories">
+    <div class="macro-label-group">
+      <span class="macro-title">Kalorie</span>
+      <span class="macro-values">
+        <strong>{{ consumed().calories }}</strong> / {{ targets().calories }} kcal
+      </span>
+    </div>
+    <div class="progress-bar-bg main-bar">
+      <div class="progress-bar-fill cal" [style.width.%]="progress().caloriesPct"></div>
+    </div>
+  </div>
+
+  <!-- Siatka Makro -->
+  <div class="macro-grid">
+    <!-- Białko -->
+    <div class="macro-item">
+      <div class="macro-label-group">
+        <span class="macro-title">Białko</span>
+        <span class="macro-values"><strong>{{ consumed().protein }}</strong> / {{ targets().protein }}g</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill protein" [style.width.%]="progress().proteinPct"></div>
+      </div>
+    </div>
+
+    <!-- Tłuszcze -->
+    <div class="macro-item">
+      <div class="macro-label-group">
+        <span class="macro-title">Tłuszcze</span>
+        <span class="macro-values"><strong>{{ consumed().fat }}</strong> / {{ targets().fat }}g</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill fat" [style.width.%]="progress().fatPct"></div>
+      </div>
+    </div>
+
+    <!-- Węglowodany -->
+    <div class="macro-item">
+      <div class="macro-label-group">
+        <span class="macro-title">Węgle</span>
+        <span class="macro-values"><strong>{{ consumed().carbs }}</strong> / {{ targets().carbs }}g</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill carbs" [style.width.%]="progress().carbsPct"></div>
+      </div>
+    </div>
+  </div>
+</section>

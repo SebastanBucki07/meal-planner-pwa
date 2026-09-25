@@ -1,0 +1,50 @@
+<div class="modal-backdrop" (click)="closeModal.emit()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Dodaj do: {{ slotName() }}</h3>
+      <button class="btn-modal-close" (click)="closeModal.emit()">✕</button>
+    </div>
+
+    <!-- Filtry -->
+    <div class="modal-filters">
+      <input
+        type="text"
+        class="filter-input full-width"
+        placeholder="Filtruj po nazwie..."
+        [value]="searchQuery()"
+        (input)="updateSearch($event)" />
+
+      <div class="filter-grid">
+        <input type="number" class="filter-input" placeholder="Max kcal" [ngModel]="filterMaxKcal()" (ngModelChange)="filterMaxKcal.set($event)" />
+        <input type="number" class="filter-input" placeholder="Min białko" [ngModel]="filterMinProtein()" (ngModelChange)="filterMinProtein.set($event)" />
+        <input type="number" class="filter-input" placeholder="Min węgle" [ngModel]="filterMinCarbs()" (ngModelChange)="filterMinCarbs.set($event)" />
+        <input type="number" class="filter-input" placeholder="Min tłuszcz" [ngModel]="filterMinFat()" (ngModelChange)="filterMinFat.set($event)" />
+      </div>
+    </div>
+
+    <!-- Lista -->
+    <div class="modal-recipes-list">
+      @for (recipe of filteredRecipes(); track recipe.id) {
+        <div class="recipe-select-card" (click)="recipeSelected.emit(recipe.id)">
+          <div class="meal-img-wrapper">
+            @if (recipe.imageUrl) {
+              <img [src]="recipe.imageUrl" [alt]="recipe.title" (error)="onImageError($event)" />
+              <div class="meal-placeholder" style="display: none;">🍽️</div>
+            } @else {
+              <div class="meal-placeholder">🍽️</div>
+            }
+          </div>
+
+          <div class="meal-info">
+            <span class="meal-title">{{ recipe.title }}</span>
+            <span class="meal-macros">
+              {{ recipe.calories }} kcal B: {{ recipe.protein }}g W: {{ recipe.carbs }}g T: {{ recipe.fat }}g
+            </span>
+          </div>
+        </div>
+      } @empty {
+        <p class="no-recipes-text">Brak przepisów spełniających kryteria.</p>
+      }
+    </div>
+  </div>
+</div>
