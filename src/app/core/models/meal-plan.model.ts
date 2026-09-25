@@ -1,6 +1,6 @@
-import { NewRecipeDTO } from './recipe.model';
+import {NewRecipeDTO, Recipe} from './recipe.model';
 
-export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
+export type MealType = 'Śniadanie' | 'II Śniadanie' | 'Obiad' | 'Kolacja' | 'Przekąska';
 
 // Model DTO dla tabeli `new_meal_plans`
 export interface NewMealPlanDTO {
@@ -20,18 +20,18 @@ export interface NewMealPlanDTO {
   new_recipes?: NewRecipeDTO;
 }
 
-// Model Domenowy Posiłku w kalendarzu/dashboardzie
-export interface MealEntry {
+export interface MealPlan {
   id: string;
+  userId: string;
   date: string;
   mealType: MealType;
-  recipeId?: string;
-  title: string;
-  imageUrl?: string;
-  servings: number;
-  completed: boolean;
+  recipeId: string | null;
+  recipe?: Recipe;
+  customName: string | null;
   calories: number;
   protein: number;
   carbs: number;
   fat: number;
+  servings: number;
+  completed: boolean;
 }
