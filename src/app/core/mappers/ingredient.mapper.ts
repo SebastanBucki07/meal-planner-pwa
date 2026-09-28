@@ -14,9 +14,8 @@ export interface NewIngredientDTO {
 export class IngredientMapper {
   static toDomain(dto: NewIngredientDTO): Ingredient {
     const validCatIds = INGREDIENT_CATEGORIES.map(c => c.id);
-    const categoryId = (dto.category_id && validCatIds.includes(dto.category_id))
-      ? dto.category_id
-      : 10;
+    const categoryId =
+      dto.category_id && validCatIds.includes(dto.category_id) ? dto.category_id : 10;
 
     return {
       id: dto.id || '',

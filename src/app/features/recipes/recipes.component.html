@@ -44,65 +44,65 @@
 
   <!-- Główna siatka z kartami -->
   @if (!recipeService.loading()) {
-    <div class="recipes-grid">
-      @if (recipeService.recipes().length === 0) {
-        <div class="empty-state">Brak przepisów pasujących do kryteriów.</div>
-      } @for (recipe of recipeService.recipes(); track recipe.id) {
-      <div class="recipe-card">
-        @if (recipe.imageUrl) {
-          <div class="recipe-image">
-            <img [src]="recipe.imageUrl" [alt]="recipe.title" />
-          </div>
-        }
+  <div class="recipes-grid">
+    @if (recipeService.recipes().length === 0) {
+    <div class="empty-state">Brak przepisów pasujących do kryteriów.</div>
+    } @for (recipe of recipeService.recipes(); track recipe.id) {
+    <div class="recipe-card">
+      @if (recipe.imageUrl) {
+      <div class="recipe-image">
+        <img [src]="recipe.imageUrl" [alt]="recipe.title" />
+      </div>
+      }
 
-        <div class="card-content">
-          <div class="recipe-header">
-            <h3>{{ recipe.title }}</h3>
-            <span class="calorie-badge">{{ recipe.calories }} kcal</span>
-          </div>
-
-          <div class="macros-grid">
-            <div class="macro-box protein">
-              <span class="label">Białko</span>
-              <span class="val">{{ recipe.protein }}g</span>
-            </div>
-            <div class="macro-box carbs">
-              <span class="label">Węgle</span>
-              <span class="val">{{ recipe.carbs }}g</span>
-            </div>
-            <div class="macro-box fat">
-              <span class="label">Tłuszcze</span>
-              <span class="val">{{ recipe.fat }}g</span>
-            </div>
-          </div>
+      <div class="card-content">
+        <div class="recipe-header">
+          <h3>{{ recipe.title }}</h3>
+          <span class="calorie-badge">{{ recipe.calories }} kcal</span>
         </div>
 
-        <button type="button" class="btn-details" (click)="openRecipeModal(recipe.id)">
-          Zobacz przepis ➔
-        </button>
+        <div class="macros-grid">
+          <div class="macro-box protein">
+            <span class="label">Białko</span>
+            <span class="val">{{ recipe.protein }}g</span>
+          </div>
+          <div class="macro-box carbs">
+            <span class="label">Węgle</span>
+            <span class="val">{{ recipe.carbs }}g</span>
+          </div>
+          <div class="macro-box fat">
+            <span class="label">Tłuszcze</span>
+            <span class="val">{{ recipe.fat }}g</span>
+          </div>
+        </div>
       </div>
-    }
+
+      <button type="button" class="btn-details" (click)="openRecipeModal(recipe.id)">
+        Zobacz przepis ➔
+      </button>
     </div>
+    }
+  </div>
 
-    <!-- Paginacja -->
-    @if (recipeService.totalPages() > 1) {
-      <div class="pagination">
-        <button class="btn-page" [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)">
-          ◄ Poprzednia
-        </button>
+  <!-- Paginacja -->
+  @if (recipeService.totalPages() > 1) {
+  <div class="pagination">
+    <button class="btn-page" [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)">
+      ◄ Poprzednia
+    </button>
 
-        <span class="page-info">Strona {{ currentPage }} z {{ recipeService.totalPages() }}</span>
+    <span class="page-info">Strona {{ currentPage }} z {{ recipeService.totalPages() }}</span>
 
-        <button
-          class="btn-page"
-          [disabled]="currentPage === recipeService.totalPages()"
-          (click)="changePage(currentPage + 1)"
-        >
-          Następna ►
-        </button>
-      </div>
-    } } @else {
-    <div class="loading">Ładowanie przepisów...</div>
+    <button
+      class="btn-page"
+      [disabled]="currentPage === recipeService.totalPages()"
+      (click)="changePage(currentPage + 1)"
+    >
+      Następna ►
+    </button>
+  </div>
+  } } @else {
+  <div class="loading">Ładowanie przepisów...</div>
   }
 
   <!-- Przycisk FAB -->
@@ -110,10 +110,10 @@
 
   <!-- Modal szczegółów przepisu -->
   @if (selectedRecipeId(); as recipeId) {
-    <app-recipe-detail-modal
-      [recipeId]="recipeId"
-      [interactiveSteps]="false"
-      (closeModal)="closeRecipeModal()"
-    ></app-recipe-detail-modal>
+  <app-recipe-detail-modal
+    [recipeId]="recipeId"
+    [interactiveSteps]="false"
+    (closeModal)="closeRecipeModal()"
+  ></app-recipe-detail-modal>
   }
 </div>

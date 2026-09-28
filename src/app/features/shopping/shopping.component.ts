@@ -62,7 +62,10 @@ export class ShoppingComponent implements OnInit {
       return;
     }
 
-    const success = await this.shoppingService.generateNewListFromMealPlan(this.startDate, this.endDate);
+    const success = await this.shoppingService.generateNewListFromMealPlan(
+      this.startDate,
+      this.endDate
+    );
     if (success) {
       this.activeTab.set('list');
     }

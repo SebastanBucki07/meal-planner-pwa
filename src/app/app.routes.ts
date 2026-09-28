@@ -38,7 +38,8 @@ export const routes: Routes = [
       },
       {
         path: 'ingredients',
-        loadComponent: () => import('./features/ingredients/ingredients.component').then(m => m.IngredientsComponent)
+        loadComponent: () =>
+          import('./features/ingredients/ingredients.component').then(m => m.IngredientsComponent)
       },
       {
         path: 'profile',

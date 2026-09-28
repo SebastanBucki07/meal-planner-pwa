@@ -1,7 +1,5 @@
 import { MacroNutrients } from './macro-nutrients.model';
 
-
-
 export interface IngredientCategory {
   idx?: number;
   id: number;

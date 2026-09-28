@@ -1,4 +1,4 @@
-import {ShoppingList, ShoppingListDto} from '../models/shopping-list.model';
+import { ShoppingList, ShoppingListDto } from '../models/shopping-list.model';
 
 export class ShoppingListMapper {
   static toDomain(dto: ShoppingListDto): ShoppingList {
