@@ -1,0 +1,21 @@
+<div class="list-container">
+  @for (category of categories(); track category) {
+  <div class="category-section">
+    <h2>{{ category }}</h2>
+    @for (item of getItemsForCategory(category); track item.name) {
+    <div class="ingredient-item">
+      <input
+        type="checkbox"
+        [id]="item.name + list.id"
+        [(ngModel)]="item.checked"
+        (ngModelChange)="itemToggled.emit()"
+      />
+      <label [for]="item.name + list.id" [class.checked]="item.checked">
+        {{ item.name }} -
+        <strong>{{ item.amount }} {{ item.unit }}</strong>
+      </label>
+    </div>
+    }
+  </div>
+  }
+</div>

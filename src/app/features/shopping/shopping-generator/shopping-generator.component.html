@@ -1,0 +1,27 @@
+<div class="generator-section">
+  <div class="date-picker-container">
+    <div class="date-input-group">
+      <label for="start-date">Od daty</label>
+      <input
+        id="start-date"
+        type="date"
+        [(ngModel)]="startDate"
+        (ngModelChange)="startDateChange.emit(startDate)"
+      />
+    </div>
+    <div class="date-input-group">
+      <label for="end-date">Do daty</label>
+      <input
+        id="end-date"
+        type="date"
+        [(ngModel)]="endDate"
+        (ngModelChange)="endDateChange.emit(endDate)"
+      />
+    </div>
+  </div>
+  <div class="actions">
+    <button type="button" class="btn-generate" (click)="generate.emit()">
+      Generuj listę z planera
+    </button>
+  </div>
+</div>

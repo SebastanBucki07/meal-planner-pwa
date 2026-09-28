@@ -1,31 +1,29 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { ShoppingListService } from '../../core/services/shopping-list.service';
-import { ShoppingList, ShoppingListItem } from '../../core/models/shopping-list.model';
+import { ShoppingList } from '../../core/models/shopping-list.model';
+import { ShoppingListViewComponent } from './shopping-list-view/shopping-list-view.component';
+import { ShoppingHistoryComponent } from './shopping-history/shopping-history.component';
+import { ShoppingGeneratorComponent } from './shopping-generator/shopping-generator.component';
 
 @Component({
   selector: 'app-shopping',
   standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './shopping.component.html', // Upewnij się, że nazwa pliku HTML w katalogu się zgadza
+  imports: [
+    CommonModule,
+    ShoppingGeneratorComponent,
+    ShoppingHistoryComponent,
+    ShoppingListViewComponent
+  ],
+  templateUrl: './shopping.component.html',
   styleUrls: ['./shopping.component.scss']
 })
 export class ShoppingComponent implements OnInit {
   public shoppingService = inject(ShoppingListService);
 
   public activeTab = signal<'list' | 'history'>('list');
-
   public startDate = '';
   public endDate = '';
-
-  // Wyciąganie unikalnych kategorii z aktywnej listy
-  public categories = computed<string[]>(() => {
-    const list = this.shoppingService.activeList();
-    if (!list || !list.items) return [];
-    const cats = list.items.map(item => item.category || 'Inne');
-    return Array.from(new Set(cats));
-  });
 
   async ngOnInit(): Promise<void> {
     const today = new Date();
@@ -41,12 +39,6 @@ export class ShoppingComponent implements OnInit {
   public selectListFromHistory(list: ShoppingList): void {
     this.shoppingService.activeList.set(list);
     this.activeTab.set('list');
-  }
-
-  public getItemsForCategory(category: string): ShoppingListItem[] {
-    const list = this.shoppingService.activeList();
-    if (!list || !list.items) return [];
-    return list.items.filter(item => (item.category || 'Inne') === category);
   }
 
   public async onItemCheck(): Promise<void> {
