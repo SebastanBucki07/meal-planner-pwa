@@ -49,7 +49,9 @@
       } @if (!shoppingService.loading() && shoppingService.activeList(); as activeList) {
       <app-shopping-list-view
         [list]="activeList"
+        [categories]="shoppingService.categories()"
         (itemToggled)="onItemCheck()"
+        (customItemAdded)="addCustomItem($event)"
       ></app-shopping-list-view>
       } @else if (!shoppingService.loading()) {
       <div class="empty-state">

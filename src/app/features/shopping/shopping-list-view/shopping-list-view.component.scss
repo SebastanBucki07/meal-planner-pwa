@@ -2,20 +2,263 @@
   display: block;
 }
 
-.list-container {
+.shopping-list-wrapper {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+}
+
+/* Styl formularza szybkiego dodawania */
+.quick-add-section {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem;
+
+  h3 {
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+    color: #334155;
+  }
+
+  .quick-add-form {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+
+    input,
+    select {
+      padding: 0.5rem 0.75rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      outline: none;
+      background: #fff;
+
+      &:focus {
+        border-color: #3b82f6;
+      }
+    }
+
+    .input-name {
+      flex: 2;
+      min-width: 180px;
+    }
+
+    .input-amount {
+      width: 80px;
+    }
+
+    .input-unit {
+      width: 90px;
+    }
+
+    .select-category {
+      flex: 1;
+      min-width: 140px;
+    }
+
+    .btn-add {
+      padding: 0.5rem 1rem;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+
+      &:hover {
+        background: #2563eb;
+      }
+    }
+  }
+}
+
+/* Sekcje kategorii z pełną paletą kolorów */
+.list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
 
   .category-section {
     background: #fff;
     border: 1px solid #f1f5f9;
     border-radius: 8px;
     padding: 1rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+
+    /* 1. Pieczywo (Ciepły brąz / Złoty) */
+    &.category-bakery {
+      border-left: 4px solid #d97706;
+      h2 {
+        color: #92400e;
+      }
+    }
+
+    /* 2. Warzywa (Zielony) */
+    &.category-vegetables {
+      border-left: 4px solid #10b981;
+      h2 {
+        color: #047857;
+      }
+    }
+
+    /* 3. Owoce (Jasnozielony / Limonka) */
+    &.category-fruits {
+      border-left: 4px solid #84cc16;
+      h2 {
+        color: #4d7c0f;
+      }
+    }
+
+    /* 4. Nabiał (Cyjan / Jasnoniebieski) */
+    &.category-dairy {
+      border-left: 4px solid #06b6d4;
+      h2 {
+        color: #0e7490;
+      }
+    }
+
+    /* 5. Mięso i Ryby (Czerwony / Bordowy) */
+    &.category-meat {
+      border-left: 4px solid #ef4444;
+      h2 {
+        color: #b91c1c;
+      }
+    }
+
+    /* 6. Mrożonki (Chłodny błękit) */
+    &.category-frozen {
+      border-left: 4px solid #38bdf8;
+      h2 {
+        color: #0369a1;
+      }
+    }
+
+    /* 7. Ryże, Kasze, Makarony (Piaskowy / Beżowy) */
+    &.category-grains {
+      border-left: 4px solid #ca8a04;
+      h2 {
+        color: #854d0e;
+      }
+    }
+
+    /* 8. Konserwy (Stalowy szaro-niebieski) */
+    &.category-cans {
+      border-left: 4px solid #64748b;
+      h2 {
+        color: #334155;
+      }
+    }
+
+    /* 9. Przyprawy (Fioletowy / Indygo) */
+    &.category-spices {
+      border-left: 4px solid #8b5cf6;
+      h2 {
+        color: #6d28d9;
+      }
+    }
+
+    /* 10. Chemia domowa (Niebieski) */
+    &.category-chemia {
+      border-left: 4px solid #2563eb;
+      h2 {
+        color: #1e40af;
+      }
+    }
+
+    /* 11. Higiena i kosmetyki (Różowy / Magenta) */
+    &.category-higiena {
+      border-left: 4px solid #ec4899;
+      h2 {
+        color: #be185d;
+      }
+    }
+
+    /* 12. Dom i kuchnia (Bursztynowy) */
+    &.category-dom {
+      border-left: 4px solid #f59e0b;
+      h2 {
+        color: #b45309;
+      }
+    }
+
+    /* 13. Alkohole (Głęboki bordo / Fiolet) */
+    &.category-alcohol {
+      border-left: 4px solid #9333ea;
+      h2 {
+        color: #6b21a8;
+      }
+    }
+
+    /* 14. Dziecięce (Pastelowy róż / Błękit) */
+    &.category-kids {
+      border-left: 4px solid #f43f5e;
+      h2 {
+        color: #9f1239;
+      }
+    }
+
+    /* 15. Chipsy i inne przekąski (Pomarańczowy) */
+    &.category-snacks {
+      border-left: 4px solid #f97316;
+      h2 {
+        color: #c2410c;
+      }
+    }
+
+    /* 16. Napoje (Morski turkus) */
+    &.category-beverages {
+      border-left: 4px solid #14b8a6;
+      h2 {
+        color: #0f766e;
+      }
+    }
+
+    /* 17. Kawa i Herbata (Ciepły brąz / Kawiowy) */
+    &.category-coffee {
+      border-left: 4px solid #78350f;
+      h2 {
+        color: #451a03;
+      }
+    }
+
+    /* 18. Inne / Domyślna (Neutralny szary) */
+    &.category-default {
+      border-left: 4px solid #94a3b8;
+      h2 {
+        color: #475569;
+      }
+    }
+
+    /* Sery (Złoty / Żółty serowy) */
+    &.category-cheese {
+      border-left: 4px solid #eab308;
+      h2 {
+        color: #a16207;
+      }
+    }
+
+    /* Wędliny (Ciemny róż / Bordowy) */
+    &.category-cold-cuts {
+      border-left: 4px solid #e11d48;
+      h2 {
+        color: #9f1239;
+      }
+    }
+
+    /* Ryby (Morski / Niebiesko-zielony) */
+    &.category-fish {
+      border-left: 4px solid #0ea5e9;
+      h2 {
+        color: #0369a1;
+      }
+    }
 
     h2 {
       font-size: 1.1rem;
-      color: #334155;
       margin-top: 0;
       margin-bottom: 0.75rem;
       border-bottom: 2px solid #e2e8f0;
@@ -48,5 +291,14 @@
         }
       }
     }
+  }
+
+  .empty-state {
+    text-align: center;
+    color: #64748b;
+    padding: 2rem;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px dashed #cbd5e1;
   }
 }

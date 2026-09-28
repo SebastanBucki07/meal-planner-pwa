@@ -9,6 +9,7 @@ import { ShoppingListMapper } from '../mappers/shopping-list.mapper';
 })
 export class ShoppingListService {
   private supabase: SupabaseClient;
+  public categories = signal<any[]>([]);
 
   historyLists = signal<ShoppingList[]>([]);
   activeList = signal<ShoppingList | null>(null);
@@ -229,5 +230,63 @@ export class ShoppingListService {
     } finally {
       this.loading.set(false);
     }
+  }
+
+  public async fetchCategories(): Promise<void> {
+    try {
+      const { data, error } = await this.supabase
+        .from('new_ingredient_categories')
+        .select('*')
+        .order('shop_order', { ascending: true });
+
+      if (error) throw error;
+      this.categories.set(data || []);
+    } catch (err) {
+      console.error('Błąd pobierania kategorii:', err);
+    }
+  }
+
+  public async addCustomItemToActiveList(newItem: any): Promise<void> {
+    const active = this.activeList();
+    if (!active || !active.id) return;
+
+    const itemWithId = {
+      id: 'custom-' + Date.now(),
+      name: newItem.name,
+      amount: newItem.amount,
+      unit: newItem.unit,
+      category: newItem.category,
+      checked: false
+    };
+
+    const updatedItems = [...active.items, itemWithId];
+
+    // Zapis w Supabase
+    const { error } = await this.supabase
+      .from('new_shopping_lists')
+      .update({ items: updatedItems })
+      .eq('id', active.id);
+
+    if (error) {
+      console.error('Błąd zapisu własnego produktu w bazie:', error);
+      alert('Nie udało się zapisać produktu: ' + error.message);
+      return;
+    }
+
+    // Tworzymy DTO zgodne z oczekiwaniami mapperów
+    const updatedDto: ShoppingListDto = {
+      id: active.id as number, // lub konwersja na number, jeśli baza tego wymaga
+      user_id: active.user_id,
+      start_date: active.start_date,
+      end_date: active.end_date,
+      items: updatedItems,
+      is_completed: active.is_completed,
+      created_at: active.created_at
+    };
+
+    const domainList = ShoppingListMapper.toDomain(updatedDto);
+
+    this.activeList.set(domainList);
+    this.historyLists.update(lists => lists.map(l => (l.id === active.id ? domainList : l)));
   }
 }

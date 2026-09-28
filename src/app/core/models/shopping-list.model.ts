@@ -1,4 +1,5 @@
 export interface ShoppingListItem {
+  id?: string | number;
   name: string;
   amount: number;
   unit: string;
@@ -6,12 +7,18 @@ export interface ShoppingListItem {
   checked: boolean;
 }
 
+export interface ShoppingCategoryGroup {
+  categoryName: string;
+  items: ShoppingListItem[];
+}
+
 export interface ShoppingList {
-  id: number;
+  id: string | number;
   user_id?: string;
   start_date: string;
   end_date: string;
   items: ShoppingListItem[];
+  categories?: ShoppingCategoryGroup[]; // Wyliczane automatycznie przez maper!
   is_completed: boolean;
   created_at?: string;
 }

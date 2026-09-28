@@ -34,6 +34,16 @@ export class ShoppingComponent implements OnInit {
     this.endDate = nextWeek.toISOString().split('T')[0];
 
     await this.shoppingService.fetchHistory();
+
+    // Pobieramy kategorie z bazy (jeśli serwis ma taką metodę)
+    if (typeof this.shoppingService.fetchCategories === 'function') {
+      await this.shoppingService.fetchCategories();
+    }
+  }
+
+  public async addCustomItem(newItem: any): Promise<void> {
+    // Przekazujemy tylko newItem, ponieważ serwis sam pobiera aktywne ID z activeList()
+    await this.shoppingService.addCustomItemToActiveList(newItem);
   }
 
   public selectListFromHistory(list: ShoppingList): void {
