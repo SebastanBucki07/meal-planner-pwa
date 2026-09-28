@@ -121,4 +121,34 @@ export class IngredientsComponent implements OnInit {
     };
     this.isModalOpen.set(true);
   }
+
+  public getCategoryClass(categoryName: string): string {
+    if (!categoryName) return 'category-default';
+
+    const name = categoryName.toLowerCase().trim();
+
+    if (name.includes('pieczywo')) return 'category-bakery';
+    if (name.includes('warzywa')) return 'category-vegetables';
+    if (name.includes('owoce')) return 'category-fruits';
+    if (name.includes('nabiał')) return 'category-dairy';
+    if (name.includes('sery')) return 'category-cheese';
+    if (name.includes('wędina') || name.includes('wedlina')) return 'category-cold-cuts';
+    if (name.includes('mięso')) return 'category-meat';
+    if (name.includes('ryby')) return 'category-fish';
+    if (name.includes('mrożonki')) return 'category-frozen';
+    if (name.includes('ryże') || name.includes('kasze') || name.includes('makarony'))
+      return 'category-grains';
+    if (name.includes('konserwy')) return 'category-cans';
+    if (name.includes('przyprawy')) return 'category-spices';
+    if (name.includes('chemia domowa')) return 'category-chemia';
+    if (name.includes('higiena')) return 'category-higiena';
+    if (name.includes('dom i kuchnia')) return 'category-dom';
+    if (name.includes('alkohole')) return 'category-alcohol';
+    if (name.includes('dziecięce')) return 'category-kids';
+    if (name.includes('chipsy') || name.includes('przekąski')) return 'category-snacks';
+    if (name.includes('napoje')) return 'category-beverages';
+    if (name.includes('kawa') || name.includes('herbata')) return 'category-coffee';
+
+    return 'category-default';
+  }
 }

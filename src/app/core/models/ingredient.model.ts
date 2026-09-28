@@ -12,12 +12,20 @@ export const INGREDIENT_CATEGORIES: IngredientCategory[] = [
   { idx: 1, id: 2, name: 'Warzywa', shop_order: 0 },
   { idx: 2, id: 3, name: 'Owoce', shop_order: 0 },
   { idx: 3, id: 4, name: 'Nabiał', shop_order: 0 },
-  { idx: 4, id: 5, name: 'Mięso i Ryby', shop_order: 0 },
+  { idx: 4, id: 5, name: 'Mięso', shop_order: 0 },
   { idx: 5, id: 6, name: 'Mrożonki', shop_order: 0 },
   { idx: 6, id: 7, name: 'Ryże, Kasze, Makarony', shop_order: 0 },
   { idx: 7, id: 8, name: 'Konserwy', shop_order: 0 },
   { idx: 8, id: 9, name: 'Przyprawy', shop_order: 0 },
-  { idx: 9, id: 10, name: 'Inne', shop_order: 0 }
+  { idx: 9, id: 10, name: 'Inne', shop_order: 0 },
+  { idx: 13, id: 14, name: 'Alkohole', shop_order: 0 },
+  { idx: 14, id: 15, name: 'Dziecięce', shop_order: 0 },
+  { idx: 15, id: 16, name: 'Chipsy i inne przekąski', shop_order: 0 },
+  { idx: 16, id: 17, name: 'Napoje', shop_order: 0 },
+  { idx: 17, id: 18, name: 'Kawa i Herbata', shop_order: 0 },
+  { idx: 18, id: 19, name: 'Sery', shop_order: 0 },
+  { idx: 19, id: 20, name: 'Wędina', shop_order: 0 },
+  { idx: 20, id: 21, name: 'Ryby', shop_order: 0 }
 ];
 
 export interface IngredientGroup {

@@ -27,6 +27,7 @@
       <button
         type="button"
         class="chip"
+        [ngClass]="getCategoryClass(cat.name)"
         [class.active]="selectedCategoryId() === cat.id"
         (click)="selectCategoryFilter(cat.id)"
       >
@@ -40,7 +41,7 @@
   @if (ingredientService.loading() && ingredientService.ingredients().length === 0) {
   <div class="loading">Ładowanie składników...</div>
   } @else { @for (group of groupedIngredients(); track group.category.id) {
-  <section class="category-section">
+  <section class="category-section" [ngClass]="getCategoryClass(group.category.name)">
     <div class="category-header">
       <h2>{{ group.category.name }}</h2>
       <span class="count-badge">{{ group.items.length }}</span>
