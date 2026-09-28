@@ -1,13 +1,14 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { RecipeService } from '../../core/services/recipe.service';
+import { RecipeDetailModalComponent } from '../../shared/components/recipe-detail-modal/recipe-detail-modal.component';
 
 @Component({
   selector: 'app-recipes',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, RecipeDetailModalComponent],
   templateUrl: './recipes.component.html',
   styleUrls: ['./recipes.component.scss']
 })
@@ -24,6 +25,9 @@ export class RecipesComponent implements OnInit, OnDestroy {
   // Paginacja
   currentPage = 1;
   pageSize = 12;
+
+  // Stan modala szczegółów przepisu
+  selectedRecipeId = signal<string | null>(null);
 
   private filterTimeout: ReturnType<typeof setTimeout> | null = null;
 
@@ -69,5 +73,14 @@ export class RecipesComponent implements OnInit, OnDestroy {
       await this.loadData();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+  }
+
+  // Obsługa modala szczegółów przepisu
+  openRecipeModal(id: string): void {
+    this.selectedRecipeId.set(id);
+  }
+
+  closeRecipeModal(): void {
+    this.selectedRecipeId.set(null);
   }
 }

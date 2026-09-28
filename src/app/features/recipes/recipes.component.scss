@@ -2,7 +2,7 @@
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 16px 16px 90px 16px; // Bezpieczny margines na dole pod navbar PWA
+  padding: 16px 16px 90px 16px; /* Bezpieczny margines na dole pod navbar PWA */
   box-sizing: border-box;
   font-family: inherit;
 
@@ -51,11 +51,11 @@
 
   .filters-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); // Na mobile 2 kolumny
+    grid-template-columns: repeat(2, 1fr); /* Na mobile 2 kolumny */
     gap: 10px;
 
     @media (min-width: 640px) {
-      grid-template-columns: repeat(4, 1fr); // Na większych ekranach 4 kolumny w rzędzie
+      grid-template-columns: repeat(4, 1fr); /* Na większych ekranach 4 kolumny w rzędzie */
     }
 
     input {
@@ -79,7 +79,7 @@
 /* Siatka przepisów */
 .recipes-grid {
   display: grid;
-  grid-template-columns: 100%; // Domyślnie pełna szerokość na małych ekranach PWA
+  grid-template-columns: 100%; /* Domyślnie pełna szerokość na małych ekranach PWA */
   gap: 16px;
   margin-bottom: 24px;
 
@@ -115,6 +115,10 @@
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+  }
 
   .recipe-image {
     width: 100%;
@@ -191,15 +195,19 @@
     }
   }
 
+  /* Przycisk akcji otwierający modal */
   .btn-details {
+    width: 100%;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
     display: block;
     text-align: center;
     background: #f3f4f6;
     color: #4b5563;
     font-weight: 600;
     font-size: 0.85rem;
-    padding: 10px;
-    text-decoration: none;
+    padding: 12px 10px;
     transition:
       background 0.2s ease,
       color 0.2s ease;
@@ -228,6 +236,11 @@
     font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
+    transition: background 0.2s ease;
+
+    &:hover:not(:disabled) {
+      background: #f3f4f6;
+    }
 
     &:disabled {
       opacity: 0.4;
@@ -265,4 +278,9 @@
   align-items: center;
   gap: 6px;
   z-index: 100;
+  transition: transform 0.2s ease;
+
+  &:active {
+    transform: scale(0.96);
+  }
 }

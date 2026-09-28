@@ -32,9 +32,13 @@ export const routes: Routes = [
         loadChildren: () => import('./features/recipes/recipes.routes').then(m => m.RECIPE_ROUTES)
       },
       {
-        path: 'shopping-list',
+        path: 'shopping',
         loadComponent: () =>
           import('./features/shopping/shopping.component').then(m => m.ShoppingComponent)
+      },
+      {
+        path: 'ingredients',
+        loadComponent: () => import('./features/ingredients/ingredients.component').then(m => m.IngredientsComponent)
       },
       {
         path: 'profile',

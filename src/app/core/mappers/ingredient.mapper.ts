@@ -1,65 +1,47 @@
-import { Ingredient, RecipeIngredient, NewIngredientDTO, NewRecipeIngredientDTO } from '../models/';
+import { Ingredient, INGREDIENT_CATEGORIES } from '../models/';
+
+export interface NewIngredientDTO {
+  id?: string;
+  name: string;
+  category_id?: number | null;
+  calories_per_100g: number;
+  protein_per_100g: number;
+  carbs_per_100g: number;
+  fat_per_100g: number;
+  default_unit_id?: string | null;
+}
 
 export class IngredientMapper {
-  /**
-   * Mapuje surowy DTO składnika na czysty model domeny Ingredient
-   */
   static toDomain(dto: NewIngredientDTO): Ingredient {
+    const validCatIds = INGREDIENT_CATEGORIES.map(c => c.id);
+    const categoryId = (dto.category_id && validCatIds.includes(dto.category_id))
+      ? dto.category_id
+      : 10;
+
     return {
-      id: dto.id,
+      id: dto.id || '',
       name: dto.name,
-      defaultUnit: dto.default_unit,
+      categoryId,
+      defaultUnitId: dto.default_unit_id || '', // UUID jednostki
       macrosPer100g: {
-        calories: dto.calories_per_100g,
-        protein: dto.protein_per_100g,
-        carbs: dto.carbs_per_100g,
-        fat: dto.fat_per_100g
+        calories: dto.calories_per_100g || 0,
+        protein: dto.protein_per_100g || 0,
+        carbs: dto.carbs_per_100g || 0,
+        fat: dto.fat_per_100g || 0
       }
     };
   }
 
-  /**
-   * Mapuje relację składnika w przepisie (razem z danymi z zjoinowanej tabeli składników) na RecipeIngredient
-   */
-  static toRecipeIngredientDomain(dto: NewRecipeIngredientDTO): RecipeIngredient {
-    const ingredientData = dto.new_ingredients;
-    const amount = dto.amount_in_grams || 0;
-    const ratio = amount / 100;
-
-    // Przeliczenie makr proporcjonalnie do gramatury w przepisie
-    const calories = ingredientData ? Math.round(ingredientData.calories_per_100g * ratio) : 0;
-    const protein = ingredientData
-      ? Number((ingredientData.protein_per_100g * ratio).toFixed(1))
-      : 0;
-    const carbs = ingredientData ? Number((ingredientData.carbs_per_100g * ratio).toFixed(1)) : 0;
-    const fat = ingredientData ? Number((ingredientData.fat_per_100g * ratio).toFixed(1)) : 0;
-
+  static toDTO(domain: Ingredient): NewIngredientDTO {
     return {
-      id: dto.id,
-      ingredientId: dto.ingredient_id,
-      name: ingredientData?.name || 'Składnik',
-      amountInGrams: amount,
-      macros: {
-        calories,
-        protein,
-        carbs,
-        fat
-      }
-    };
-  }
-
-  /**
-   * Mapuje model domeny Ingredient na DTO do zapisu w bazie
-   */
-  static toDTO(ingredient: Ingredient): Partial<NewIngredientDTO> {
-    return {
-      id: ingredient.id,
-      name: ingredient.name,
-      default_unit: ingredient.defaultUnit,
-      calories_per_100g: ingredient.macrosPer100g.calories,
-      protein_per_100g: ingredient.macrosPer100g.protein,
-      carbs_per_100g: ingredient.macrosPer100g.carbs,
-      fat_per_100g: ingredient.macrosPer100g.fat
+      id: domain.id || undefined,
+      name: domain.name,
+      category_id: domain.categoryId,
+      calories_per_100g: domain.macrosPer100g.calories,
+      protein_per_100g: domain.macrosPer100g.protein,
+      carbs_per_100g: domain.macrosPer100g.carbs,
+      fat_per_100g: domain.macrosPer100g.fat,
+      default_unit_id: domain.defaultUnitId || null // Zapisujemy UUID do kolumny w bazie
     };
   }
 }
