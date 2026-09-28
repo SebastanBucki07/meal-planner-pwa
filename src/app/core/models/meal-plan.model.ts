@@ -1,4 +1,4 @@
-import {NewRecipeDTO, Recipe} from './recipe.model';
+import { NewRecipeDTO, Recipe } from './recipe.model';
 
 export type MealType = 'Śniadanie' | 'II Śniadanie' | 'Obiad' | 'Kolacja' | 'Przekąska';
 

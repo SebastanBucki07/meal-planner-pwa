@@ -6,35 +6,45 @@
     (daySelected)="selectDay($event)"
     (prevWeek)="previousWeek()"
     (nextWeek)="nextWeek()"
-    (todayClicked)="goToToday()">
-  </app-planner-calendar>
+    (todayClicked)="goToToday()"
+  ></app-planner-calendar>
 
   <!-- 2. Makroskładniki -->
   @let currentDayString = selectedDate().toISOString().split('T')[0];
   <app-macro-summary
     [consumed]="getDailySummary(currentDayString)"
-    [targets]="targetSummary">
-  </app-macro-summary>
+    [targets]="targetSummary"
+  ></app-macro-summary>
 
   <!-- 3. Sloty Posiłków -->
   <main class="meals-list">
     @for (mealType of mealTypes; track mealType) {
-      <app-meal-slot
-        [mealType]="mealType"
-        [meals]="getMealsForSlot(currentDayString, mealType)"
-        (addMealClicked)="activeModalSlot.set($event)"
-        (removeMeal)="removeMeal($event)">
-      </app-meal-slot>
+    <app-meal-slot
+      [mealType]="mealType"
+      [meals]="getMealsForSlot(currentDayString, mealType)"
+      (addMealClicked)="activeModalSlot.set($event)"
+      (removeMeal)="removeMeal($event)"
+      (mealClicked)="openRecipeModal($event)"
+    ></app-meal-slot>
     }
   </main>
 
-  <!-- 4. Modal -->
+  <!-- 4. Modal wyboru przepisu -->
   @if (activeModalSlot(); as slot) {
-    <app-recipe-select-modal
-      [slotName]="slot"
-      [availableRecipes]="availableRecipes()"
-      (recipeSelected)="selectRecipeForSlot($event)"
-      (closeModal)="activeModalSlot.set(null)">
-    </app-recipe-select-modal>
+  <app-recipe-select-modal
+    [slotName]="slot"
+    [availableRecipes]="availableRecipes()"
+    (recipeSelected)="selectRecipeForSlot($event)"
+    (closeModal)="activeModalSlot.set(null)"
+  ></app-recipe-select-modal>
+  }
+
+  <!-- 5. Modal szczegółów przepisu -->
+  @if (selectedRecipeId(); as recipeId) {
+  <app-recipe-detail-modal
+    [recipeId]="recipeId"
+    [interactiveSteps]="false"
+    (closeModal)="closeRecipeModal()"
+  ></app-recipe-detail-modal>
   }
 </div>

@@ -101,7 +101,8 @@ $primary-blue: #2563eb;
       background: $primary-blue;
       border-color: $primary-blue;
 
-      .day-name, .day-date {
+      .day-name,
+      .day-date {
         color: #ffffff;
       }
     }

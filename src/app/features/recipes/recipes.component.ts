@@ -60,7 +60,11 @@ export class RecipesComponent implements OnInit, OnDestroy {
   }
 
   async changePage(newPage: number): Promise<void> {
-    if (newPage >= 1 && newPage <= this.recipeService.totalPages() && newPage !== this.currentPage) {
+    if (
+      newPage >= 1 &&
+      newPage <= this.recipeService.totalPages() &&
+      newPage !== this.currentPage
+    ) {
       this.currentPage = newPage;
       await this.loadData();
       window.scrollTo({ top: 0, behavior: 'smooth' });

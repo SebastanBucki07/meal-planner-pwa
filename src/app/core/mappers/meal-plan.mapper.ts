@@ -1,5 +1,5 @@
 import { RecipeMapper } from './recipe.mapper';
-import {MealPlan, NewMealPlanDTO} from '../models';
+import { MealPlan, NewMealPlanDTO } from '../models';
 
 export class MealPlanMapper {
   static toDomain(dto: NewMealPlanDTO): MealPlan {

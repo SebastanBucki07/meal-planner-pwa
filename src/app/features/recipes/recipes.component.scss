@@ -22,7 +22,9 @@
   background: #ffffff;
   border-radius: 16px;
   padding: 16px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 2px 4px -1px rgba(0, 0, 0, 0.03);
   margin-bottom: 20px;
   border: 1px solid #f3f4f6;
   box-sizing: border-box;
@@ -110,7 +112,9 @@
   border: 1px solid #f3f4f6;
   display: flex;
   flex-direction: column;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 
   .recipe-image {
     width: 100%;
@@ -196,7 +200,9 @@
     font-size: 0.85rem;
     padding: 10px;
     text-decoration: none;
-    transition: background 0.2s ease, color 0.2s ease;
+    transition:
+      background 0.2s ease,
+      color 0.2s ease;
 
     &:hover {
       background: #6366f1;

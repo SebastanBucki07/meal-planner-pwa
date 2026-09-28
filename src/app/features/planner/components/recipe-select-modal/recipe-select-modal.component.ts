@@ -33,7 +33,8 @@ export class RecipeSelectModalComponent {
     return this.availableRecipes().filter(r => {
       const matchesQuery = !query || r.title.toLowerCase().includes(query);
       const matchesKcal = maxKcal === null || maxKcal === undefined || r.calories <= maxKcal;
-      const matchesProtein = minProtein === null || minProtein === undefined || r.protein >= minProtein;
+      const matchesProtein =
+        minProtein === null || minProtein === undefined || r.protein >= minProtein;
       const matchesCarbs = minCarbs === null || minCarbs === undefined || r.carbs >= minCarbs;
       const matchesFat = minFat === null || minFat === undefined || r.fat >= minFat;
 

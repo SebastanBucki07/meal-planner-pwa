@@ -55,10 +55,18 @@ $primary-blue: #2563eb;
       border-radius: 4px;
       transition: width 0.3s ease;
 
-      &.cal { background: $primary-blue; }
-      &.protein { background: #ef4444; }
-      &.fat { background: #f59e0b; }
-      &.carbs { background: #10b981; }
+      &.cal {
+        background: $primary-blue;
+      }
+      &.protein {
+        background: #ef4444;
+      }
+      &.fat {
+        background: #f59e0b;
+      }
+      &.carbs {
+        background: #10b981;
+      }
     }
   }
 

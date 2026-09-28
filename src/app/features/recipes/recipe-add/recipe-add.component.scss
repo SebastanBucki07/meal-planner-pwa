@@ -4,7 +4,16 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 24px 16px;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    sans-serif;
   color: #1e293b;
   box-sizing: border-box;
 }
@@ -65,7 +74,9 @@
   outline: none;
   background-color: #ffffff;
   box-sizing: border-box;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 
   &:focus {
     border-color: #3b82f6;
@@ -193,11 +204,22 @@ textarea.form-control {
     text-transform: uppercase;
     color: #64748b;
 
-    .h-ing { flex: 2; }
-    .h-amt { flex: 0.8; }
-    .h-unit { flex: 1; }
-    .h-macro { flex: 1.5; text-align: right; }
-    .h-act { flex: 0 0 40px; }
+    .h-ing {
+      flex: 2;
+    }
+    .h-amt {
+      flex: 0.8;
+    }
+    .h-unit {
+      flex: 1;
+    }
+    .h-macro {
+      flex: 1.5;
+      text-align: right;
+    }
+    .h-act {
+      flex: 0 0 40px;
+    }
   }
 }
 
@@ -234,7 +256,9 @@ textarea.form-control {
     background-color: #ffffff;
     border: 1px solid #cbd5e1;
     border-radius: 8px;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    box-shadow:
+      0 10px 25px -5px rgba(0, 0, 0, 0.15),
+      0 8px 10px -6px rgba(0, 0, 0, 0.1);
 
     max-height: 200px;
     overflow-y: auto;
@@ -248,7 +272,9 @@ textarea.form-control {
       color: #1e293b;
       cursor: pointer;
       text-align: left;
-      transition: background-color 0.15s ease, color 0.15s ease;
+      transition:
+        background-color 0.15s ease,
+        color 0.15s ease;
 
       &:hover {
         background-color: #eff6ff;

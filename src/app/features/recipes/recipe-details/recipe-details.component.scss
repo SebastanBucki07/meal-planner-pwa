@@ -4,7 +4,16 @@
   max-width: 900px;
   margin: 0 auto;
   padding: 24px 16px 90px 16px; // Dodatkowe miejsce na dole pod navbar PWA
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    sans-serif;
   color: #1e293b;
   box-sizing: border-box;
 }
@@ -117,25 +126,33 @@
     &.kcal {
       background: #fdf2f8;
       border-color: #fbcfe8;
-      .value { color: #db2777; }
+      .value {
+        color: #db2777;
+      }
     }
 
     &.protein {
       background: #eff6ff;
       border-color: #bfdbfe;
-      .value { color: #2563eb; }
+      .value {
+        color: #2563eb;
+      }
     }
 
     &.carbs {
       background: #fefce8;
       border-color: #fef08a;
-      .value { color: #ca8a04; }
+      .value {
+        color: #ca8a04;
+      }
     }
 
     &.fat {
       background: #f0fdf4;
       border-color: #bbf7d0;
-      .value { color: #16a34a; }
+      .value {
+        color: #16a34a;
+      }
     }
   }
 }

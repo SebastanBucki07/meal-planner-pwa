@@ -11,7 +11,7 @@ import { PlannerCalendarComponent } from './components/planner-calendar/planner-
 import { MealSlotComponent } from './components/meal-slot/meal-slot.component';
 import { RecipeSelectModalComponent } from './components/recipe-select-modal/recipe-select-modal.component';
 import { MacroSummaryComponent } from '../../shared/components/macro-summary/macro-summary.component';
-
+import { RecipeDetailModalComponent } from '../../shared/components/recipe-detail-modal/recipe-detail-modal.component';
 
 @Component({
   selector: 'app-planner',
@@ -22,6 +22,7 @@ import { MacroSummaryComponent } from '../../shared/components/macro-summary/mac
     MealSlotComponent,
     MacroSummaryComponent,
     RecipeSelectModalComponent,
+    RecipeDetailModalComponent
   ],
   templateUrl: './planner.component.html',
   styleUrl: './planner.component.scss'
@@ -30,6 +31,7 @@ export class PlannerComponent implements OnInit {
   private supabase: SupabaseClient;
 
   selectedDate = signal<Date>(new Date());
+  selectedRecipeId = signal<string | null>(null);
   availableRecipes = signal<Recipe[]>([]);
   mealPlans = signal<MealPlan[]>([]);
   mealTypes: MealType[] = ['Śniadanie', 'II Śniadanie', 'Obiad', 'Kolacja', 'Przekąska'];
@@ -128,10 +130,10 @@ export class PlannerComponent implements OnInit {
     const endDate = days[6].dateString;
 
     const { data, error } = await this.supabase
-    .from('new_meal_plans')
-    .select(`*, new_recipes (*)`)
-    .gte('date', startDate)
-    .lte('date', endDate);
+      .from('new_meal_plans')
+      .select(`*, new_recipes (*)`)
+      .gte('date', startDate)
+      .lte('date', endDate);
 
     if (error) {
       console.error('Błąd pobierania planu posiłków:', error);
@@ -196,5 +198,14 @@ export class PlannerComponent implements OnInit {
     if (!error) {
       await this.fetchMealPlansForWeek();
     }
+  }
+  openRecipeModal(recipeId?: string | null): void {
+    if (recipeId) {
+      this.selectedRecipeId.set(recipeId);
+    }
+  }
+
+  closeRecipeModal(): void {
+    this.selectedRecipeId.set(null);
   }
 }

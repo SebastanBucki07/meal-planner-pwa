@@ -2,36 +2,38 @@ import { NewRecipeDTO, Recipe, RecipeIngredient } from '../models';
 
 export class RecipeMapper {
   static toDomain(dto: NewRecipeDTO & { new_recipe_ingredients?: any[] }): Recipe {
-    const mappedIngredients: RecipeIngredient[] = (dto.new_recipe_ingredients || []).map((ri: any) => {
-      const ingredientInfo = ri.new_ingredients || {};
+    const mappedIngredients: RecipeIngredient[] = (dto.new_recipe_ingredients || []).map(
+      (ri: any) => {
+        const ingredientInfo = ri.new_ingredients || {};
 
-      // Kluczowa zmiana: ilość to 'ri.amount', a waga do liczenia kalorii to 'ri.amount_in_grams'
-      const displayAmount = ri.amount ?? 1;
-      const totalGrams = ri.amount_in_grams || (displayAmount * 100);
+        // Kluczowa zmiana: ilość to 'ri.amount', a waga do liczenia kalorii to 'ri.amount_in_grams'
+        const displayAmount = ri.amount ?? 1;
+        const totalGrams = ri.amount_in_grams || displayAmount * 100;
 
-      const caloriesPer100g = ingredientInfo.calories_per_100g || 0;
-      const proteinPer100g = ingredientInfo.protein_per_100g || 0;
-      const carbsPer100g = ingredientInfo.carbs_per_100g || 0;
-      const fatPer100g = ingredientInfo.fat_per_100g || 0;
+        const caloriesPer100g = ingredientInfo.calories_per_100g || 0;
+        const proteinPer100g = ingredientInfo.protein_per_100g || 0;
+        const carbsPer100g = ingredientInfo.carbs_per_100g || 0;
+        const fatPer100g = ingredientInfo.fat_per_100g || 0;
 
-      const multiplier = totalGrams / 100;
-      const calculatedCalories = Math.round(caloriesPer100g * multiplier);
+        const multiplier = totalGrams / 100;
+        const calculatedCalories = Math.round(caloriesPer100g * multiplier);
 
-      return {
-        id: ri.id || '',
-        ingredientId: ri.ingredient_id || ingredientInfo.id || '',
-        amountInGrams: displayAmount, // <--- Tutaj trafia "1", a nie "400" czy "100"
-        name: ingredientInfo.name || 'Składnik',
-        unit: ri.unit || 'g',
-        calories: calculatedCalories,
-        macros: {
+        return {
+          id: ri.id || '',
+          ingredientId: ri.ingredient_id || ingredientInfo.id || '',
+          amountInGrams: displayAmount, // <--- Tutaj trafia "1", a nie "400" czy "100"
+          name: ingredientInfo.name || 'Składnik',
+          unit: ri.unit || 'g',
           calories: calculatedCalories,
-          protein: Number((proteinPer100g * multiplier).toFixed(1)),
-          carbs: Number((carbsPer100g * multiplier).toFixed(1)),
-          fat: Number((fatPer100g * multiplier).toFixed(1))
-        }
-      };
-    });
+          macros: {
+            calories: calculatedCalories,
+            protein: Number((proteinPer100g * multiplier).toFixed(1)),
+            carbs: Number((carbsPer100g * multiplier).toFixed(1)),
+            fat: Number((fatPer100g * multiplier).toFixed(1))
+          }
+        };
+      }
+    );
 
     return {
       id: dto.id,

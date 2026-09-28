@@ -2,7 +2,6 @@ import { Routes } from '@angular/router';
 import { AuthComponent } from './features/auth/auth.component';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
 import { authGuard } from './core/guards/auth.guard';
-import {RECIPE_ROUTES} from './features/recipes/recipes.routes';
 
 export const routes: Routes = [
   // Ekran Logowania / Rejestracji (Publiczny)
@@ -30,10 +29,10 @@ export const routes: Routes = [
       },
       {
         path: 'recipes',
-        loadChildren: () => import('./features/recipes/recipes.routes').then(m => RECIPE_ROUTES)
+        loadChildren: () => import('./features/recipes/recipes.routes').then(m => m.RECIPE_ROUTES)
       },
       {
-        path: 'shopping-list', // <-- ZMIENIONE: 'shopping' -> 'shopping-list'
+        path: 'shopping-list',
         loadComponent: () =>
           import('./features/shopping/shopping.component').then(m => m.ShoppingComponent)
       },

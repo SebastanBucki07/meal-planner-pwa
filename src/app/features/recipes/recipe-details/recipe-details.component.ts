@@ -2,10 +2,8 @@ import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
-import {Recipe} from '../../../core/models';
-import {RecipeService} from '../../../core/services/recipe.service';
-
-
+import { Recipe } from '../../../core/models';
+import { RecipeService } from '../../../core/services/recipe.service';
 
 @Component({
   selector: 'app-recipe-details',
@@ -40,10 +38,10 @@ export class RecipeDetailsComponent implements OnInit {
     }
     // Oczyszczanie linii i usuwanie prefiksów typu "Krok X:" w TS zamiast w HTML
     this.formattedSteps = instructions
-    .split('\n')
-    .map(line => line.trim())
-    .filter(line => line.length > 0)
-    .map(line => line.replace(/^Krok\s*\d+:\s*/i, ''));
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line.length > 0)
+      .map(line => line.replace(/^Krok\s*\d+:\s*/i, ''));
   }
 
   // Pomocniczegettery bezpiecznie obsługujące różne warianty pól w RecipeIngredient

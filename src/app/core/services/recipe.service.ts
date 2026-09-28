@@ -3,7 +3,7 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { environment } from '../../../environment';
 import { RecipeMapper } from '../mappers/recipe.mapper';
 import { IngredientMapper } from '../mappers/ingredient.mapper';
-import {Ingredient, NewIngredientDTO, NewRecipeDTO, Recipe} from '../models';
+import { Ingredient, NewIngredientDTO, NewRecipeDTO, Recipe } from '../models';
 
 export interface RecipeFilterParams {
   searchTerm: string;
@@ -38,9 +38,9 @@ export class RecipeService {
     this.loading.set(true);
 
     let query = this.supabase
-    .from('new_recipes')
-    .select('*, new_recipe_ingredients(*, new_ingredients(*))', { count: 'exact' })
-    .order('created_at', { ascending: false });
+      .from('new_recipes')
+      .select('*, new_recipe_ingredients(*, new_ingredients(*))', { count: 'exact' })
+      .order('created_at', { ascending: false });
 
     if (params.searchTerm) {
       query = query.ilike('title', `%${params.searchTerm}%`);
@@ -82,8 +82,9 @@ export class RecipeService {
 
   async getRecipeById(id: string): Promise<Recipe | null> {
     const { data, error } = await this.supabase
-    .from('new_recipes')
-    .select(`
+      .from('new_recipes')
+      .select(
+        `
         *,
         new_recipe_ingredients (
           id,
@@ -98,9 +99,10 @@ export class RecipeService {
             fat_per_100g
           )
         )
-      `)
-    .eq('id', id)
-    .single();
+      `
+      )
+      .eq('id', id)
+      .single();
 
     if (error || !data) {
       console.error('Błąd pobierania przepisu po ID:', error);
@@ -115,9 +117,9 @@ export class RecipeService {
    */
   async getIngredients(): Promise<Ingredient[]> {
     const { data, error } = await this.supabase
-    .from('new_ingredients')
-    .select('*')
-    .order('name', { ascending: true });
+      .from('new_ingredients')
+      .select('*')
+      .order('name', { ascending: true });
 
     if (error) {
       console.error('Błąd podczas pobierania składników:', error);
@@ -126,6 +128,4 @@ export class RecipeService {
 
     return (data as NewIngredientDTO[]).map(dto => IngredientMapper.toDomain(dto));
   }
-
-
 }

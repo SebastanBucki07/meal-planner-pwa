@@ -9,8 +9,7 @@ describe('MacroSummaryComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [MacroSummaryComponent]
-    })
-    .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(MacroSummaryComponent);
     component = fixture.componentInstance;

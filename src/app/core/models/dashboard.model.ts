@@ -7,12 +7,13 @@ export interface DaySummary {
 
 export interface DashboardMealItem {
   id: string;
+  recipeId?: string | null; // <-- Dodaj tę właściwość
   name: string;
   calories: number;
-  protein: number;      // <-- nowość
-  carbs: number;        // <-- nowość
-  fat: number;          // <-- nowość
-  imageUrl?: string;    // <-- nowość
+  protein: number;
+  carbs: number;
+  fat: number;
+  imageUrl?: string | null;
   completed: boolean;
   mealType?: string;
 }

@@ -1,6 +1,6 @@
 <section class="macro-summary-card">
   @if (title()) {
-    <h2 class="card-title">{{ title() }}</h2>
+  <h2 class="card-title">{{ title() }}</h2>
   }
 
   <!-- Główne Kalorie -->
@@ -8,7 +8,8 @@
     <div class="macro-label-group">
       <span class="macro-title">Kalorie</span>
       <span class="macro-values">
-        <strong>{{ consumed().calories }}</strong> / {{ targets().calories }} kcal
+        <strong>{{ consumed().calories }}</strong>
+        / {{ targets().calories }} kcal
       </span>
     </div>
     <div class="progress-bar-bg main-bar">
@@ -22,7 +23,10 @@
     <div class="macro-item">
       <div class="macro-label-group">
         <span class="macro-title">Białko</span>
-        <span class="macro-values"><strong>{{ consumed().protein }}</strong> / {{ targets().protein }}g</span>
+        <span class="macro-values">
+          <strong>{{ consumed().protein }}</strong>
+          / {{ targets().protein }}g
+        </span>
       </div>
       <div class="progress-bar-bg">
         <div class="progress-bar-fill protein" [style.width.%]="progress().proteinPct"></div>
@@ -33,7 +37,10 @@
     <div class="macro-item">
       <div class="macro-label-group">
         <span class="macro-title">Tłuszcze</span>
-        <span class="macro-values"><strong>{{ consumed().fat }}</strong> / {{ targets().fat }}g</span>
+        <span class="macro-values">
+          <strong>{{ consumed().fat }}</strong>
+          / {{ targets().fat }}g
+        </span>
       </div>
       <div class="progress-bar-bg">
         <div class="progress-bar-fill fat" [style.width.%]="progress().fatPct"></div>
@@ -44,7 +51,10 @@
     <div class="macro-item">
       <div class="macro-label-group">
         <span class="macro-title">Węgle</span>
-        <span class="macro-values"><strong>{{ consumed().carbs }}</strong> / {{ targets().carbs }}g</span>
+        <span class="macro-values">
+          <strong>{{ consumed().carbs }}</strong>
+          / {{ targets().carbs }}g
+        </span>
       </div>
       <div class="progress-bar-bg">
         <div class="progress-bar-fill carbs" [style.width.%]="progress().carbsPct"></div>

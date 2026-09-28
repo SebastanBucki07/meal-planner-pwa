@@ -1,5 +1,4 @@
-
-import {Unit, UnitDto} from '../models/';
+import { Unit, UnitDto } from '../models/';
 
 export class UnitMapper {
   static toDomain(dto: UnitDto): Unit {

@@ -1,9 +1,4 @@
-import {
-  Ingredient,
-  RecipeIngredient,
-  NewIngredientDTO,
-  NewRecipeIngredientDTO
-} from '../models/';
+import { Ingredient, RecipeIngredient, NewIngredientDTO, NewRecipeIngredientDTO } from '../models/';
 
 export class IngredientMapper {
   /**
@@ -33,7 +28,9 @@ export class IngredientMapper {
 
     // Przeliczenie makr proporcjonalnie do gramatury w przepisie
     const calories = ingredientData ? Math.round(ingredientData.calories_per_100g * ratio) : 0;
-    const protein = ingredientData ? Number((ingredientData.protein_per_100g * ratio).toFixed(1)) : 0;
+    const protein = ingredientData
+      ? Number((ingredientData.protein_per_100g * ratio).toFixed(1))
+      : 0;
     const carbs = ingredientData ? Number((ingredientData.carbs_per_100g * ratio).toFixed(1)) : 0;
     const fat = ingredientData ? Number((ingredientData.fat_per_100g * ratio).toFixed(1)) : 0;
 

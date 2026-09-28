@@ -13,8 +13,9 @@ export class MealSlotComponent {
   mealType = input.required<MealType>();
   meals = input.required<MealPlan[]>();
 
+  mealClicked = output<string | null | undefined>();
   addMealClicked = output<MealType>();
-  removeMeal = output<any>();
+  removeMeal = output<string>();
 
   onImageError(event: Event): void {
     const img = event.target as HTMLImageElement;
@@ -22,6 +23,20 @@ export class MealSlotComponent {
     const sibling = img.nextElementSibling as HTMLElement;
     if (sibling) {
       sibling.style.display = 'flex';
+    }
+  }
+
+  onMealClick(meal: MealPlan): void {
+    console.log('Kliknięty posiłek:', meal);
+
+    // Sprawdzamy wszystkie możliwe ścieżki do ID przepisu
+    const recipeId = meal.recipe?.id || meal.recipeId || (meal as any).recipe_id;
+    console.log('Wyciągnięte recipeId:', recipeId);
+
+    if (recipeId) {
+      this.mealClicked.emit(recipeId);
+    } else {
+      console.warn('Ten posiłek nie posiada powiązanego przepisu (np. posiłek własny).');
     }
   }
 }

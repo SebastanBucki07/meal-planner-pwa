@@ -40,11 +40,11 @@ export class DashboardService {
 
       // 1. Historia wagi
       const { data: weightData, error: weightError } = await this.supabase
-      .from('new_weight_logs')
-      .select('id, user_id, weight, date, logged_at')
-      .eq('user_id', user.id)
-      .order('logged_at', { ascending: true })
-      .limit(30);
+        .from('new_weight_logs')
+        .select('id, user_id, weight, date, logged_at')
+        .eq('user_id', user.id)
+        .order('logged_at', { ascending: true })
+        .limit(30);
 
       if (!weightError && weightData) {
         const dtoList = weightData as NewWeightLogDTO[];
@@ -62,15 +62,18 @@ export class DashboardService {
         this.weightHistory.set(domainList);
       }
 
-      // 2. Dzisiejsze posiłki (z nowymi polami image_url oraz makro)
+      // 2. Dzisiejsze posiłki (z dołączonym recipe_id)
       const { data: mealData, error: mealError } = await this.supabase
-      .from('new_meal_plans')
-      .select('id, calories, protein, carbs, fat, completed, custom_name, meal_type, new_recipes(title, image_url)')
-      .eq('date', todayStr);
+        .from('new_meal_plans')
+        .select(
+          'id, recipe_id, calories, protein, carbs, fat, completed, custom_name, meal_type, new_recipes(id, title, image_url)'
+        )
+        .eq('date', todayStr);
 
       if (!mealError && mealData) {
         const mealsList: DashboardMealItem[] = mealData.map((dto: any) => ({
           id: dto.id || '',
+          recipeId: dto.recipe_id || dto.new_recipes?.id || null, // <-- Dodane przekazywanie ID przepisu
           name: dto.new_recipes?.title || dto.custom_name || 'Posiłek',
           calories: Math.round(dto.calories || 0),
           protein: Math.round(dto.protein || 0),
@@ -83,7 +86,7 @@ export class DashboardService {
 
         this.todayMeals.set(mealsList);
 
-        // Podsumowanie makro na dziś...
+        // Podsumowanie makro na dziś
         const summary = mealData.reduce<DaySummary>(
           (acc, meal: any) => ({
             calories: acc.calories + Math.round(meal.calories || 0),
@@ -126,9 +129,9 @@ export class DashboardService {
     }
 
     await this.supabase
-    .from('new_profiles')
-    .update({ weight: weight, updated_at: new Date().toISOString() })
-    .eq('id', userId);
+      .from('new_profiles')
+      .update({ weight: weight, updated_at: new Date().toISOString() })
+      .eq('id', userId);
 
     await this.loadDashboardData();
     return true;
@@ -136,9 +139,9 @@ export class DashboardService {
 
   async toggleMealCompleted(mealId: string, completed: boolean): Promise<void> {
     const { error } = await this.supabase
-    .from('new_meal_plans')
-    .update({ completed })
-    .eq('id', mealId);
+      .from('new_meal_plans')
+      .update({ completed })
+      .eq('id', mealId);
 
     if (!error) {
       await this.loadDashboardData();

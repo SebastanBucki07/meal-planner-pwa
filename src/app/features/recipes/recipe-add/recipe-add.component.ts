@@ -40,10 +40,10 @@ export class RecipeAddComponent implements OnInit {
   private supabase: SupabaseClient;
 
   // Pola formularza
-  title: string = '';
-  description: string = '';
-  imageUrl: string = '';
-  videoUrl: string = '';
+  title = '';
+  description = '';
+  imageUrl = '';
+  videoUrl = '';
 
   availableUnits: Unit[] = [];
   availableIngredients: Ingredient[] = [];
@@ -67,9 +67,9 @@ export class RecipeAddComponent implements OnInit {
 
   async fetchUnits(): Promise<void> {
     const { data, error } = await this.supabase
-    .from('new_units')
-    .select('*')
-    .order('name', { ascending: true });
+      .from('new_units')
+      .select('*')
+      .order('name', { ascending: true });
 
     if (error) {
       console.error('Błąd pobierania jednostek z new_units:', error);
@@ -80,9 +80,9 @@ export class RecipeAddComponent implements OnInit {
 
   async fetchIngredients(): Promise<void> {
     const { data, error } = await this.supabase
-    .from('new_ingredients') // Dostosuj nazwę tabeli ze składnikami jeśli jest inna, np. 'new_ingredients'
-    .select('*')
-    .order('name', { ascending: true });
+      .from('new_ingredients') // Dostosuj nazwę tabeli ze składnikami jeśli jest inna, np. 'new_ingredients'
+      .select('*')
+      .order('name', { ascending: true });
 
     if (error) {
       console.error('Błąd pobierania składników:', error);
@@ -157,7 +157,9 @@ export class RecipeAddComponent implements OnInit {
   }
 
   calculateRowMacro(row: RecipeIngredientFormRow): void {
-    const ingredient: any = this.availableIngredients.find((ing: any) => ing.id === row.ingredientId);
+    const ingredient: any = this.availableIngredients.find(
+      (ing: any) => ing.id === row.ingredientId
+    );
     const unitObj = this.availableUnits.find((u: Unit) => u.name === row.unit);
 
     if (!ingredient || !row.amount) {
@@ -227,9 +229,9 @@ export class RecipeAddComponent implements OnInit {
     }
 
     const instructionsCombined = this.stepRows
-    .filter(step => step.instruction.trim() !== '')
-    .map((step, index) => `Krok ${index + 1}: ${step.instruction}`)
-    .join('\n');
+      .filter(step => step.instruction.trim() !== '')
+      .map((step, index) => `Krok ${index + 1}: ${step.instruction}`)
+      .join('\n');
 
     const recipePayload = RecipeMapper.toInsertDto({
       title: this.title,
@@ -245,10 +247,10 @@ export class RecipeAddComponent implements OnInit {
 
     // 1. Zapisz główny przepis i pobierz jego nowe ID
     const { data: insertedRecipe, error: recipeError } = await this.supabase
-    .from('new_recipes')
-    .insert([recipePayload])
-    .select('id')
-    .single();
+      .from('new_recipes')
+      .insert([recipePayload])
+      .select('id')
+      .single();
 
     if (recipeError || !insertedRecipe) {
       console.error('Błąd podczas zapisywania przepisu:', recipeError);
@@ -260,25 +262,25 @@ export class RecipeAddComponent implements OnInit {
 
     // 2. Przygotuj wiersze składników do tabeli łącznikowej `new_recipe_ingredients`
     const validIngredients = this.ingredientRows
-    .filter(row => row.ingredientId && row.amount > 0)
-    .map(row => {
-      const unitObj = this.availableUnits.find(u => u.name === row.unit);
-      const multiplier = unitObj ? unitObj.multiplierToGrams : 1;
+      .filter(row => row.ingredientId && row.amount > 0)
+      .map(row => {
+        const unitObj = this.availableUnits.find(u => u.name === row.unit);
+        const multiplier = unitObj ? unitObj.multiplierToGrams : 1;
 
-      return {
-        recipe_id: recipeId,
-        ingredient_id: row.ingredientId,
-        amount: row.amount, // <--- Czysta liczba z formularza (np. 1)
-        amount_in_grams: row.amount * multiplier, // <--- Waga w gramach (np. 150)
-        unit: row.unit || 'g'
-      };
-    });
+        return {
+          recipe_id: recipeId,
+          ingredient_id: row.ingredientId,
+          amount: row.amount, // <--- Czysta liczba z formularza (np. 1)
+          amount_in_grams: row.amount * multiplier, // <--- Waga w gramach (np. 150)
+          unit: row.unit || 'g'
+        };
+      });
 
     // 3. Wstaw powiązane składniki, jeśli zostały wybrane
     if (validIngredients.length > 0) {
       const { error: ingredientsError } = await this.supabase
-      .from('new_recipe_ingredients')
-      .insert(validIngredients);
+        .from('new_recipe_ingredients')
+        .insert(validIngredients);
 
       if (ingredientsError) {
         console.error('Błąd podczas zapisywania składników przepisu:', ingredientsError);
