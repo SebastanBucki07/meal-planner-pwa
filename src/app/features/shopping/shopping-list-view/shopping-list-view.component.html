@@ -1,0 +1,54 @@
+<div class="shopping-list-wrapper">
+  <!-- Formularz szybkiego dodawania produktu -->
+  <div class="quick-add-section">
+    <h3>Dodaj produkt do listy</h3>
+    <div class="quick-add-form">
+      <input
+        type="text"
+        [(ngModel)]="newItemName"
+        placeholder="Nazwa (np. Płyn do naczyń)"
+        class="input-name"
+      />
+      <input
+        type="number"
+        [(ngModel)]="newItemAmount"
+        placeholder="Ilość"
+        class="input-amount"
+        min="0.1"
+        step="any"
+      />
+      <input type="text" [(ngModel)]="newItemUnit" placeholder="Jednostka" class="input-unit" />
+      <select [(ngModel)]="selectedCategory" class="select-category">
+        <option value="" disabled selected>Wybierz kategorię</option>
+        @for (cat of categories; track cat.id) {
+        <option [value]="cat.name">{{ cat.name }}</option>
+        }
+      </select>
+      <button type="button" class="btn-add" (click)="onAddCustomItem()">Dodaj</button>
+    </div>
+  </div>
+
+  <!-- Poprawnie grupowana lista zakupów (zgodna z Twoim oryginalnym modelem) -->
+  <div class="list-container">
+    @for (group of list.categories; track group.categoryName) {
+    <div class="category-section" [ngClass]="getCategoryClass(group.categoryName)">
+      <h2>{{ group.categoryName }}</h2>
+      @for (item of group.items; track item.id || item.name) {
+      <div class="ingredient-item">
+        <input
+          type="checkbox"
+          [checked]="item.checked"
+          (change)="toggleItem(item)"
+          [id]="'item-' + item.name + '-' + item.id"
+        />
+        <label [class.checked]="item.checked" [for]="'item-' + item.name + '-' + item.id">
+          {{ item.name }} – {{ item.amount }} {{ item.unit }}
+        </label>
+      </div>
+      }
+    </div>
+    } @empty {
+    <div class="empty-state">Brak produktów na liście.</div>
+    }
+  </div>
+</div>

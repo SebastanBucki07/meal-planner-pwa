@@ -1,0 +1,25 @@
+.dashboard-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 24px 16px;
+
+  h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 24px;
+  }
+}
+
+.loading-state {
+  text-align: center;
+  padding: 40px;
+  color: #64748b;
+  font-size: 16px;
+}
+
+.dashboard-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}

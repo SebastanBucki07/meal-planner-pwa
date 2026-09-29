@@ -1,0 +1,735 @@
+.ingredients-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 16px 90px 16px; /* Odstęp na dole pod paski nawigacji PWA */
+  box-sizing: border-box;
+  font-family: inherit;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #111827;
+      margin: 0;
+
+      @media (min-width: 480px) {
+        font-size: 1.75rem;
+      }
+    }
+  }
+}
+
+.btn-primary {
+  background: #6366f1;
+  color: #ffffff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.1s ease;
+
+  &:hover {
+    background: #4f46e5;
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+/* Wyszukiwarka i Pigułki Kategorii */
+.filters-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 14px;
+  margin-bottom: 24px;
+  border: 1px solid #f3f4f6;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+  box-sizing: border-box;
+  width: 100%;
+
+  .search-input {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 0.95rem;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    outline: none;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+
+    &:focus {
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    }
+  }
+
+  /* Pigułki kategorii zawijane wewnątrz karty */
+  .category-chips {
+    display: flex;
+    flex-wrap: wrap; /* Zawija pigułki do kolejnego wiersza, zapobiegając ucinaniu */
+    gap: 8px;
+    margin-top: 12px;
+    width: 100%;
+    box-sizing: border-box;
+
+    .chip {
+      white-space: nowrap;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      color: #475569;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: #f1f5f9;
+      }
+
+      &.active {
+        background: #6366f1;
+        color: #ffffff;
+        border-color: #6366f1;
+      }
+
+      /* Dynamiczne kolory aktywnego stanu chipów */
+      &.category-bakery.active {
+        background: #d97706;
+        border-color: #d97706;
+        color: #fff;
+      }
+      &.category-vegetables.active {
+        background: #10b981;
+        border-color: #10b981;
+        color: #fff;
+      }
+      &.category-fruits.active {
+        background: #84cc16;
+        border-color: #84cc16;
+        color: #fff;
+      }
+      &.category-dairy.active {
+        background: #06b6d4;
+        border-color: #06b6d4;
+        color: #fff;
+      }
+      &.category-cheese.active {
+        background: #eab308;
+        border-color: #eab308;
+        color: #fff;
+      }
+      &.category-cold-cuts.active {
+        background: #e11d48;
+        border-color: #e11d48;
+        color: #fff;
+      }
+      &.category-meat.active {
+        background: #ef4444;
+        border-color: #ef4444;
+        color: #fff;
+      }
+      &.category-fish.active {
+        background: #0ea5e9;
+        border-color: #0ea5e9;
+        color: #fff;
+      }
+      &.category-frozen.active {
+        background: #38bdf8;
+        border-color: #38bdf8;
+        color: #fff;
+      }
+      &.category-grains.active {
+        background: #ca8a04;
+        border-color: #ca8a04;
+        color: #fff;
+      }
+      &.category-cans.active {
+        background: #64748b;
+        border-color: #64748b;
+        color: #fff;
+      }
+      &.category-spices.active {
+        background: #8b5cf6;
+        border-color: #8b5cf6;
+        color: #fff;
+      }
+      &.category-chemia.active {
+        background: #2563eb;
+        border-color: #2563eb;
+        color: #fff;
+      }
+      &.category-higiena.active {
+        background: #ec4899;
+        border-color: #ec4899;
+        color: #fff;
+      }
+      &.category-dom.active {
+        background: #f59e0b;
+        border-color: #f59e0b;
+        color: #fff;
+      }
+      &.category-alcohol.active {
+        background: #9333ea;
+        border-color: #9333ea;
+        color: #fff;
+      }
+      &.category-kids.active {
+        background: #f43f5e;
+        border-color: #f43f5e;
+        color: #fff;
+      }
+      &.category-snacks.active {
+        background: #f97316;
+        border-color: #f97316;
+        color: #fff;
+      }
+      &.category-beverages.active {
+        background: #14b8a6;
+        border-color: #14b8a6;
+        color: #fff;
+      }
+      &.category-coffee.active {
+        background: #78350f;
+        border-color: #78350f;
+        color: #fff;
+      }
+    }
+  }
+}
+
+/* Sekcje Kategorii z kolorowymi akcentami */
+/* Sekcje Kategorii z kolorowymi akcentami i tłem kart */
+.category-section {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 28px;
+  border: 1px solid #f3f4f6;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+
+  /* Piekarnik / Pieczywo */
+  &.category-bakery {
+    border-left: 5px solid #d97706;
+    .category-header h2 {
+      color: #92400e;
+    }
+    .ingredient-card {
+      background: #fffbeb;
+      border-color: #fde68a;
+    }
+  }
+  /* Warzywa */
+  &.category-vegetables {
+    border-left: 5px solid #10b981;
+    .category-header h2 {
+      color: #047857;
+    }
+    .ingredient-card {
+      background: #ecfdf5;
+      border-color: #a7f3d0;
+    }
+  }
+  /* Owoce */
+  &.category-fruits {
+    border-left: 5px solid #84cc16;
+    .category-header h2 {
+      color: #4d7c0f;
+    }
+    .ingredient-card {
+      background: #f7fee7;
+      border-color: #d9f99d;
+    }
+  }
+  /* Nabiał */
+  &.category-dairy {
+    border-left: 5px solid #06b6d4;
+    .category-header h2 {
+      color: #0e7490;
+    }
+    .ingredient-card {
+      background: #ecfeff;
+      border-color: #a5f3fc;
+    }
+  }
+  /* Sery */
+  &.category-cheese {
+    border-left: 5px solid #eab308;
+    .category-header h2 {
+      color: #a16207;
+    }
+    .ingredient-card {
+      background: #fefce8;
+      border-color: #fef08a;
+    }
+  }
+  /* Wędliny */
+  &.category-cold-cuts {
+    border-left: 5px solid #e11d48;
+    .category-header h2 {
+      color: #9f1239;
+    }
+    .ingredient-card {
+      background: #fff1f2;
+      border-color: #fecdd3;
+    }
+  }
+  /* Mięso */
+  &.category-meat {
+    border-left: 5px solid #ef4444;
+    .category-header h2 {
+      color: #b91c1c;
+    }
+    .ingredient-card {
+      background: #fef2f2;
+      border-color: #fecaca;
+    }
+  }
+  /* Ryby */
+  &.category-fish {
+    border-left: 5px solid #0ea5e9;
+    .category-header h2 {
+      color: #0369a1;
+    }
+    .ingredient-card {
+      background: #f0f9ff;
+      border-color: #bae6fd;
+    }
+  }
+  /* Mrożonki */
+  &.category-frozen {
+    border-left: 5px solid #38bdf8;
+    .category-header h2 {
+      color: #0369a1;
+    }
+    .ingredient-card {
+      background: #f0fdf4;
+      border-color: #e0f2fe;
+    }
+  }
+  /* Ryże / Kasze / Makarony */
+  &.category-grains {
+    border-left: 5px solid #ca8a04;
+    .category-header h2 {
+      color: #854d0e;
+    }
+    .ingredient-card {
+      background: #fefce8;
+      border-color: #fef08a;
+    }
+  }
+  /* Konserwy */
+  &.category-cans {
+    border-left: 5px solid #64748b;
+    .category-header h2 {
+      color: #334155;
+    }
+    .ingredient-card {
+      background: #f8fafc;
+      border-color: #e2e8f0;
+    }
+  }
+  /* Przyprawy */
+  &.category-spices {
+    border-left: 5px solid #8b5cf6;
+    .category-header h2 {
+      color: #6d28d9;
+    }
+    .ingredient-card {
+      background: #f5f3ff;
+      border-color: #ddd6fe;
+    }
+  }
+  /* Chemia domowa */
+  &.category-chemia {
+    border-left: 5px solid #2563eb;
+    .category-header h2 {
+      color: #1e40af;
+    }
+    .ingredient-card {
+      background: #eff6ff;
+      border-color: #bfdbfe;
+    }
+  }
+  /* Higiena */
+  &.category-higiena {
+    border-left: 5px solid #ec4899;
+    .category-header h2 {
+      color: #be185d;
+    }
+    .ingredient-card {
+      background: #fdf2f8;
+      border-color: #fbcfe8;
+    }
+  }
+  /* Dom i kuchnia */
+  &.category-dom {
+    border-left: 5px solid #f59e0b;
+    .category-header h2 {
+      color: #b45309;
+    }
+    .ingredient-card {
+      background: #fffbeb;
+      border-color: #fde68a;
+    }
+  }
+  /* Alkohole */
+  &.category-alcohol {
+    border-left: 5px solid #9333ea;
+    .category-header h2 {
+      color: #6b21a8;
+    }
+    .ingredient-card {
+      background: #faf5ff;
+      border-color: #e9d5ff;
+    }
+  }
+  /* Dziecięce */
+  &.category-kids {
+    border-left: 5px solid #f43f5e;
+    .category-header h2 {
+      color: #9f1239;
+    }
+    .ingredient-card {
+      background: #fff1f2;
+      border-color: #fecdd3;
+    }
+  }
+  /* Chipsy i przekąski */
+  &.category-snacks {
+    border-left: 5px solid #f97316;
+    .category-header h2 {
+      color: #c2410c;
+    }
+    .ingredient-card {
+      background: #fff7ed;
+      border-color: #fed7aa;
+    }
+  }
+  /* Napoje */
+  &.category-beverages {
+    border-left: 5px solid #14b8a6;
+    .category-header h2 {
+      color: #0f766e;
+    }
+    .ingredient-card {
+      background: #f0fdfa;
+      border-color: #99f6e4;
+    }
+  }
+  /* Kawa i herbata */
+  &.category-coffee {
+    border-left: 5px solid #78350f;
+    .category-header h2 {
+      color: #451a03;
+    }
+    .ingredient-card {
+      background: #fdf8f6;
+      border-color: #e7d5ce;
+    }
+  }
+  /* Domyślny */
+  &.category-default {
+    border-left: 5px solid #94a3b8;
+    .category-header h2 {
+      color: #475569;
+    }
+    .ingredient-card {
+      background: #f8fafc;
+      border-color: #e2e8f0;
+    }
+  }
+
+  .category-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #f1f5f9;
+
+    h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .count-badge {
+      background: #e0e7ff;
+      color: #4338ca;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 12px;
+    }
+  }
+}
+
+/* Siatka kart składników */
+.ingredients-grid {
+  display: grid;
+  grid-template-columns: 100%;
+  gap: 12px;
+
+  @media (min-width: 550px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 900px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.ingredient-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 14px;
+  border: 1px solid #f3f4f6;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  .card-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+    gap: 8px;
+
+    h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #1f2937;
+      margin: 0;
+      word-break: break-word;
+    }
+
+    .unit-badge {
+      font-size: 0.75rem;
+      background: #f1f5f9;
+      color: #64748b;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+  }
+
+  .macros-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    background: #f8fafc;
+    padding: 8px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+
+    .macro-box {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+
+      .val {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #334155;
+      }
+
+      .label {
+        font-size: 0.68rem;
+        color: #64748b;
+      }
+
+      &.kcal .val {
+        color: #d97706;
+      }
+    }
+  }
+
+  .btn-edit {
+    width: 100%;
+    background: #f3f4f6;
+    border: none;
+    padding: 8px;
+    border-radius: 8px;
+    color: #4b5563;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: #6366f1;
+      color: #ffffff;
+    }
+  }
+}
+
+/* Modal Dodawania / Edycji Składnika */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+}
+
+.modal-container {
+  background: #ffffff;
+  border-radius: 20px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 90dvh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  padding: 20px;
+  box-sizing: border-box;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+  h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0 0 16px 0;
+    color: #0f172a;
+  }
+}
+
+.btn-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: #f1f5f9;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #64748b;
+  font-weight: bold;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+  min-width: 0;
+
+  label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #334155;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  input,
+  select {
+    width: 100%;
+    min-width: 0;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    outline: none;
+    font-family: inherit;
+    box-sizing: border-box;
+
+    &:focus {
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    }
+  }
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+
+  &.macros-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+
+  button {
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    border: none;
+    font-family: inherit;
+    transition: background 0.2s ease;
+  }
+
+  .btn-cancel {
+    background: #f1f5f9;
+    color: #64748b;
+
+    &:hover {
+      background: #e2e8f0;
+    }
+  }
+
+  .btn-save {
+    background: #6366f1;
+    color: #ffffff;
+
+    &:hover:not(:disabled) {
+      background: #4f46e5;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.empty-state,
+.loading {
+  text-align: center;
+  padding: 36px 16px;
+  color: #64748b;
+  font-size: 0.95rem;
+  background: #f9fafb;
+  border-radius: 12px;
+  border: 1px dashed #e5e7eb;
+}

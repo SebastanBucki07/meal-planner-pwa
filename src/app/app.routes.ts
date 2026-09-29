@@ -1,30 +1,54 @@
 import { Routes } from '@angular/router';
-import { AuthComponent } from './components/auth/auth.component';
-import { DashboardComponent } from './components/dashboard/dashboard.component';
-import { authGuard } from './guards/auth.guard';
-import { RecipesComponent } from './recipes/recipes.component';
-import { AddRecipeComponent } from './recipes/add-recipe/add-recipe.component';
-import { RecipeDetailsComponent } from './recipes/recipe-details/recipe-details.component';
-import { ProfileComponent } from './components/profile/profile.component';
-import { PlanComponent } from './components/plan/plan.component';
-import { ShoppingListComponent } from './components/shopping-list/shopping-list.component';
-import { AddIngredientComponent } from './components/add-ingredient/add-ingredient.component'; // Import
+import { AuthComponent } from './features/auth/auth.component';
+import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
+import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-  { path: 'auth', component: AuthComponent },
-  { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
-  { path: 'recipes/add', component: AddRecipeComponent, canActivate: [authGuard] },
-  { path: 'recipes/:id', component: RecipeDetailsComponent, canActivate: [authGuard] },
-  { path: 'recipes', component: RecipesComponent, canActivate: [authGuard] },
-  { path: 'profile', component: ProfileComponent },
-  { path: 'plan', component: PlanComponent },
-  { path: 'shopping-list', component: ShoppingListComponent, canActivate: [authGuard] },
+  // Ekran Logowania / Rejestracji (Publiczny)
   {
-    path: 'add-ingredient',
-    component: AddIngredientComponent,
-    canActivate: [authGuard]
+    path: 'auth',
+    component: AuthComponent
   },
 
+  // Chroniona część aplikacji
+  {
+    path: '',
+    component: MainLayoutComponent,
+    canActivate: [authGuard],
+    children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent)
+      },
+      {
+        path: 'planner',
+        loadComponent: () =>
+          import('./features/planner/planner.component').then(m => m.PlannerComponent)
+      },
+      {
+        path: 'recipes',
+        loadChildren: () => import('./features/recipes/recipes.routes').then(m => m.RECIPE_ROUTES)
+      },
+      {
+        path: 'shopping',
+        loadComponent: () =>
+          import('./features/shopping/shopping.component').then(m => m.ShoppingComponent)
+      },
+      {
+        path: 'ingredients',
+        loadComponent: () =>
+          import('./features/ingredients/ingredients.component').then(m => m.IngredientsComponent)
+      },
+      {
+        path: 'profile',
+        loadComponent: () =>
+          import('./features/profile/profile.component').then(m => m.ProfileComponent)
+      }
+    ]
+  },
+
+  // Przekierowanie nieznanych ścieżek do dashboardu (jeśli zalogowany) lub auth
   { path: '**', redirectTo: 'dashboard' }
 ];

@@ -1,0 +1,56 @@
+<section class="card meals-card">
+  <h2>Dzisiejsze posiłki</h2>
+
+  @if (dashboardService.todayMeals().length === 0) {
+  <div class="empty-meals">Brak zarejestrowanych posiłków na dziś.</div>
+  } @else {
+  <div class="meal-groups">
+    @for (group of groupedMeals(); track group.type) {
+    <div class="meal-group">
+      <h3 class="group-title">{{ group.type }}</h3>
+
+      <ul class="meals-list">
+        @for (meal of group.meals; track meal.id) {
+        <li
+          class="meal-item clickable"
+          role="button"
+          tabindex="0"
+          (click)="openRecipeModal(meal.recipeId)"
+          (keyup.enter)="openRecipeModal(meal.recipeId)"
+          (keyup.space)="openRecipeModal(meal.recipeId); $event.preventDefault()"
+        >
+          <!-- Zdjęcie posiłku / Emoji fallback -->
+          <div class="meal-img-wrapper">
+            @if (meal.imageUrl) {
+            <img [src]="meal.imageUrl" [alt]="meal.name" (error)="onImageError($event)" />
+            <div class="meal-placeholder" style="display: none">🍽️</div>
+            } @else {
+            <div class="meal-placeholder">🍽️</div>
+            }
+          </div>
+
+          <!-- Nazwa + Pełne Makro -->
+          <div class="meal-info">
+            <span class="meal-name">{{ meal.name }}</span>
+            <span class="meal-macros">
+              {{ meal.calories }} kcal • B: {{ meal.protein }}g • T: {{ meal.fat }}g • W: {{
+              meal.carbs }}g
+            </span>
+          </div>
+        </li>
+        }
+      </ul>
+    </div>
+    }
+  </div>
+  }
+</section>
+
+<!-- Modal szczegółów przepisu z interaktywnymi krokami -->
+@if (selectedRecipeId()) {
+<app-recipe-detail-modal
+  [recipeId]="selectedRecipeId()"
+  [interactiveSteps]="true"
+  (closeModal)="closeRecipeModal()"
+/>
+}

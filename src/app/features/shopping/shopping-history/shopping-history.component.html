@@ -1,0 +1,22 @@
+<h3>Historia list</h3>
+<div class="history-list">
+  @for (list of history; track list.id) {
+  <button
+    type="button"
+    class="history-item"
+    [class.active]="list.id === activeId"
+    (click)="selectList.emit(list)"
+  >
+    <div class="history-dates">
+      <span class="date">{{ list.start_date }}</span>
+      <span class="separator">-</span>
+      <span class="date">{{ list.end_date }}</span>
+    </div>
+    <div class="history-meta">
+      <span class="badge">{{ list.items.length }} prod.</span>
+    </div>
+  </button>
+  } @empty {
+  <div class="no-history">Brak zapisanych list w historii.</div>
+  }
+</div>

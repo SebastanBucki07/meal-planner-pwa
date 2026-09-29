@@ -1,0 +1,36 @@
+<header class="planner-header">
+  <button type="button" class="btn-arrow" (click)="prevWeek.emit()" aria-label="Poprzedni tydzień">
+    ‹
+  </button>
+
+  <div class="header-center">
+    <h2>{{ weekRange() }}</h2>
+    <button type="button" class="btn-today" (click)="todayClicked.emit()">Dzisiaj</button>
+  </div>
+
+  <button type="button" class="btn-arrow" (click)="nextWeek.emit()" aria-label="Następny tydzień">
+    ›
+  </button>
+</header>
+
+<nav class="days-bar">
+  @for (day of weekDays(); track day.dateString) {
+  <div
+    class="day-card"
+    role="button"
+    tabindex="0"
+    [class.selected]="day.isSelected"
+    [class.today]="day.isToday"
+    (click)="daySelected.emit(day.dateString)"
+    (keyup.enter)="daySelected.emit(day.dateString)"
+    (keyup.space)="daySelected.emit(day.dateString); $event.preventDefault()"
+  >
+    @if (day.isToday) {
+    <span class="today-badge">DZIŚ</span>
+    }
+
+    <span class="day-name">{{ day.name }}</span>
+    <span class="day-date">{{ day.dayNumber }}.{{ day.monthNumber }}</span>
+  </div>
+  }
+</nav>

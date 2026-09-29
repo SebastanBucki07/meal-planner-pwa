@@ -1,0 +1,54 @@
+:host {
+  display: block;
+  background: #f8fafc;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 2rem;
+}
+
+.date-picker-container {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+  }
+
+  .date-input-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #475569;
+    }
+
+    input[type='date'] {
+      padding: 0.6rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 0.95rem;
+    }
+  }
+}
+
+.btn-generate {
+  width: 100%;
+  padding: 0.75rem;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #059669;
+  }
+}

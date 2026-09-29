@@ -1,0 +1,66 @@
+<div class="page-layout">
+  <!-- Przełącznik zakładek (mobilny) -->
+  <div class="mobile-tabs">
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="activeTab() === 'list'"
+      (click)="activeTab.set('list')"
+    >
+      Lista Zakupów
+    </button>
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="activeTab() === 'history'"
+      (click)="activeTab.set('history')"
+    >
+      Historia
+    </button>
+  </div>
+
+  <!-- Sidebar z historią -->
+  <aside class="sidebar" [class.mobile-hidden]="activeTab() !== 'history'">
+    <app-shopping-history
+      [history]="shoppingService.historyLists()"
+      [activeId]="$any(shoppingService.activeList()?.id)"
+      (selectList)="selectListFromHistory($event)"
+    ></app-shopping-history>
+  </aside>
+
+  <!-- Główna zawartość -->
+  <main class="main-content" [class.mobile-hidden]="activeTab() !== 'list'">
+    <div class="shopping-list-container">
+      <div class="header">
+        <h1>Lista Zakupów</h1>
+        <p>Generuj listy na podstawie zaplanowanych posiłków</p>
+      </div>
+
+      <!-- Generator nowej listy -->
+      <app-shopping-generator
+        [(startDate)]="startDate"
+        [(endDate)]="endDate"
+        (generate)="generateShoppingList()"
+      ></app-shopping-generator>
+
+      <!-- Stan ładowania i widok listy -->
+      @if (shoppingService.loading()) {
+      <div class="loading-spinner">Ładowanie...</div>
+      } @if (!shoppingService.loading() && shoppingService.activeList(); as activeList) {
+      <app-shopping-list-view
+        [list]="activeList"
+        [categories]="shoppingService.categories()"
+        (itemToggled)="onItemCheck()"
+        (customItemAdded)="addCustomItem($event)"
+      ></app-shopping-list-view>
+      } @else if (!shoppingService.loading()) {
+      <div class="empty-state">
+        <p>
+          Brak aktywnej listy zakupów. Wybierz zakres dat i wygeneruj listę lub wybierz ją z
+          historii.
+        </p>
+      </div>
+      }
+    </div>
+  </main>
+</div>

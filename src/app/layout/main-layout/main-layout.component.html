@@ -1,0 +1,14 @@
+<div class="layout-wrapper">
+  <!-- Dynamiczny Header z nazwą użytkownika -->
+  <app-header [displayName]="userDisplayName" (logout)="handleLogout()"></app-header>
+
+  <!-- Główna treść z router-outlet -->
+  <main class="main-content">
+    <div class="app-container">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+
+  <!-- Footer z dolnym paskiem -->
+  <app-footer></app-footer>
+</div>
