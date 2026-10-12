@@ -25,6 +25,11 @@
           @if (currentRecipe.description) {
           <p class="recipe-description">{{ currentRecipe.description }}</p>
           }
+          <!-- Informacja o domyślnej liczbie porcji -->
+          <span class="recipe-servings-badge">
+            Liczba porcji:
+            <strong>{{ currentRecipe.servings || 1 }}</strong>
+          </span>
         </div>
 
         <!-- Główne podsumowanie makroskładników -->

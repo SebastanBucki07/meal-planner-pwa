@@ -13,6 +13,7 @@ export interface NewRecipeDTO {
   protein: number;
   carbs: number;
   fat: number;
+  servings: number;
   created_at: string;
   new_recipe_ingredients?: NewRecipeIngredientDTO[];
 }
@@ -29,5 +30,6 @@ export interface Recipe {
   protein: number;
   carbs: number;
   fat: number;
+  servings: number;
   ingredients: RecipeIngredient[];
 }

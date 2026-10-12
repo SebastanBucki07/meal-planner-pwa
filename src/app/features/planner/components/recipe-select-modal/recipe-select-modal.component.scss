@@ -3,6 +3,8 @@ $border-color: #e2e8f0;
 $text-muted: #64748b;
 $text-light: #94a3b8;
 $primary-blue: #2563eb;
+$primary-hover: #1d4ed8;
+$success-green: #16a34a;
 
 .modal-backdrop {
   position: fixed;
@@ -21,7 +23,7 @@ $primary-blue: #2563eb;
 .modal-content {
   background: $bg-card;
   width: 90%;
-  max-width: 460px;
+  max-width: 520px; // Zwiększone delikatnie, aby zmieścić kontrolki porcji
   max-height: 85vh;
   border-radius: 20px;
   padding: 1.25rem;
@@ -39,6 +41,7 @@ $primary-blue: #2563eb;
       margin: 0;
       font-size: 1.1rem;
       font-weight: 800;
+      color: #0f172a;
     }
 
     .btn-modal-close {
@@ -47,6 +50,12 @@ $primary-blue: #2563eb;
       font-size: 1.2rem;
       color: $text-muted;
       cursor: pointer;
+      padding: 4px;
+      line-height: 1;
+
+      &:hover {
+        color: #0f172a;
+      }
     }
   }
 
@@ -72,7 +81,7 @@ $primary-blue: #2563eb;
 
     .filter-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(2, 1fr);
       gap: 0.5rem;
     }
   }
@@ -81,27 +90,31 @@ $primary-blue: #2563eb;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.65rem;
+    padding-right: 2px;
 
     .recipe-select-card {
       background: #ffffff;
       border: 1px solid $border-color;
       border-radius: 12px;
-      padding: 0.6rem;
+      padding: 0.65rem;
       display: flex;
-      align-items: center;
-      gap: 0.85rem;
-      cursor: pointer;
+      flex-direction: column; // Układ kolumnowy na mniejszych szerokościach lub hybrydowy
+      gap: 0.65rem;
+      transition:
+        border-color 0.2s,
+        background 0.2s;
 
       &:hover {
         border-color: $primary-blue;
         background: #f8fafc;
       }
 
+      // Górna część karty: obrazek i informacje o przepisie
       .meal-img-wrapper {
-        width: 48px;
-        height: 48px;
-        border-radius: 10px;
+        width: 44px;
+        height: 44px;
+        border-radius: 8px;
         overflow: hidden;
         flex-shrink: 0;
         background: #e2e8f0;
@@ -121,25 +134,101 @@ $primary-blue: #2563eb;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 1.2rem;
+          font-size: 1.1rem;
         }
       }
 
+      // Układ wiersza głównego karty (zdjęcie + tekst)
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      align-items: center;
+      gap: 0.75rem;
+
       .meal-info {
-        flex: 1;
         display: flex;
         flex-direction: column;
+        overflow: hidden;
 
         .meal-title {
           font-weight: 700;
-          font-size: 0.9rem;
+          font-size: 0.88rem;
           color: #0f172a;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
 
         .meal-macros {
-          font-size: 0.78rem;
+          font-size: 0.76rem;
           color: $text-muted;
           margin-top: 2px;
+        }
+      }
+
+      // Dolna/prawa sekcja z kontrolkami porcji i przyciskiem wyboru
+      .card-actions {
+        grid-column: 1 / -1; // Rozciąga się na pełną szerokość pod głównym wierszem
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px dashed $border-color;
+        padding-top: 0.5rem;
+        margin-top: 0.15rem;
+
+        .card-servings-control {
+          display: flex;
+          align-items: center;
+          gap: 0.35rem;
+
+          .servings-text {
+            font-size: 0.78rem;
+            color: $text-muted;
+            font-weight: 500;
+          }
+
+          .btn-srv {
+            background: #f1f5f9;
+            border: 1px solid $border-color;
+            border-radius: 6px;
+            width: 24px;
+            height: 24px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #334155;
+            transition: background 0.15s;
+
+            &:hover {
+              background: #e2e8f0;
+            }
+          }
+
+          .srv-val {
+            font-size: 0.85rem;
+            font-weight: 700;
+            min-width: 18px;
+            text-align: center;
+            color: #0f172a;
+          }
+        }
+
+        .btn-select-recipe {
+          background: $primary-blue;
+          color: #ffffff;
+          border: none;
+          border-radius: 8px;
+          padding: 0.35rem 0.85rem;
+          font-size: 0.8rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: background 0.15s;
+
+          &:hover {
+            background: $primary-hover;
+          }
         }
       }
     }
@@ -148,7 +237,8 @@ $primary-blue: #2563eb;
       text-align: center;
       color: $text-light;
       font-size: 0.85rem;
-      padding: 1rem;
+      padding: 1.5rem;
+      margin: 0;
     }
   }
 }

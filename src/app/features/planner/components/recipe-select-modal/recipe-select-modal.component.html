@@ -65,14 +65,7 @@
     <!-- Lista -->
     <div class="modal-recipes-list">
       @for (recipe of filteredRecipes(); track recipe.id) {
-      <div
-        class="recipe-select-card"
-        role="button"
-        tabindex="0"
-        (click)="recipeSelected.emit(recipe.id)"
-        (keyup.enter)="recipeSelected.emit(recipe.id)"
-        (keyup.space)="recipeSelected.emit(recipe.id); $event.preventDefault()"
-      >
+      <div class="recipe-select-card">
         <div class="meal-img-wrapper">
           @if (recipe.imageUrl) {
           <img [src]="recipe.imageUrl" [alt]="recipe.title" (error)="onImageError($event)" />
@@ -85,9 +78,37 @@
         <div class="meal-info">
           <span class="meal-title">{{ recipe.title }}</span>
           <span class="meal-macros">
-            {{ recipe.calories }} kcal B: {{ recipe.protein }}g W: {{ recipe.carbs }}g T: {{
-            recipe.fat }}g
+            {{ getScaledCalories(recipe) }} kcal | B: {{ getScaledProtein(recipe) }}g | W: {{
+            getScaledCarbs(recipe) }}g | T: {{ getScaledFat(recipe) }}g
           </span>
+        </div>
+
+        <!-- Sekcja sterowania porcjami i przycisk zatwierdzenia -->
+        <div class="card-actions">
+          <div class="card-servings-control">
+            <span class="servings-text">Porcje:</span>
+            <button
+              type="button"
+              class="btn-srv"
+              (click)="updateServings(recipe, -1, $event)"
+              aria-label="Zmniejsz liczbę porcji"
+            >
+              -
+            </button>
+            <span class="srv-val">{{ getServings(recipe) }}</span>
+            <button
+              type="button"
+              class="btn-srv"
+              (click)="updateServings(recipe, 1, $event)"
+              aria-label="Zwiększ liczbę porcji"
+            >
+              +
+            </button>
+          </div>
+
+          <button type="button" class="btn-select-recipe" (click)="selectRecipe(recipe)">
+            Wybierz ➕
+          </button>
         </div>
       </div>
       } @empty {
