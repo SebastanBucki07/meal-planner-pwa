@@ -1,113 +1,139 @@
-import { Component, OnInit, inject, signal, input, output, effect } from '@angular/core';
+import { Component, OnInit, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Recipe } from '../../../core/models';
-import { RecipeService } from '../../../core/services/recipe.service';
+import { FormsModule } from '@angular/forms';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import {environment} from '../../../../environment';
+import {ProductService} from '../../../core/services/product.service';
+import {Product} from '../../../core/models/product.model';
+
 
 @Component({
   selector: 'app-recipe-detail-modal',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './recipe-detail-modal.component.html',
   styleUrls: ['./recipe-detail-modal.component.scss']
 })
 export class RecipeDetailModalComponent implements OnInit {
-  private recipeService = inject(RecipeService);
+  private supabase: SupabaseClient = createClient(environment.SUPABASE_URL, environment.SUPABASE_ANON_KEY);
+  private productService = inject(ProductService);
 
-  readonly recipeId = input<string | null>(null);
-  readonly recipeData = input<Recipe | null>(null);
-  readonly interactiveSteps = input<boolean>(false);
+  // Wejścia: ID przepisu oraz opcjonalnie ID wpisu w planie (mealPlanId), jeśli edytujemy konkretny posiłek w kalendarzu
+  recipeId = input.required<string>();
+  mealPlanId = input<string | null>(null);
+  interactiveSteps = input<boolean>(false);
 
-  readonly closeModal = output<void>();
+  closeModal = output<void>();
 
-  // State
-  recipe = signal<Recipe | null>(null);
-  formattedSteps = signal<string[]>([]);
-  completedSteps = signal<Set<number>>(new Set());
+  // Stan przepisu i składników
+  recipe: any = null;
+  ingredients: any[] = [];
+  loading = signal<boolean>(true);
 
-  constructor() {
-    effect(
-      () => {
-        const directRecipe = this.recipeData();
-        const id = this.recipeId();
-
-        if (directRecipe) {
-          this.setRecipe(directRecipe);
-        } else if (id) {
-          this.loadRecipeById(id);
-        }
-      },
-      { allowSignalWrites: true }
-    );
-  }
+  // Mapy do obsługi konkretnych produktów i nadpisań
+  availableProductsMap = new Map<string, Product[]>(); // klucz: ingredientId -> lista produktów
+  selectedProductsMap = new Map<string, string>();    // klucz: ingredientId -> wybrany productId
 
   async ngOnInit(): Promise<void> {
-    if (this.recipeData()) {
-      this.setRecipe(this.recipeData()!);
-    } else if (this.recipeId()) {
-      await this.loadRecipeById(this.recipeId()!);
-    }
+    await this.loadRecipeDetails();
   }
 
-  private async loadRecipeById(id: string): Promise<void> {
-    const fetched = await this.recipeService.getRecipeById(id);
-    if (fetched) {
-      this.setRecipe(fetched);
-    }
-  }
+  async loadRecipeDetails(): Promise<void> {
+    this.loading.set(true);
 
-  private setRecipe(recipe: Recipe): void {
-    this.recipe.set(recipe);
-    this.prepareSteps(recipe.instructions);
-  }
+    // 1. Pobranie danych przepisu
+    const { data: recipeData, error: recipeError } = await this.supabase
+    .from('new_recipes')
+    .select('*')
+    .eq('id', this.recipeId())
+    .single();
 
-  private prepareSteps(instructions?: string): void {
-    if (!instructions) {
-      this.formattedSteps.set([]);
+    if (recipeError || !recipeData) {
+      console.error('Błąd pobierania przepisu:', recipeError);
+      this.loading.set(false);
       return;
     }
-    const steps = instructions
-      .split('\n')
-      .map(line => line.trim())
-      .filter(line => line.length > 0)
-      .map(line => line.replace(/^Krok\s*\d+:\s*/i, ''));
+    this.recipe = recipeData;
 
-    this.formattedSteps.set(steps);
-  }
+    // 2. Pobranie składników przepisu wraz z powiązanymi generycznymi składnikami
+    const { data: ingData, error: ingError } = await this.supabase
+    .from('new_recipe_ingredients')
+    .select(`
+        id,
+        amount_in_grams,
+        amount,
+        unit,
+        new_ingredients (
+          id,
+          name,
+          calories_per_100g,
+          protein_per_100g,
+          carbs_per_100g,
+          fat_per_100g
+        )
+      `)
+    .eq('recipe_id', this.recipeId());
 
-  toggleStep(index: number): void {
-    if (!this.interactiveSteps()) return;
+    if (!ingError && ingData) {
+      this.ingredients = ingData;
 
-    const current = new Set(this.completedSteps());
-    if (current.has(index)) {
-      current.delete(index);
-    } else {
-      current.add(index);
+      // 3. Jeśli podano mealPlanId, pobieramy zapisane nadpisania produktów dla tego konkretnego posiłku
+      if (this.mealPlanId()) {
+        const overrides = await this.productService.getOverridesForMealPlan(this.mealPlanId()!);
+        overrides.forEach(o => {
+          this.selectedProductsMap.set(o.ingredientId, o.productId);
+        });
+      }
+
+      // 4. Dla każdego składnika pobieramy z bazy listę dostępnych konkretnych produktów markowych
+      for (const item of ingData) {
+        const genIng = (item as any).new_ingredients;
+        if (genIng && genIng.id) {
+          const products = await this.productService.getProductsForIngredient(genIng.id);
+          this.availableProductsMap.set(genIng.id, products);
+        }
+      }
     }
-    this.completedSteps.set(current);
+
+    this.loading.set(false);
   }
 
-  isStepCompleted(index: number): boolean {
-    return this.completedSteps().has(index);
+  getProductsFor(ingredientId: string): Product[] {
+    return this.availableProductsMap.get(ingredientId) || [];
   }
 
-  close(): void {
-    this.closeModal.emit();
+  getParsedSteps(): string[] {
+    if (!this.recipe?.instructions) return [];
+    return this.recipe.instructions
+    .split('\n')
+    .map((step: string) => step.trim())
+    .filter((step: string) => step.length > 0);
   }
 
-  // Gettery pomocnicze do wyświetlania danych z bazy
-  getIngredientName(ing: any): string {
-    return ing.name || ing.ingredientName || 'Składnik';
+  getSelectedProduct(ingredientId: string): string {
+    return this.selectedProductsMap.get(ingredientId) || '';
   }
 
-  getIngredientAmount(ing: any): number {
-    return ing.amount ?? ing.amountInGrams ?? ing.quantity ?? 0;
-  }
+  async onProductChange(ingredientId: string, event: Event): Promise<void> {
+    const selectElement = event.target as HTMLSelectElement;
+    const productId = selectElement.value;
+    const currentMealPlanId = this.mealPlanId();
 
-  getIngredientUnit(ing: any): string {
-    return ing.unit || ing.unitName || 'g';
-  }
+    if (!currentMealPlanId) {
+      console.warn('Brak mealPlanId – wybór produktu działa tylko w kontekście zaplanowanego posiłku w kalendarzu.');
+      return;
+    }
 
-  getIngredientCalories(ing: any): number {
-    return ing.calories ?? 0;
+    if (!productId) {
+      // Usunięcie nadpisania (powrót do domyślnego generycznego składnika)
+      await this.productService.removeProductOverride(currentMealPlanId, ingredientId);
+      this.selectedProductsMap.delete(ingredientId);
+    } else {
+      // Zapis nowego nadpisania
+      const success = await this.productService.saveProductOverride(currentMealPlanId, ingredientId, productId);
+      if (success) {
+        this.selectedProductsMap.set(ingredientId, productId);
+      }
+    }
   }
 }

@@ -41,10 +41,10 @@
 
   <!-- 5. Modal szczegółów przepisu -->
   @if (selectedRecipeId(); as recipeId) {
-  <app-recipe-detail-modal
-    [recipeId]="recipeId"
-    [interactiveSteps]="false"
-    (closeModal)="closeRecipeModal()"
-  ></app-recipe-detail-modal>
+    <app-recipe-detail-modal
+      [recipeId]="recipeId"
+      [mealPlanId]="selectedMealPlanId()"
+      (closeModal)="closeRecipeModal()"
+    ></app-recipe-detail-modal>
   }
 </div>

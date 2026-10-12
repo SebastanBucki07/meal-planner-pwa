@@ -34,6 +34,7 @@ export class PlannerComponent implements OnInit {
   selectedRecipeId = signal<string | null>(null);
   availableRecipes = signal<Recipe[]>([]);
   mealPlans = signal<MealPlan[]>([]);
+  selectedMealPlanId = signal<string | null>(null);
   mealTypes: MealType[] = ['Śniadanie', 'II Śniadanie', 'Obiad', 'Kolacja', 'Przekąska'];
 
   activeModalSlot = signal<MealType | null>(null);
@@ -205,13 +206,26 @@ export class PlannerComponent implements OnInit {
       await this.fetchMealPlansForWeek();
     }
   }
-  openRecipeModal(recipeId?: string | null): void {
+  // openRecipeModal(recipeId?: string | null): void {
+  //   if (recipeId) {
+  //     this.selectedRecipeId.set(recipeId);
+  //   }
+  // }
+
+
+  openRecipeModal(meal: any): void {
+    console.log('Kliknięty posiłek w planerze:', meal); // <-- Sprawdź w konsoli przeglądarki (F12)
+
+    const recipeId = meal.recipe?.id || meal.recipeId;
     if (recipeId) {
       this.selectedRecipeId.set(recipeId);
+      this.selectedMealPlanId.set(meal.id); // Sprawdź, czy tutaj jest unikalne ID z bazy (np. UUID)
     }
   }
 
+// Oraz w metodzie zamykającej modal wyczyść je:
   closeRecipeModal(): void {
     this.selectedRecipeId.set(null);
+    this.selectedMealPlanId.set(null); // <-- Czyszczenie
   }
 }

@@ -15,8 +15,9 @@ export type MealType = 'Śniadanie' | 'II Śniadanie' | 'Obiad' | 'Kolacja' | 'P
 export class TodayMealsComponent {
   public dashboardService = inject(DashboardService);
 
-  // Stan wybranego przepisu do wyświetlenia w modalu
+  // Stany wybranego przepisu oraz ID posiłku z planu
   selectedRecipeId = signal<string | null>(null);
+  selectedMealPlanId = signal<string | null>(null); // <-- DODANE
 
   readonly mealTypes: MealType[] = ['Śniadanie', 'II Śniadanie', 'Obiad', 'Kolacja', 'Przekąska'];
 
@@ -24,21 +25,25 @@ export class TodayMealsComponent {
     const meals = this.dashboardService.todayMeals();
 
     return this.mealTypes
-      .map(type => ({
-        type,
-        meals: meals.filter(m => m.mealType === type)
-      }))
-      .filter(group => group.meals.length > 0);
+    .map(type => ({
+      type,
+      meals: meals.filter(m => m.mealType === type)
+    }))
+    .filter(group => group.meals.length > 0);
   });
 
-  // Przełącz typ parametru na: recipeId?: string | null
-  openRecipeModal(recipeId?: string | null): void {
+  // Przyjmujemy cały obiekt meal, aby wyciągnąć recipeId oraz id planu
+  openRecipeModal(meal: any): void {
+    const recipeId = meal.recipeId || meal.recipe?.id;
     if (recipeId) {
       this.selectedRecipeId.set(recipeId);
+      this.selectedMealPlanId.set(meal.id); // <-- Zapisujemy ID wpisu z new_meal_plans
     }
   }
+
   closeRecipeModal(): void {
     this.selectedRecipeId.set(null);
+    this.selectedMealPlanId.set(null); // <-- Czyszczenie
   }
 
   onImageError(event: Event): void {

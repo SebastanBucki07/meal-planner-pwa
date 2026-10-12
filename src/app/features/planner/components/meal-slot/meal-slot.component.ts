@@ -26,17 +26,7 @@ export class MealSlotComponent {
     }
   }
 
-  onMealClick(meal: MealPlan): void {
-    console.log('Kliknięty posiłek:', meal);
-
-    // Sprawdzamy wszystkie możliwe ścieżki do ID przepisu
-    const recipeId = meal.recipe?.id || meal.recipeId || (meal as any).recipe_id;
-    console.log('Wyciągnięte recipeId:', recipeId);
-
-    if (recipeId) {
-      this.mealClicked.emit(recipeId);
-    } else {
-      console.warn('Ten posiłek nie posiada powiązanego przepisu (np. posiłek własny).');
-    }
+  onMealClick(meal: any): void {
+    this.mealClicked.emit(meal); // <-- Emitujemy cały obiekt posiłku!
   }
 }
