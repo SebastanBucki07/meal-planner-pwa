@@ -6,7 +6,6 @@ export class RecipeMapper {
       (ri: any) => {
         const ingredientInfo = ri.new_ingredients || {};
 
-        // Kluczowa zmiana: ilość to 'ri.amount', a waga do liczenia kalorii to 'ri.amount_in_grams'
         const displayAmount = ri.amount ?? 1;
         const totalGrams = ri.amount_in_grams || displayAmount * 100;
 
@@ -21,7 +20,7 @@ export class RecipeMapper {
         return {
           id: ri.id || '',
           ingredientId: ri.ingredient_id || ingredientInfo.id || '',
-          amountInGrams: displayAmount, // <--- Tutaj trafia "1", a nie "400" czy "100"
+          amountInGrams: displayAmount,
           name: ingredientInfo.name || 'Składnik',
           unit: ri.unit || 'g',
           calories: calculatedCalories,
@@ -46,6 +45,7 @@ export class RecipeMapper {
       protein: Number(dto.protein ?? 0),
       carbs: Number(dto.carbs ?? 0),
       fat: Number(dto.fat ?? 0),
+      servings: dto.servings ?? 1,
       ingredients: mappedIngredients
     };
   }
@@ -64,6 +64,7 @@ export class RecipeMapper {
     protein: number;
     carbs: number;
     fat: number;
+    servings?: number;
   }): Partial<NewRecipeDTO> {
     return {
       title: formValues.title,
@@ -74,7 +75,8 @@ export class RecipeMapper {
       calories: formValues.calories,
       protein: formValues.protein,
       carbs: formValues.carbs,
-      fat: formValues.fat
+      fat: formValues.fat,
+      servings: formValues.servings ?? 1
     };
   }
 }

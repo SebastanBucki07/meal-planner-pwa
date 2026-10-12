@@ -44,6 +44,7 @@ export class RecipeAddComponent implements OnInit {
   description = '';
   imageUrl = '';
   videoUrl = '';
+  servings = 1; // <--- DODANE: Liczba porcji
 
   availableUnits: Unit[] = [];
   availableIngredients: Ingredient[] = [];
@@ -80,15 +81,29 @@ export class RecipeAddComponent implements OnInit {
 
   async fetchIngredients(): Promise<void> {
     const { data, error } = await this.supabase
-      .from('new_ingredients') // Dostosuj nazwę tabeli ze składnikami jeśli jest inna, np. 'new_ingredients'
+      .from('new_ingredients')
       .select('*')
       .order('name', { ascending: true });
 
     if (error) {
-      console.error('Błąd pobierania składników:', error);
+      console.error('Błąd pobierania składników z Supabase:', error);
     } else if (data) {
       this.availableIngredients = data as Ingredient[];
+      console.log('✅ Pobrane składniki z bazy:', this.availableIngredients);
     }
+  }
+
+  onSearchInput(row: RecipeIngredientFormRow): void {
+    const query = (row.searchText || '').toLowerCase().trim();
+    if (!query) {
+      row.filteredIngredients = [];
+      row.showDropdown = false;
+      return;
+    }
+    row.filteredIngredients = this.availableIngredients.filter(ing =>
+      ing.name.toLowerCase().includes(query)
+    );
+    row.showDropdown = true; // <--- Kluczowe, żeby otwierać listę!
   }
 
   // --- Zarządzanie wierszami składników ---
@@ -114,19 +129,6 @@ export class RecipeAddComponent implements OnInit {
     this.ingredientRows.splice(index, 1);
   }
 
-  onSearchInput(row: RecipeIngredientFormRow): void {
-    const query = (row.searchText || '').toLowerCase();
-    if (!query) {
-      row.filteredIngredients = [];
-      row.showDropdown = false;
-      return;
-    }
-    row.filteredIngredients = this.availableIngredients.filter(ing =>
-      ing.name.toLowerCase().includes(query)
-    );
-    row.showDropdown = true;
-  }
-
   onInputFocus(row: RecipeIngredientFormRow): void {
     if (row.searchText) {
       row.showDropdown = true;
@@ -134,7 +136,6 @@ export class RecipeAddComponent implements OnInit {
   }
 
   onInputBlur(row: RecipeIngredientFormRow): void {
-    // Opóźnienie, aby zdarzenie mousedown na elemencie listy zdążyło się wykonać
     setTimeout(() => {
       row.showDropdown = false;
     }, 200);
@@ -172,7 +173,7 @@ export class RecipeAddComponent implements OnInit {
 
     const multiplier = unitObj ? unitObj.multiplierToGrams : 1;
     row.unitMultiplier = multiplier;
-    const totalGrams = row.amount * multiplier;
+    const totalGrams = row.amount * multiplier; // Naprawiono operator mnożenia
 
     const calPer100 = ingredient.calories_per_100g ?? ingredient.caloriesPer100g ?? 0;
     const protPer100 = ingredient.protein_per_100g ?? ingredient.proteinPer100g ?? 0;
@@ -196,7 +197,6 @@ export class RecipeAddComponent implements OnInit {
 
   removeStepRow(index: number): void {
     this.stepRows.splice(index, 1);
-    // Przelumeruj kroki na nowo
     this.stepRows.forEach((step, idx) => {
       step.stepNumber = idx + 1;
     });
@@ -218,6 +218,11 @@ export class RecipeAddComponent implements OnInit {
 
   get totalFat(): number {
     return Number(this.ingredientRows.reduce((sum, row) => sum + (row.fat || 0), 0).toFixed(1));
+  }
+
+  getPerServing(total: number): number {
+    const s = this.servings && this.servings > 0 ? this.servings : 1;
+    return Math.round((total / s) * 10) / 10;
   }
 
   // --- Zapis do bazy ---
@@ -242,7 +247,8 @@ export class RecipeAddComponent implements OnInit {
       calories: this.totalCalories,
       protein: this.totalProtein,
       carbs: this.totalCarbs,
-      fat: this.totalFat
+      fat: this.totalFat,
+      servings: this.servings // <--- PRZEKAZUJEMY PORCJE DO MAPPERA
     });
 
     // 1. Zapisz główny przepis i pobierz jego nowe ID
@@ -270,8 +276,8 @@ export class RecipeAddComponent implements OnInit {
         return {
           recipe_id: recipeId,
           ingredient_id: row.ingredientId,
-          amount: row.amount, // <--- Czysta liczba z formularza (np. 1)
-          amount_in_grams: row.amount * multiplier, // <--- Waga w gramach (np. 150)
+          amount: row.amount,
+          amount_in_grams: row.amount * multiplier, // Naprawiono operator mnożenia
           unit: row.unit || 'g'
         };
       });

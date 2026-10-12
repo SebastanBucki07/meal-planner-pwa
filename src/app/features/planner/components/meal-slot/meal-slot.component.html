@@ -34,8 +34,11 @@
       <div class="meal-info">
         <span class="meal-title">{{ meal.recipe ? meal.recipe.title : meal.customName }}</span>
         <span class="meal-macros">
-          {{ meal.calories }} kcal • B: {{ meal.protein }}g • T: {{ meal.fat }}g • W: {{ meal.carbs
-          }}g
+          <!-- DODANE: Wyświetlanie liczby porcji, jeśli jest większa od 0 -->
+          @if (meal.servings && meal.servings > 0) {
+          <span class="meal-servings">Porcje: {{ meal.servings }} •</span>
+          } {{ meal.calories }} kcal • B: {{ meal.protein }}g • T: {{ meal.fat }}g • W: {{
+          meal.carbs }}g
         </span>
       </div>
 

@@ -6,15 +6,28 @@
         <h2>Nowy Przepis 🍳</h2>
       </div>
 
-      <div class="form-group">
-        <label for="recipeTitle">Nazwa przepisu</label>
-        <input
-          id="recipeTitle"
-          type="text"
-          [(ngModel)]="title"
-          placeholder="np. Kurczak w sosie słodko-kwaśnym"
-          class="form-control"
-        />
+      <div class="form-row" style="display: flex; gap: 1rem">
+        <div class="form-group" style="flex: 2">
+          <label for="recipeTitle">Nazwa przepisu</label>
+          <input
+            id="recipeTitle"
+            type="text"
+            [(ngModel)]="title"
+            placeholder="np. Kurczak w sosie słodko-kwaśnym"
+            class="form-control"
+          />
+        </div>
+
+        <div class="form-group" style="flex: 1">
+          <label for="recipeServings">Liczba porcji</label>
+          <input
+            id="recipeServings"
+            type="number"
+            [(ngModel)]="servings"
+            min="1"
+            class="form-control"
+          />
+        </div>
       </div>
 
       <div class="form-group">
@@ -170,22 +183,28 @@
         <h2>{{ title || 'Nazwa Twojego przepisu' }}</h2>
 
         <!-- Sumaryczny pasek kalorii i makro -->
-        <div class="macro-summary">
-          <div class="macro-box kcal">
-            <span class="val">{{ totalCalories }}</span>
-            <span class="lbl">kcal</span>
+        <div class="macro-summary-container">
+          <div style="font-size: 0.85rem; color: #666; margin-bottom: 4px; text-align: center">
+            Całość ({{ servings || 1 }} porcje) /
+            <span style="font-weight: bold; color: #333">Na 1 porcję:</span>
           </div>
-          <div class="macro-box protein">
-            <span class="val">{{ totalProtein }}g</span>
-            <span class="lbl">Białko</span>
-          </div>
-          <div class="macro-box carbs">
-            <span class="val">{{ totalCarbs }}g</span>
-            <span class="lbl">Węgle</span>
-          </div>
-          <div class="macro-box fat">
-            <span class="val">{{ totalFat }}g</span>
-            <span class="lbl">Tłuszcze</span>
+          <div class="macro-summary">
+            <div class="macro-box kcal">
+              <span class="val">{{ getPerServing(totalCalories) }}</span>
+              <span class="lbl">kcal / porcja</span>
+            </div>
+            <div class="macro-box protein">
+              <span class="val">{{ getPerServing(totalProtein) }}g</span>
+              <span class="lbl">Białko</span>
+            </div>
+            <div class="macro-box carbs">
+              <span class="val">{{ getPerServing(totalCarbs) }}g</span>
+              <span class="lbl">Węgle</span>
+            </div>
+            <div class="macro-box fat">
+              <span class="val">{{ getPerServing(totalFat) }}g</span>
+              <span class="lbl">Tłuszcze</span>
+            </div>
           </div>
         </div>
 

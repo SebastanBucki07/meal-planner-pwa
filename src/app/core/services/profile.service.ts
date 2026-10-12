@@ -37,17 +37,18 @@ export class ProfileService {
 
     if (error || !profileData) return null;
 
-    // 2. Pobranie najnowszej wagi z new_weight_logs
+    // 2. Pobranie najnowszej wagi z new_weight_logs (używamy poprawnej kolumny 'date')
     const { data: latestWeightData } = await this.supabase
       .from('new_weight_logs')
       .select('weight')
       .eq('user_id', userId)
-      .order('recorded_at', { ascending: false })
-      .limit(1)
-      .single();
+      .order('date', { ascending: false })
+      .limit(1);
 
-    // Fallback: jeśli nie ma wpisów w new_weight_logs, bierzemy wagę z profilu (profileData.weight)
-    const latestWeight = latestWeightData?.weight ?? profileData.weight ?? undefined;
+    const latestWeight =
+      latestWeightData && latestWeightData.length > 0
+        ? latestWeightData[0].weight
+        : (profileData.weight ?? undefined);
 
     // 3. Mapowanie do modelu domeny
     const domainProfile = ProfileMapper.toDomain(profileData, latestWeight);

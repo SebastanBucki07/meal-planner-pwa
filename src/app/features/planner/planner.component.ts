@@ -166,23 +166,29 @@ export class PlannerComponent implements OnInit {
     };
   }
 
-  async selectRecipeForSlot(recipeId: string): Promise<void> {
+  async selectRecipeForSlot(event: { recipeId: string; servings: number }): Promise<void> {
     const slot = this.activeModalSlot();
     const dateStr = this.selectedDate().toISOString().split('T')[0];
 
-    if (slot && recipeId) {
-      const recipe = this.availableRecipes().find(r => r.id === recipeId);
+    if (slot && event && event.recipeId) {
+      const recipe = this.availableRecipes().find(r => r.id === event.recipeId);
       if (!recipe) return;
+
+      const chosenServings = event.servings;
+      const baseServings = recipe.servings || 1;
+
+      // Proporcjonalne przeliczenie makro i kalorii w zależności od wybranej liczby porcji
+      const ratio = chosenServings / baseServings;
 
       const payload = MealPlanMapper.toInsertDto({
         date: dateStr,
         mealType: slot,
         recipeId: recipe.id,
-        calories: recipe.calories,
-        protein: recipe.protein,
-        carbs: recipe.carbs,
-        fat: recipe.fat,
-        servings: 1
+        calories: Math.round(recipe.calories * ratio),
+        protein: Number((recipe.protein * ratio).toFixed(1)),
+        carbs: Number((recipe.carbs * ratio).toFixed(1)),
+        fat: Number((recipe.fat * ratio).toFixed(1)),
+        servings: chosenServings
       });
 
       const { error } = await this.supabase.from('new_meal_plans').insert([payload]);

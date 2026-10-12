@@ -13,12 +13,10 @@ import { RecipeService } from '../../../core/services/recipe.service';
 export class RecipeDetailModalComponent implements OnInit {
   private recipeService = inject(RecipeService);
 
-  // Inputs (usunięto alias z recipeData)
   readonly recipeId = input<string | null>(null);
   readonly recipeData = input<Recipe | null>(null);
   readonly interactiveSteps = input<boolean>(false);
 
-  // Outputs
   readonly closeModal = output<void>();
 
   // State
@@ -27,7 +25,6 @@ export class RecipeDetailModalComponent implements OnInit {
   completedSteps = signal<Set<number>>(new Set());
 
   constructor() {
-    // Reaguj na zmiany recipeId lub recipeData
     effect(
       () => {
         const directRecipe = this.recipeData();
@@ -97,7 +94,7 @@ export class RecipeDetailModalComponent implements OnInit {
     this.closeModal.emit();
   }
 
-  // Gettery pomocnicze
+  // Gettery pomocnicze do wyświetlania danych z bazy
   getIngredientName(ing: any): string {
     return ing.name || ing.ingredientName || 'Składnik';
   }
