@@ -42,6 +42,11 @@ export const routes: Routes = [
           import('./features/ingredients/ingredients.component').then(m => m.IngredientsComponent)
       },
       {
+        path: 'products',
+        loadComponent: () =>
+          import('./features/products/products.component').then(m => m.ProductsComponent)
+      },
+      {
         path: 'profile',
         loadComponent: () =>
           import('./features/profile/profile.component').then(m => m.ProfileComponent)
@@ -49,6 +54,6 @@ export const routes: Routes = [
     ]
   },
 
-  // Przekierowanie nieznanych ścieżek do dashboardu (jeśli zalogowany) lub auth
+  // Przekierowanie nieznanych ścieżek do dashboardu
   { path: '**', redirectTo: 'dashboard' }
 ];
