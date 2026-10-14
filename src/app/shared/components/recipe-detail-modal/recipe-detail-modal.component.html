@@ -10,40 +10,60 @@
       </header>
 
       <div class="modal-body">
-        @if (recipe.imageUrl) {
-          <img [src]="recipe.imageUrl" [alt]="recipe.title" class="recipe-image" />
+        <!-- Zdjęcie przepisu -->
+        @if (recipe.imageUrl || recipe.image_url) {
+          <img [src]="recipe.imageUrl || recipe.image_url" [alt]="recipe.title" class="recipe-image" />
         }
 
         <p class="recipe-desc">{{ recipe.description }}</p>
 
-        <!-- Sekcja Makroskładników bazowych -->
-        <div class="macro-badge-container">
-          <span class="badge">🔥 {{ recipe.calories }} kcal</span>
-          <span class="badge">B: {{ recipe.protein }}g</span>
-          <span class="badge">W: {{ recipe.carbs }}g</span>
-          <span class="badge">T: {{ recipe.fat }}g</span>
+        <!-- Sekcja Porcji (Servings) -->
+        <div class="servings-control">
+          <span>Porcje:</span>
+          <button type="button" class="btn-serving" (click)="updateServings(currentServings() - 1)">-</button>
+          <span class="servings-value">{{ currentServings() }}</span>
+          <button type="button" class="btn-serving" (click)="updateServings(currentServings() + 1)">+</button>
         </div>
 
-        <!-- Sekcja Składników z wyborem konkretnych produktów -->
+        <!-- Sekcja Makroskładników bazowych -->
+        <div class="macro-badge-container">
+          <span class="badge">🔥 {{ calculatedCalories() }} kcal</span>
+          <span class="badge">B: {{ calculatedProtein() }}g</span>
+          <span class="badge">W: {{ calculatedCarbs() }}g</span>
+          <span class="badge">T: {{ calculatedFat() }}g</span>
+        </div>
+
+        <!-- Sekcja Składników z wyborem wariantów i pełnymi makro -->
         <div class="ingredients-section">
           <h3>Składniki</h3>
           <ul class="ingredients-list">
             @for (item of ingredients; track item.id) {
               @let genIng = item.new_ingredients;
+              @let macros = getIngredientMacros(item);
               <li class="ingredient-item">
                 <div class="ingredient-main-info">
                   <span class="ing-name">{{ genIng?.name || 'Składnik' }}</span>
-                  <span class="ing-amount">{{ item.amount_in_grams }} g</span>
+                  <div class="ing-right">
+                    <span class="ing-amount">{{ item.amount_in_grams * currentServings() }} g</span>
+                  </div>
                 </div>
 
-                <!-- Select widoczny, gdy otwieramy przepis z poziomu zaplanowanego posiłku (mealPlanId jest obecny) -->
+                <!-- Pełne makroskładniki składnika -->
+                <div class="ing-macros-mini">
+                  <span class="macro-pill">🔥 {{ macros.calories }} kcal</span>
+                  <span class="macro-pill">B: {{ macros.protein }}g</span>
+                  <span class="macro-pill">W: {{ macros.carbs }}g</span>
+                  <span class="macro-pill">T: {{ macros.fat }}g</span>
+                </div>
+
+                <!-- Select wariantu/marki -->
                 @if (mealPlanId()) {
                   <div class="product-override-group">
                     <label [for]="'prod-' + genIng?.id" class="sub-label">Wariant / Marka:</label>
                     <select
                       [id]="'prod-' + genIng?.id"
-                      [value]="getSelectedProduct(genIng?.id)"
-                      (change)="onProductChange(genIng?.id, $event)"
+                      [ngModel]="getSelectedProduct(genIng?.id)"
+                      (ngModelChange)="onProductChangeModel(genIng?.id, $event)"
                     >
                       <option value="">(Domyślny / generyczny)</option>
                       @for (prod of getProductsFor(genIng?.id); track prod.id) {
@@ -59,6 +79,7 @@
           </ul>
         </div>
 
+        <!-- Przygotowanie z checkboxami -->
         @if (recipe.instructions) {
           <div class="instructions-section">
             <h3>Przygotowanie</h3>
@@ -79,6 +100,7 @@
             }
           </div>
         }
+
       </div>
     }
 

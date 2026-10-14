@@ -81,6 +81,51 @@
   }
 }
 
+/* Sekcja porcji */
+.servings-control {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: #f8fafc;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  width: fit-content;
+
+  span {
+    font-size: 0.9rem;
+    color: #475569;
+    font-weight: 500;
+  }
+
+  .servings-value {
+    font-weight: 600;
+    color: #1e293b;
+    min-width: 1.2rem;
+    text-align: center;
+  }
+
+  .btn-serving {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #334155;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+
+    &:hover {
+      background-color: #f1f5f9;
+      border-color: #94a3b8;
+    }
+  }
+}
+
 .macro-badge-container {
   display: flex;
   gap: 0.5rem;
@@ -114,7 +159,7 @@
     .ingredient-item {
       display: flex;
       flex-direction: column;
-      gap: 0.5Key;
+      gap: 0.5rem;
       padding: 0.75rem;
       background: #f8fafc;
       border-radius: 8px;
@@ -130,9 +175,20 @@
           color: #1e293b;
         }
 
-        .ing-amount {
-          color: #64748b;
-          font-size: 0.9rem;
+        .ing-right {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+
+          .ing-amount {
+            color: #64748b;
+            font-size: 0.9rem;
+          }
+
+          .ing-macros-mini {
+            color: #94a3b8;
+            font-size: 0.8rem;
+          }
         }
       }
 
@@ -184,7 +240,6 @@
     white-space: pre-line;
   }
 
-  /* Nowoczesne, czyste kroki z niestandardowym checkboxem */
   .interactive-steps-list {
     list-style: none;
     padding: 0;
@@ -207,7 +262,6 @@
         cursor: pointer;
         user-select: none;
 
-        /* Ukrywamy domyślny, brzydki input systemowy */
         .step-checkbox {
           appearance: none;
           -webkit-appearance: none;
@@ -222,7 +276,6 @@
           position: relative;
           transition: all 0.2s ease;
 
-          /* Własny spersonalizowany ptaszek (checkmark) rysowany w CSS */
           &::after {
             content: '';
             position: absolute;
@@ -236,7 +289,6 @@
             transition: transform 0.15s ease-in-out;
           }
 
-          /* Stan po zaznaczeniu */
           &:checked {
             background-color: #3b82f6;
             border-color: #3b82f6;
@@ -244,11 +296,6 @@
             &::after {
               transform: rotate(45deg) scale(1);
             }
-          }
-
-          &:focus-visible {
-            outline: 2px solid rgba(59, 130, 246, 0.4);
-            outline-offset: 1px;
           }
         }
 
@@ -260,7 +307,6 @@
         }
       }
 
-      /* Delikatny efekt po zaznaczeniu całego kroku */
       &:has(.step-checkbox:checked) {
         background-color: #f0fdf4;
         border-color: #bbf7d0;
@@ -272,5 +318,21 @@
         }
       }
     }
+  }
+}
+
+.ing-macros-mini {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.25rem;
+
+  .macro-pill {
+    background-color: #e2e8f0;
+    color: #334155;
+    font-size: 0.75rem;
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    font-weight: 500;
   }
 }

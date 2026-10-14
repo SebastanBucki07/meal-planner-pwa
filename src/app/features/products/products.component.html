@@ -1,0 +1,120 @@
+<div class="products-container">
+  <header class="header-section">
+    <h2>Zarządzanie Produktami i Markami</h2>
+    <button class="btn-primary" (click)="openAddModal()">+ Dodaj produkt</button>
+  </header>
+
+  <!-- Pasek wyszukiwania -->
+  <div class="search-bar">
+    <input
+      type="text"
+      [(ngModel)]="searchTerm"
+      (ngModelChange)="onSearchChange()"
+      placeholder="Szukaj produktu lub marki..."
+    />
+  </div>
+
+  <!-- Lista produktów -->
+  <div class="products-list">
+    @if (productService.loading()) {
+      <div class="loading">Ładowanie produktów...</div>
+    } @else {
+      <table class="products-table">
+        <thead>
+        <tr>
+          <th>Nazwa produktu</th>
+          <th>Marka</th>
+          <th>Kalorie (100g)</th>
+          <th>Białko</th>
+          <th>Węglowodany</th>
+          <th>Tłuszcz</th>
+          <th>Akcje</th>
+        </tr>
+        </thead>
+        <tbody>
+          @for (prod of productService.products(); track prod.id) {
+            <tr>
+              <td><strong>{{ prod.name }}</strong></td>
+              <td><span class="brand-badge">{{ prod.brand || 'Brak' }}</span></td>
+              <td>{{ prod.carbsPer100g }} kcal</td>
+              <td>{{ prod.proteinPer100g }}g</td>
+              <td>{{ prod.carbsPer100g }}g</td>
+              <td>{{ prod.fatPer100g }}g</td>
+              <td>
+                <button class="btn-icon" (click)="openEditModal(prod)">Edytuj</button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="empty-state">Brak produktów w bazie.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+
+  <!-- Modal dodawania / edycji -->
+  @if (isModalOpen()) {
+    <div class="modal-backdrop" (click)="closeModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <header class="modal-header">
+          <h3>{{ editingProductId() ? 'Edytuj produkt' : 'Nowy produkt / wariant' }}</h3>
+          <button type="button" class="btn-close" (click)="closeModal()">✕</button>
+        </header>
+
+        <form (ngSubmit)="onSubmit()" class="product-form">
+          <!-- W sekcji formularza modala -->
+          <div class="form-group">
+            <label>Składnik bazowy</label>
+            <select [(ngModel)]="formData.ingredientId" name="ingredientId" required class="form-control">
+              <option value="" disabled selected>-- Wybierz składnik bazowy --</option>
+              @for (ing of ingredients(); track ing.id) {
+                <option [value]="ing.id">{{ ing.name }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Nazwa produktu</label>
+            <input type="text" [(ngModel)]="formData.name" name="name" required placeholder="np. Skyr Naturalny" />
+          </div>
+
+          <div class="form-group">
+            <label>Marka / Producent</label>
+            <input type="text" [(ngModel)]="formData.brand" name="brand" placeholder="np. Piątnica" />
+          </div>
+
+          <h4>Wartości odżywcze (na 100g)</h4>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Kalorie (kcal)</label>
+              <input type="number" [(ngModel)]="formData.caloriesPer100g" name="calories" required min="0" />
+            </div>
+            <div class="form-group">
+              <label>Białko (g)</label>
+              <input type="number" [(ngModel)]="formData.proteinPer100g" name="protein" required min="0" step="0.1" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Węglowodany (g)</label>
+              <input type="number" [(ngModel)]="formData.carbsPer100g" name="carbs" required min="0" step="0.1" />
+            </div>
+            <div class="form-group">
+              <label>Tłuszcze (g)</label>
+              <input type="number" [(ngModel)]="formData.fatPer100g" name="fat" required min="0" step="0.1" />
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="btn-secondary" (click)="closeModal()">Anuluj</button>
+            <button type="submit" class="btn-primary">Zapisz</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>
