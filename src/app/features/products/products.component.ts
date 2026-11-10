@@ -91,4 +91,17 @@ export class ProductsComponent implements OnInit {
       fatPer100g: 0
     };
   }
+
+  onIngredientChange(selectedIngredientId: string): void {
+    const foundIngredient = this.ingredients().find(ing => ing.id === selectedIngredientId);
+
+    if (foundIngredient && foundIngredient.macrosPer100g) {
+      // Przepisujemy domyślne makro ze składnika bazowego do formularza produktu
+      this.formData.caloriesPer100g = foundIngredient.macrosPer100g.calories ?? 0;
+      this.formData.proteinPer100g = foundIngredient.macrosPer100g.protein ?? 0;
+      this.formData.carbsPer100g = foundIngredient.macrosPer100g.carbs ?? 0;
+      this.formData.fatPer100g = foundIngredient.macrosPer100g.fat ?? 0;
+    }
+  }
+
 }
