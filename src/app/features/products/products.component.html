@@ -36,7 +36,7 @@
             <tr>
               <td><strong>{{ prod.name }}</strong></td>
               <td><span class="brand-badge">{{ prod.brand || 'Brak' }}</span></td>
-              <td>{{ prod.carbsPer100g }} kcal</td>
+              <td>{{ prod.caloriesPer100g }} kcal</td>
               <td>{{ prod.proteinPer100g }}g</td>
               <td>{{ prod.carbsPer100g }}g</td>
               <td>{{ prod.fatPer100g }}g</td>
@@ -67,7 +67,13 @@
           <!-- W sekcji formularza modala -->
           <div class="form-group">
             <label>Składnik bazowy</label>
-            <select [(ngModel)]="formData.ingredientId" name="ingredientId" required class="form-control">
+            <select
+              [(ngModel)]="formData.ingredientId"
+              (ngModelChange)="onIngredientChange($event)"
+              name="ingredientId"
+              required
+              class="form-control"
+            >
               <option value="" disabled selected>-- Wybierz składnik bazowy --</option>
               @for (ing of ingredients(); track ing.id) {
                 <option [value]="ing.id">{{ ing.name }}</option>
